@@ -93,7 +93,7 @@
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                        Products
+                       Create Products
                     </a>
                     
                     <a href="{{ route('owner.create_service') }}" wire:navigate 
@@ -104,8 +104,31 @@
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
+                        Create Services
+                    </a>
+
+                      <a href="{{ route('owner.product_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="products"
+                       @click="sidebarOpen = false">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                       Products
+                    </a>
+                    
+                    <a href="{{ route('owner.service_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="services"
+                       @click="sidebarOpen = false">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
                         Services
                     </a>
+                    
                     
                     <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
                        data-parent="management" 
@@ -158,6 +181,8 @@
                         </svg>
                         Bookings
                     </a>
+
+                    
                     
                     <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
                        data-parent="operations" 
@@ -334,14 +359,44 @@
                         Employees
                     </a>
                     
-                    <a href="{{ route('owner.create_product') }}" wire:navigate class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="management" data-route="products">
+                    <a href="{{ route('owner.create_product') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="products"
+                       @click="sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                        Products
+                       Create Products
                     </a>
                     
-                    <a href="{{ route('owner.create_service') }}" wire:navigate class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="management" data-route="services">
+                    <a href="{{ route('owner.create_service') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="services"
+                       @click="sidebarOpen = false">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        Create Services
+                    </a>
+
+                      <a href="{{ route('owner.product_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="products"
+                       @click="sidebarOpen = false">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                       Products
+                    </a>
+                    
+                    <a href="{{ route('owner.service_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
+                       data-parent="management" 
+                       data-route="services"
+                       @click="sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>

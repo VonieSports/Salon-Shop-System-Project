@@ -31,7 +31,6 @@ Route::prefix('owner')->middleware(['auth', 'owner'])->group(function () {
     Route::livewire('/post/table', 'pages::salon_owner.post-table')->name('owner.post_table');
     Route::livewire('/product/management', 'pages::salon_owner.product-management')->name('owner.product_management');
     Route::livewire('/service/management', 'pages::salon_owner.service-management')->name('owner.service_management');
-    Route::livewire('/item/management', 'pages::salon_owner.item-management')->name('owner.item_management');
     Route::livewire('/create/user', 'pages::salon_owner.create-user')->name('owner.create_user');
     });
 });

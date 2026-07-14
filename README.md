@@ -1,6 +1,6 @@
 # Salon-Shop-System-Project
 
-A multi-tenant web application for managing salon and shop operations built with Laravel and Livewire.
+A multi-tenant web application for managing salon and shop operations built with Laravel and Livewire. https://www.youtube.com/watch?v=8Tv1wNJg2vg&t=1s
 
 ## Features
 
