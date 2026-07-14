@@ -1,34 +1,5 @@
 <div class="min-h-screen bg-gray-50" x-data="{ showCategoryModal: false }" x-on:category-created.window="showCategoryModal = false">
     <div class="mx-auto space-y-6">
-        <div class="flex items-start justify-between flex-wrap gap-4">
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-[#1E7A4A]/10 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
-                    </span>
-                    <h1 class="text-2xl font-bold text-gray-900">Create Product</h1>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <button type="button" wire:click="$set('status', 'draft'); save()" wire:loading.attr="disabled" wire:target="save"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-full hover:bg-gray-50 transition text-sm font-medium">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    Save Draft
-                </button>
-                <a href="{{ route('owner.create_service') }}" 
-                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1E7A4A]/5 text-[#1E7A4A] border border-[#1E7A4A]/20 rounded-full hover:bg-[#1E7A4A]/10 hover:border-[#1E7A4A]/40 transition text-sm font-medium">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                    </svg>
-                    Switch to Service
-                </a>
-            </div>
-        </div>
-
         <!-- Alert Messages -->
         @if (session()->has('message'))
             <div class="bg-green-50 text-green-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('message') }}</div>
@@ -44,11 +15,28 @@
                 <!-- LEFT COLUMN -->
                 <div class="lg:col-span-8 space-y-6">
 
-                    <!-- General Information -->
+                    <!-- General Information with Header Attached -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-100">
-                            <h3 class="text-base font-bold text-gray-900">General Information</h3>
+                        <!-- Header Section -->
+                        <div class="px-6 py-5 border-b border-gray-100 bg-[#1E7A4A]">
+                            <div class="flex items-center justify-between flex-wrap gap-4">
+                                <div class="flex items-center gap-3">
+                                    <!-- Back Button -->
+                                    <a href="{{ route('owner.dashboard') }}" class="p-2 hover:bg-green-100 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 text-neutral-50 hover:text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                        </svg>
+                                    </a>
+                                    <div>
+                                        <h1 class="text-2xl font-bold text-neutral-50">Create Product</h1>
+                                        <p class="text-sm text-neutral-50 mt-0.5">Add a new product to your inventory</p>
+                                    </div>
+                                </div>
+                            
+                            </div>
                         </div>
+                        
+                        <!-- Form Fields -->
                         <div class="p-6 space-y-5">
                             <div>
                                 <label for="name" class="block text-xs font-medium text-gray-500 mb-1.5">Product Name</label>
@@ -201,29 +189,30 @@
                         </div>
                     </div>
 
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-gray-900">Category</h3>
-    </div>
-    <div class="p-6 space-y-3">
-        <div>
-            <label for="category" class="block text-xs font-medium text-gray-500 mb-1.5">Product Category</label>
-            <select id="category" wire:model="product_category_id"
-                    class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
-                <option value="">Select a category</option>
-                @foreach($this->categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
-            @error('product_category_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
-        <button type="button" @click="showCategoryModal = true"
-                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1E7A4A] text-white rounded-xl hover:bg-[#16633c] transition text-sm font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Add Category
-        </button>
-    </div>
-</div>
+                    <!-- Category -->
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-100">
+                            <h3 class="text-base font-bold text-gray-900">Category</h3>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <div>
+                                <label for="category" class="block text-xs font-medium text-gray-500 mb-1.5">Product Category</label>
+                                <select id="category" wire:model="product_category_id"
+                                        class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
+                                    <option value="">Select a category</option>
+                                    @foreach($this->categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('product_category_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                            <button type="button" @click="showCategoryModal = true"
+                                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1E7A4A] text-white rounded-xl hover:bg-[#16633c] transition text-sm font-medium">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                Add Category
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -276,5 +265,6 @@
         </form>
         @include('layouts.partials.inventory-product-list')
         @include('layouts.partials.category-modal')
+
     </div>
 </div>
