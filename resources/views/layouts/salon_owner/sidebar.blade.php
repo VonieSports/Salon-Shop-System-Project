@@ -2,7 +2,7 @@
     $tenant = Auth::user()->tenant;
 @endphp
 
-<aside class="fixed top-0 left-0 bottom-0 w-[320px] bg-white z-50 lg:hidden shadow-xl overflow-y-auto"
+<aside class="fixed top-0 left-0 bottom-0 w-[280px] sm:w-[320px] bg-white z-50 lg:hidden shadow-xl overflow-y-auto"
        x-show="sidebarOpen"
        x-transition:enter="transition-transform duration-300 ease-out"
        x-transition:enter-start="-translate-x-full"
@@ -13,7 +13,7 @@
        x-cloak>
     <div class="flex flex-col h-full">
         <!-- Logo -->
-        <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 shrink-0">
+        <div class="flex items-center gap-3 px-4 py-4 border-b border-gray-100 shrink-0">
             <div class="w-9 h-9 rounded-lg bg-[#1E7A4A] flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-1.5 2-4 3-4 6a4 4 0 008 0c0-3-2.5-4-4-6z"/>
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Business Info -->
-        <div class="px-6 py-5 border-b border-gray-100 shrink-0">
+        <div class="px-4 py-4 border-b border-gray-100 shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden">
                     @if($tenant && $tenant->logo)
@@ -43,13 +43,12 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+        <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-1">
             
             <!-- Dashboard -->
             <a href="{{ route('owner.dashboard') }}" wire:navigate 
-               class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-               data-route="dashboard"
-               @click="sidebarOpen = false">
+               class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+               @click="if(window.innerWidth < 1024) sidebarOpen = false">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
@@ -57,15 +56,11 @@
             </a>
 
             <!-- MANAGEMENT -->
-            @php
-                $managementOpen = request()->routeIs('owner.create_product') || 
-                                  request()->routeIs('owner.create_service') || 
-                                  request()->routeIs('owner.employees') || 
-                                  request()->routeIs('owner.accounts');
-            @endphp
-            <div x-data="{ open: {{ $managementOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('managementOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('managementOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
-                     class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
+                     class="flex items-center justify-between px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Management</span>
                     <svg class="w-4 h-4 transition-transform duration-300 ease-in-out" 
                          :class="open ? 'rotate-180' : ''" 
@@ -75,10 +70,7 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="employees"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -86,54 +78,51 @@
                     </a>
                     
                     <a href="{{ route('owner.create_product') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="products"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                       @click="if(window.innerWidth < 1024) sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                       Create Products
+                        Create Products
                     </a>
                     
                     <a href="{{ route('owner.create_service') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="services"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                       @click="if(window.innerWidth < 1024) sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
                         Create Services
                     </a>
 
-                      <a href="{{ route('owner.product_management') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="products"
-                       @click="sidebarOpen = false">
+                    <a href="{{ route('owner.product_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                       @click="if(window.innerWidth < 1024) sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                       Products
+                        Products
                     </a>
                     
                     <a href="{{ route('owner.service_management') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="services"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                       @click="if(window.innerWidth < 1024) sidebarOpen = false">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                         Services
                     </a>
+
+                    <a href="{{ route('owner.category_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                       @click="if(window.innerWidth < 1024) sidebarOpen = false">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        Categories
+                    </a>
                     
-                    
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="accounts"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
@@ -143,16 +132,11 @@
             </div>
 
             <!-- OPERATIONS -->
-            @php
-                $operationsOpen = request()->routeIs('owner.orders') || 
-                                   request()->routeIs('owner.bookings') || 
-                                   request()->routeIs('owner.reservations') || 
-                                   request()->routeIs('owner.feedback') || 
-                                   request()->routeIs('owner.walkin');
-            @endphp
-            <div x-data="{ open: {{ $operationsOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('operationsOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('operationsOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
-                     class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
+                     class="flex items-center justify-between px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Operations</span>
                     <svg class="w-4 h-4 transition-transform duration-300 ease-in-out" 
                          :class="open ? 'rotate-180' : ''" 
@@ -162,52 +146,35 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="operations" 
-                       data-route="orders"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                         Orders
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="operations" 
-                       data-route="bookings"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         Bookings
                     </a>
-
                     
-                    
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="operations" 
-                       data-route="reservations"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Reservations
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="operations" 
-                       data-route="feedback"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
                         </svg>
                         Customer Feedback
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="operations" 
-                       data-route="walkin"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                         </svg>
@@ -217,14 +184,11 @@
             </div>
 
             <!-- BUSINESS -->
-            @php
-                $businessOpen = request()->routeIs('owner.analytics') || 
-                                 request()->routeIs('owner.inventory') || 
-                                 request()->routeIs('owner.shop');
-            @endphp
-            <div x-data="{ open: {{ $businessOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('businessOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('businessOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
-                     class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
+                     class="flex items-center justify-between px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Business</span>
                     <svg class="w-4 h-4 transition-transform duration-300 ease-in-out" 
                          :class="open ? 'rotate-180' : ''" 
@@ -234,30 +198,21 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="business" 
-                       data-route="analytics"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                         Performance Analytics
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="business" 
-                       data-route="inventory"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
                         Inventory
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="business" 
-                       data-route="shop"
-                       @click.prevent="sidebarOpen = false">
+                    <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
@@ -268,11 +223,10 @@
         </nav>
 
         <!-- Settings & Logout -->
-        <div class="border-t border-gray-100 px-4 py-4 space-y-1 shrink-0">
-            <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900" 
-               data-route="settings"
-               @click.prevent="sidebarOpen = false">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="border-t border-gray-100 px-3 py-3 space-y-1 shrink-0">
+            <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+               @click="if(window.innerWidth < 1024) sidebarOpen = false">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
@@ -281,9 +235,9 @@
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200 ease-in-out"
-                        @click="sidebarOpen = false">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-all duration-200 ease-in-out"
+                        @click="if(window.innerWidth < 1024) sidebarOpen = false">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
                     Logout
@@ -293,7 +247,7 @@
     </div>
 </aside>
 
-{{-- Desktop Sidebar --}}
+<!-- Desktop Sidebar -->
 <aside class="hidden lg:flex lg:w-[270px] lg:shrink-0 lg:h-full lg:overflow-y-auto lg:border-r lg:border-gray-100 lg:bg-white">
     <div class="flex flex-col h-full w-full overflow-y-auto">
         <!-- Logo -->
@@ -326,13 +280,12 @@
             </div>
         </div>
 
-        <!-- Navigation (Desktop) - Same as mobile but without @click close handlers -->
+        <!-- Navigation (Desktop) -->
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             
             <!-- Dashboard -->
             <a href="{{ route('owner.dashboard') }}" wire:navigate 
-               class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-               data-route="dashboard">
+               class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
@@ -340,7 +293,9 @@
             </a>
 
             <!-- MANAGEMENT (Desktop) -->
-            <div x-data="{ open: {{ $managementOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('managementOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('managementOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
                      class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Management</span>
@@ -352,7 +307,7 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="management" data-route="employees">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -360,50 +315,46 @@
                     </a>
                     
                     <a href="{{ route('owner.create_product') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="products"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                       Create Products
+                        Create Products
                     </a>
                     
                     <a href="{{ route('owner.create_service') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="services"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
                         Create Services
                     </a>
 
-                      <a href="{{ route('owner.product_management') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="products"
-                       @click="sidebarOpen = false">
+                    <a href="{{ route('owner.product_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
-                       Products
+                        Products
                     </a>
                     
                     <a href="{{ route('owner.service_management') }}" wire:navigate 
-                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" 
-                       data-parent="management" 
-                       data-route="services"
-                       @click="sidebarOpen = false">
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                         Services
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="management" data-route="accounts">
+                    <a href="{{ route('owner.category_management') }}" wire:navigate 
+                       class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        Categories
+                    </a>
+
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
@@ -413,7 +364,9 @@
             </div>
 
             <!-- OPERATIONS (Desktop) -->
-            <div x-data="{ open: {{ $operationsOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('operationsOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('operationsOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
                      class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Operations</span>
@@ -425,35 +378,35 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="operations" data-route="orders">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                         Orders
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="operations" data-route="bookings">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         Bookings
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="operations" data-route="reservations">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Reservations
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="operations" data-route="feedback">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
                         </svg>
                         Customer Feedback
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="operations" data-route="walkin">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                         </svg>
@@ -463,7 +416,9 @@
             </div>
 
             <!-- BUSINESS (Desktop) -->
-            <div x-data="{ open: {{ $businessOpen ? 'true' : 'false' }} }" class="pt-2 border-t border-gray-100">
+            <div x-data="{ open: localStorage.getItem('businessOpen') === 'true' }" 
+                 x-init="$watch('open', val => localStorage.setItem('businessOpen', val))"
+                 class="pt-2 border-t border-gray-100">
                 <div @click="open = !open" 
                      class="flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider cursor-pointer select-none transition-colors duration-200 text-gray-400 hover:text-gray-600">
                     <span>Business</span>
@@ -475,21 +430,21 @@
                 </div>
 
                 <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="business" data-route="analytics">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                         Performance Analytics
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="business" data-route="inventory">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
                         Inventory
                     </a>
                     
-                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900" data-parent="business" data-route="shop">
+                    <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
@@ -501,7 +456,7 @@
 
         <!-- Settings & Logout (Desktop) -->
         <div class="border-t border-gray-100 px-4 py-4 space-y-1 shrink-0">
-            <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900" data-route="settings">
+            <a href="#" class="sidebar-item flex items-center gap-3.5 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -518,59 +473,6 @@
                     Logout
                 </button>
             </form>
-        </div>
+            </div>
     </div>
 </aside>
-
-<script>
-    // Update active states dynamically
-    document.addEventListener('DOMContentLoaded', function() {
-        updateActiveStates();
-    });
-
-    document.addEventListener('livewire:navigated', function() {
-        updateActiveStates();
-    });
-
-    function updateActiveStates() {
-        const currentPath = window.location.pathname;
-        const currentUrl = window.location.href;
-        
-        // Remove all active states
-        document.querySelectorAll('.sidebar-item').forEach(el => {
-            el.classList.remove('bg-[#1E7A4A]', 'text-white');
-            el.classList.add('text-gray-600', 'hover:bg-gray-50', 'hover:text-gray-900');
-        });
-
-        // Find matching item
-        let foundItem = null;
-
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            const href = item.getAttribute('href');
-            const route = item.getAttribute('data-route');
-            
-            // Check href match
-            if (href && href !== '#' && currentUrl.includes(href)) {
-                foundItem = item;
-            }
-            
-            // Check data-route match
-            if (!foundItem && route && currentPath.includes(route)) {
-                foundItem = item;
-            }
-        });
-
-        // Check dashboard
-        if (!foundItem && (currentPath === '/' || currentPath === '/owner/dashboard')) {
-            document.querySelectorAll('.sidebar-item[data-route="dashboard"]').forEach(item => {
-                foundItem = item;
-            });
-        }
-
-        // Activate found item
-        if (foundItem) {
-            foundItem.classList.remove('text-gray-600', 'hover:bg-gray-50', 'hover:text-gray-900');
-            foundItem.classList.add('bg-[#1E7A4A]', 'text-white');
-        }
-    }
-</script>

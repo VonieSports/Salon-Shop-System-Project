@@ -34,8 +34,7 @@ class Post extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relationships
-    public function tenant(): BelongsTo
+     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
@@ -55,12 +54,6 @@ class Post extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
-    public function inventory(): MorphTo
-    {
-        return $this->morphTo();
-    }
-
-    // Scopes
     public function scopeProduct($query)
     {
         return $query->where('type', 'product');

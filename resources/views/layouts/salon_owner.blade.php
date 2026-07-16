@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full overflow-hidden">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full overflow-hidden scroll-smooth">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +20,7 @@
         @livewireStyles
         
     </head>
-    <body class="bg-gray-50 font-sans antialiased h-full overflow-hidden" x-data="{ sidebarOpen: false }">
+    <body class="bg-gray-50 font-sans antialiased h-full overflow-hidden scroll-smooth" x-data="{ sidebarOpen: false }">
         <div class="flex h-screen overflow-hidden">
             <!-- Overlay -->
             <div class="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -33,7 +33,6 @@
                  x-transition:leave-end="opacity-0"
                  @click="sidebarOpen = false">
             </div>
-
             @include('layouts.salon_owner.sidebar')
 
             <div class="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">

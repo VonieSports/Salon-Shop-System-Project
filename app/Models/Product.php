@@ -47,10 +47,15 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function variants(): HasMany
+{
+    return $this->hasMany(ItemVariant::class);
+}
+
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'inventory_id')
-            ->where('inventory_type', 'Product');
+            ->where('inventory_type', 'App\\Models\\Product');
     }
 
     public function scopeAvailable($query)

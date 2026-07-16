@@ -50,7 +50,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'service_category_id' => 'required|exists:service_categories,id',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:1',
             'duration_minutes' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
@@ -74,27 +74,14 @@ new #[Layout('layouts.salon_owner')] class extends Component
         ];
     }
 
-    #[Computed]
-    public function categories()
-    {
-        return ServiceCategory::where('tenant_id', $this->tenantId)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-    }
-
-    #[Computed]
-    public function inventoryServices()
-    {
-        return Post::with('serviceCategory:id,name')
-            ->select('id', 'service_category_id', 'name', 'image', 'price', 'status')
-            ->where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'service')
-            ->latest()
-            ->limit(20)
-            ->get();
-    }
+   #[Computed]
+public function categories()
+{
+    return ServiceCategory::where('tenant_id', Auth::user()->tenant->id)
+        ->select('id', 'name')
+        ->orderBy('name')
+        ->get();
+}
 
     public function createCategory(): void
     {
@@ -126,7 +113,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
         try {
             DB::transaction(function () {
                 $imagePath = $this->image?->store('services', 'public');
-
                 $service = Service::create([
                     'tenant_id' => $this->tenantId,
                     'service_category_id' => $this->service_category_id,
@@ -138,16 +124,19 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'is_active' => $this->status === 'published',
                 ]);
 
-                if ($this->hasVariants) {
+                if ($this->hasVariants && !empty($this->variants)) {
                     $valueImagePaths = $this->storeVariantValueImages('service-variants');
 
                     foreach ($this->variants as $i => $variant) {
+                        $sku = 'SRV-' . strtoupper(Str::random(8)) . '-' . ($i + 1);
+                        
                         ItemVariant::create([
                             'tenant_id' => $this->tenantId,
                             'service_id' => $service->id,
+                            'product_id' => null,
                             'attributes' => $variant['attributes'],
-                            'sku' => 'SRV-' . strtoupper(Str::random(8)) . '-' . ($i + 1),
-                            'stock' => null,
+                            'sku' => $sku,
+                            'stock' => null, // Services don't have stock
                             'price_adjustment' => $variant['price_adjustment'] ?? 0,
                             'duration_adjustment' => $variant['duration_adjustment'] ?? 0,
                             'image' => $this->variantImagePathFor($variant['attributes'], $valueImagePaths),
@@ -160,6 +149,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'tenant_id' => $this->tenantId,
                     'created_by' => Auth::id(),
                     'service_category_id' => $this->service_category_id,
+                    'product_category_id' => null,
                     'type' => 'service',
                     'inventory_type' => Service::class,
                     'inventory_id' => $service->id,
@@ -176,39 +166,19 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
             $this->reset(['name', 'service_category_id', 'price', 'duration_minutes', 'description', 'image', 'status', 'hasVariants']);
             $this->resetVariantBuilder();
-            unset($this->inventoryServices);
+
         } catch (\Exception $e) {
-            Log::error('Error saving service', ['error' => $e->getMessage(), 'tenant_id' => $this->tenantId]);
-            session()->flash('error', 'Failed to save service. Please try again.');
+            Log::error('Error saving service', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'tenant_id' => $this->tenantId
+            ]);
+            session()->flash('error', 'Failed to save service. Error: ' . $e->getMessage());
         }
     }
 
     public function editService(int $postId)
     {
         return redirect()->route('owner.update_service', $postId);
-    }
-
-    public function deleteService(int $postId): void
-    {
-        $post = Post::where('id', $postId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'service')
-            ->first();
-
-        if (!$post) {
-            session()->flash('error', 'Service not found.');
-            return;
-        }
-
-        DB::transaction(function () use ($post) {
-            if ($post->inventory_type === Service::class) {
-                ItemVariant::where('service_id', $post->inventory_id)->delete();
-                Service::where('id', $post->inventory_id)->delete();
-            }
-            $post->delete();
-        });
-
-        unset($this->inventoryServices);
-        session()->flash('message', 'Service deleted successfully.');
     }
 };

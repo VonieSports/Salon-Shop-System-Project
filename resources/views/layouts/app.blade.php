@@ -23,7 +23,7 @@
     @livewireScripts
 
     @include('layouts.public.footer')
-
+ <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script src="./node_modules/preline/dist/preline.js"></script>
 </body>
 </html>

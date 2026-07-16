@@ -21,6 +21,13 @@ new #[Layout('layouts.salon_owner')] class extends Component
     #[Url(as: 'q')]
     public string $search = '';
 
+    public string $dateFilter = 'all';
+    public ?string $customDateFrom = null;
+    public ?string $customDateTo = null;
+
+    public array $selectedIds = [];
+    public bool $selectAll = false;
+
     public ?int $selectedPostId = null;
 
     public function mount(): void
@@ -35,6 +42,25 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function updatingSearch(): void
     {
         $this->resetPage();
+        $this->clearSelection();
+    }
+
+    public function updatingDateFilter(): void
+    {
+        $this->resetPage();
+        $this->clearSelection();
+    }
+
+    public function updatingCustomDateFrom(): void
+    {
+        $this->resetPage();
+        $this->clearSelection();
+    }
+
+    public function updatingCustomDateTo(): void
+    {
+        $this->resetPage();
+        $this->clearSelection();
     }
 
     #[Computed]
@@ -46,6 +72,11 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->where('created_by', Auth::id())
             ->where('type', 'service')
             ->when($this->search !== '', fn ($q) => $q->where('name', 'like', '%' . $this->search . '%'))
+            ->when($this->dateFilter === 'today', fn ($q) => $q->whereDate('created_at', today()))
+            ->when($this->dateFilter === 'week', fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
+            ->when($this->dateFilter === 'month', fn ($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year))
+            ->when($this->dateFilter === 'custom' && $this->customDateFrom, fn ($q) => $q->whereDate('created_at', '>=', $this->customDateFrom))
+            ->when($this->dateFilter === 'custom' && $this->customDateTo, fn ($q) => $q->whereDate('created_at', '<=', $this->customDateTo))
             ->latest()
             ->paginate(12);
     }
@@ -136,12 +167,60 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $newStatus = $post->status === 'published' ? 'draft' : 'published';
         $post->update(['status' => $newStatus]);
 
-        // Mirrors your create-service.php save() logic, which sets
-        // is_active based on status at creation time.
         Service::where('id', $post->inventory_id)->update(['is_active' => $newStatus === 'published']);
 
         unset($this->items);
         unset($this->selectedPost);
+    }
+
+    public function toggleSelectAll(): void
+    {
+        $this->selectedIds = $this->selectAll
+            ? $this->items->getCollection()->pluck('id')->map(fn ($id) => (string) $id)->toArray()
+            : [];
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        $pageIds = $this->items->getCollection()->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->selectAll = count($pageIds) > 0 && empty(array_diff($pageIds, $this->selectedIds));
+    }
+
+    public function clearSelection(): void
+    {
+        $this->selectedIds = [];
+        $this->selectAll = false;
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedIds)) {
+            return;
+        }
+
+        $posts = Post::where('tenant_id', $this->tenantId)
+            ->where('created_by', Auth::id())
+            ->where('type', 'service')
+            ->whereIn('id', $this->selectedIds)
+            ->get();
+
+        try {
+            DB::transaction(function () use ($posts) {
+                foreach ($posts as $post) {
+                    ItemVariant::where('service_id', $post->inventory_id)->delete();
+                    Service::where('id', $post->inventory_id)->delete();
+                    $post->delete();
+                }
+            });
+
+            $count = $posts->count();
+            $this->clearSelection();
+            unset($this->items);
+            session()->flash('message', "{$count} service(s) deleted successfully.");
+        } catch (\Exception $e) {
+            Log::error('Error bulk deleting services', ['error' => $e->getMessage()]);
+            session()->flash('error', 'Failed to delete selected services. Please try again.');
+        }
     }
 
     public function deleteItem(int $postId): void
@@ -167,6 +246,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
             if ($this->selectedPostId === $postId) {
                 $this->selectedPostId = null;
             }
+
+            $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $postId]));
 
             unset($this->items);
             session()->flash('message', 'Service deleted successfully.');

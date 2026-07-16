@@ -80,27 +80,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
         ];
     }
 
-    #[Computed]
-    public function categories()
-    {
-        return ProductCategory::where('tenant_id', $this->tenantId)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-    }
+   #[Computed]
+public function categories()
+{
+    return ProductCategory::where('tenant_id', Auth::user()->tenant->id)
+        ->select('id', 'name')
+        ->orderBy('name')
+        ->get();
+}
 
-    #[Computed]
-    public function inventoryProducts()
-    {
-        return Post::with('productCategory:id,name')
-            ->select('id', 'product_category_id', 'name', 'image', 'price', 'status')
-            ->where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->latest()
-            ->limit(20)
-            ->get();
-    }
 
     public function createCategory(): void
     {
@@ -169,8 +157,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'created_by' => Auth::id(),
                     'product_category_id' => $this->product_category_id,
                     'type' => 'product',
-                    'inventory_type' => Product::class,
-                    'inventory_id' => $product->id,
+                    'inventory_type' => 'App\\Models\\Product', 
+                    'inventory_id' => $product->id,   
                     'name' => $this->name,
                     'image' => $imagePath,
                     'price' => $this->selling_price,
@@ -196,26 +184,4 @@ new #[Layout('layouts.salon_owner')] class extends Component
         return redirect()->route('owner.update_product', $postId);
     }
 
-    public function deleteProduct(int $postId): void
-    {
-        $post = Post::with('inventory')
-            ->where('id', $postId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->first();
-
-        if (!$post) {
-            session()->flash('error', 'Product not found.');
-            return;
-        }
-
-        DB::transaction(function () use ($post) {
-            $post->inventory?->variants()->delete();
-            $post->inventory?->delete();
-            $post->delete();
-        });
-
-        unset($this->inventoryProducts);
-        session()->flash('message', 'Product deleted successfully.');
-    }
 };

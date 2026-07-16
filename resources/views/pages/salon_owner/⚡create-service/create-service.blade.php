@@ -1,35 +1,6 @@
 <div class="min-h-screen bg-gray-50" x-data="{ showCategoryModal: false }" x-on:category-created.window="showCategoryModal = false">
     <div class="mx-auto space-y-6">
 
-        <div class="flex items-start justify-between flex-wrap gap-4">
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-[#1E7A4A]/10 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </span>
-                    <h1 class="text-2xl font-bold text-gray-900">Create Service</h1>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <button type="button" wire:click="$set('status', 'draft'); save()" wire:loading.attr="disabled" wire:target="save"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-full hover:bg-gray-50 transition text-sm font-medium">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    Save Draft
-                </button>
-                <a href="{{ route('owner.create_product') }}"
-                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1E7A4A]/5 text-[#1E7A4A] border border-[#1E7A4A]/20 rounded-full hover:bg-[#1E7A4A]/10 hover:border-[#1E7A4A]/40 transition text-sm font-medium">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                    </svg>
-                    Switch to Product
-                </a>
-            </div>
-        </div>
-
         @if (session()->has('message'))
             <div class="bg-green-50 text-green-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('message') }}</div>
         @endif
@@ -39,15 +10,25 @@
 
         <form wire:submit.prevent="save">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                <!-- LEFT COLUMN -->
                 <div class="lg:col-span-8 space-y-6">
-
-                    <!-- General Information -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-100">
-                            <h3 class="text-base font-bold text-gray-900">General Information</h3>
+                        <div class="px-6 py-5 border-b border-gray-100 bg-[#1E7A4A]">
+                            <div class="flex items-center justify-between flex-wrap gap-4">
+                                <div class="flex items-center gap-3">
+                                    <a href="{{ route('owner.dashboard') }}" class="p-2 hover:bg-green-100 rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 text-neutral-50 hover:text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                        </svg>
+                                    </a>
+                                    <div>
+                                        <h1 class="text-2xl font-bold text-neutral-50">Create Service</h1>
+                                        <p class="text-sm text-neutral-50 mt-0.5">Add a new service to your catalog</p>
+                                    </div>
+                                </div>
+                            
+                            </div>
                         </div>
+                        
                         <div class="p-6 space-y-5">
                             <div>
                                 <label for="name" class="block text-xs font-medium text-gray-500 mb-1.5">Service Name</label>
@@ -91,10 +72,10 @@
                         </div>
                     </div>
 
-                    <!-- Service Options -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <!-- Service Options / Variants -->
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="variants-section">
                         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
-                            <h3 class="text-base font-bold text-gray-900">Service Options</h3>
+                            <h3 class="text-base font-bold text-gray-900">Service Options</h3>                            
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" wire:model.live="hasVariants" class="sr-only peer">
                                 <span class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-[#1E7A4A] transition-colors block"></span>
@@ -102,7 +83,7 @@
                                 <span class="ml-2 text-sm font-medium text-gray-700">Has options</span>
                             </label>
                         </div>
-
+                        
                         <div class="p-6">
                             @if ($hasVariants)
                                 @include('layouts.partials.variant-option-builder')
@@ -121,7 +102,6 @@
                                                             <span class="text-xs font-semibold bg-white border border-gray-200 px-2.5 py-1 rounded-full text-gray-700">{{ $optionName }}: {{ $value }}</span>
                                                         @endforeach
                                                     </div>
-                                                    <span class="text-[11px] text-gray-400 font-mono ml-auto">SKU auto-generated</span>
                                                 </div>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <div>
@@ -189,9 +169,9 @@
                         <div class="p-6 space-y-3">
                             <div>
                                 <label for="category" class="block text-xs font-medium text-gray-500 mb-1.5">Service Category</label>
-                                <select id="category" wire:model="service_category_id"
-                                        class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
-                                    <option value="">Select a category</option>
+                                <select wire:model="service_category_id" 
+                                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#1E7A4A]/30">
+                                    <option value="">Select category</option>
                                     @foreach($this->categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
@@ -209,6 +189,7 @@
                 </div>
             </div>
 
+            <!-- Bottom Actions -->
             <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <!-- Status Field -->
                 <div class="w-full sm:w-auto">
@@ -235,14 +216,14 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-3 w-full sm:w-auto flex-shrink-0">
-                    <a href="{{ route('owner.dashboard') }}"
+                    <a href="{{ route('owner.dashboard') }}" 
                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition text-sm font-medium w-full sm:w-auto whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                         Cancel
                     </a>
-
+                    
                     <button type="submit" wire:loading.attr="disabled" wire:target="save"
                             class="inline-flex items-center justify-center gap-2 px-8 py-2.5 bg-[#1E7A4A] text-white rounded-xl hover:bg-[#16633c] transition text-sm font-medium shadow-sm w-full sm:w-auto whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -255,64 +236,6 @@
             </div>
         </form>
 
-        <!-- Inventory Services -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-base font-bold text-gray-900">Inventory Services</h3>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $this->inventoryServices->count() }} services</p>
-            </div>
-            <table class="min-w-full divide-y divide-gray-100">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
-                    @forelse($this->inventoryServices as $service)
-                        <tr wire:key="inventory-{{ $service->id }}">
-                            <td class="px-4 py-3">
-                                <div class="flex items-center gap-2">
-                                    @if($service->image)
-                                        <img src="{{ Storage::url($service->image) }}" alt="{{ $service->name }}" class="h-8 w-8 rounded-lg object-cover">
-                                    @else
-                                        <div class="h-8 w-8 bg-gray-100 rounded-lg"></div>
-                                    @endif
-                                    <div>
-                                        <div class="text-sm font-medium text-gray-900 truncate max-w-[160px]">{{ $service->name }}</div>
-                                        <div class="text-xs text-gray-400">{{ $service->serviceCategory?->name ?? 'Uncategorized' }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-900 font-medium">${{ number_format($service->price ?? 0, 2) }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-500">{{ $service->duration_minutes ? $service->duration_minutes . ' min' : '—' }}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $service->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ ucfirst($service->status) }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex space-x-2">
-                                    <button wire:click="editService({{ $service->id }})" class="text-blue-600 hover:text-blue-900">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    </button>
-                                    <button wire:click="deleteService({{ $service->id }})" onclick="return confirm('Delete this service? This cannot be undone.')" class="text-red-600 hover:text-red-900">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 text-sm">No services found. Create your first service!</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
+        @include('layouts.partials.category-modal')
     </div>
-
-    @include('layouts.partials.category-modal')
 </div>

@@ -32,7 +32,6 @@
                                         <p class="text-sm text-neutral-50 mt-0.5">Add a new product to your inventory</p>
                                     </div>
                                 </div>
-                            
                             </div>
                         </div>
                         
@@ -128,7 +127,7 @@
                                                             <span class="text-xs font-semibold bg-white border border-gray-200 px-2.5 py-1 rounded-full text-gray-700">{{ $optionName }}: {{ $value }}</span>
                                                         @endforeach
                                                     </div>
-                                                    <span class="text-[11px] text-gray-400 font-mono ml-auto">SKU </span>
+                                                    <span class="text-[11px] text-gray-400 font-mono ml-auto">SKU</span>
                                                 </div>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <div>
@@ -197,9 +196,9 @@
                         <div class="p-6 space-y-3">
                             <div>
                                 <label for="category" class="block text-xs font-medium text-gray-500 mb-1.5">Product Category</label>
-                                <select id="category" wire:model="product_category_id"
-                                        class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
-                                    <option value="">Select a category</option>
+                                <select wire:model="product_category_id" 
+                                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#1E7A4A]/30">
+                                    <option value="">Select category</option>
                                     @foreach($this->categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
@@ -221,7 +220,6 @@
                 <div class="w-full sm:w-auto">
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
                     <div class="flex items-center gap-2 bg-gray-100 rounded-xl p-1 h-12">
-                        <!-- Draft -->
                         <label class="flex items-center gap-2 cursor-pointer px-3 py-1 rounded-lg transition-colors duration-200 hover:bg-gray-200/50 flex-1">
                             <input type="radio" wire:model="status" value="draft" class="hidden peer">
                             <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center flex-shrink-0 transition-colors duration-200 peer-checked:border-gray-500 peer-checked:bg-gray-200">
@@ -230,7 +228,6 @@
                             <span class="text-sm font-medium text-gray-600 peer-checked:text-gray-900 transition-colors whitespace-nowrap">Draft</span>
                         </label>
 
-                        <!-- Published -->
                         <label class="flex items-center gap-2 cursor-pointer px-3 py-1 rounded-lg transition-colors duration-200 hover:bg-green-100/50 flex-1">
                             <input type="radio" wire:model="status" value="published" class="hidden peer">
                             <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center flex-shrink-0 transition-colors duration-200 peer-checked:border-[#1E7A4A] peer-checked:bg-[#1E7A4A]/20">
@@ -263,7 +260,6 @@
                 </div>
             </div>
         </form>
-        @include('layouts.partials.inventory-product-list')
         @include('layouts.partials.category-modal')
 
     </div>
