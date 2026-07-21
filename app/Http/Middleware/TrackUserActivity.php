@@ -15,8 +15,7 @@ class TrackUserActivity
      * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {
-        
+    {      
         if (Auth::check()) {
             $user = Auth::user();
             $user->last_activity_at = now();

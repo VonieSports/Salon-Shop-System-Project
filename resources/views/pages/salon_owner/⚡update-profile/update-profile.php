@@ -32,11 +32,13 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public $user;
     public $tenant;
+    public $status;
 
     public function mount()
     {
         $this->user = Auth::user()->load('tenant');
         $this->tenant = $this->user->tenant;
+        $this->status = $this->user->status;
 
         $this->user_name = $this->user->name;
         $this->user_email = $this->user->email;
@@ -90,6 +92,52 @@ new #[Layout('layouts.salon_owner')] class extends Component
         ];
     }
 
+    public function updatedAvatar()
+    {
+        $this->validateOnly('avatar');
+
+        try {
+            if ($this->existing_avatar) {
+                Storage::disk('public')->delete($this->existing_avatar);
+            }
+
+            $avatarPath = $this->avatar->store('avatars', 'public');
+            $this->user->update(['avatar' => $avatarPath]);
+            $this->existing_avatar = $avatarPath;
+            $this->avatar = null;
+
+            $this->user = Auth::user()->load('tenant');
+            $this->tenant = $this->user->tenant;
+
+            session()->flash('success', 'Profile photo updated successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to upload profile photo.');
+        }
+    }
+
+    public function updatedCoverPhoto()
+    {
+        $this->validateOnly('cover_photo');
+
+        try {
+            if ($this->existing_cover_photo) {
+                Storage::disk('public')->delete($this->existing_cover_photo);
+            }
+
+            $coverPath = $this->cover_photo->store('cover_photos', 'public');
+            $this->user->update(['cover_photo' => $coverPath]);
+            $this->existing_cover_photo = $coverPath;
+            $this->cover_photo = null;
+
+            $this->user = Auth::user()->load('tenant');
+            $this->tenant = $this->user->tenant;
+
+            session()->flash('success', 'Cover photo updated successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to upload cover photo.');
+        }
+    }
+
     public function updateProfile()
     {
         $this->validate();
@@ -108,26 +156,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
             if ($this->new_password) {
                 $user->update(['password' => Hash::make($this->new_password)]);
-            }
-
-            if ($this->avatar) {
-                if ($user->avatar) {
-                    Storage::disk('public')->delete($user->avatar);
-                }
-                $avatarPath = $this->avatar->store('avatars', 'public');
-                $user->update(['avatar' => $avatarPath]);
-                $this->existing_avatar = $avatarPath;
-                $this->avatar = null;
-            }
-
-            if ($this->cover_photo) {
-                if ($user->cover_photo) {
-                    Storage::disk('public')->delete($user->cover_photo);
-                }
-                $coverPath = $this->cover_photo->store('cover_photos', 'public');
-                $user->update(['cover_photo' => $coverPath]);
-                $this->existing_cover_photo = $coverPath;
-                $this->cover_photo = null;
             }
 
             if ($tenant) {
@@ -154,6 +182,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
             Storage::disk('public')->delete($this->user->avatar);
             $this->user->update(['avatar' => null]);
             $this->existing_avatar = null;
+            
+            $this->user = Auth::user()->load('tenant');
+            $this->tenant = $this->user->tenant;
+            
             session()->flash('success', 'Profile photo removed successfully!');
         }
     }
@@ -164,6 +196,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
             Storage::disk('public')->delete($this->user->cover_photo);
             $this->user->update(['cover_photo' => null]);
             $this->existing_cover_photo = null;
+            
+            $this->user = Auth::user()->load('tenant');
+            $this->tenant = $this->user->tenant;
+            
             session()->flash('success', 'Cover photo removed successfully!');
         }
     }

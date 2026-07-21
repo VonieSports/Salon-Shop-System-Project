@@ -1,22 +1,19 @@
 <div>
     <div class="w-full">
-        <!-- Profile Header with Cover Photo -->
         <div class="relative w-full bg-white overflow-hidden rounded-2xl">
-            <!-- Cover Photo -->
-            <div class="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gradient-to-r from-[#1E7A4A] to-emerald-500">
+            <div class="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gradient-to- from-[#1E7A4A] to-emerald-500">
                 @if ($user->cover_photo)
                     <img src="{{ Storage::url($user->cover_photo) }}" 
                          alt="Cover Photo"
                          class="w-full h-full object-cover">
                 @else
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-[#1E7A4A] to-emerald-500">
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to- from-[#1E7A4A] to-emerald-500">
                         <svg class="w-16 h-16 sm:w-20 sm:h-20 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
                         </svg>
                     </div>
                 @endif
 
-                <!-- 3-Dots Menu -->
                 <div class="absolute top-3 right-3" x-data="{ open: false }" @click.away="open = false">
                     <button @click="open = !open" 
                             class="p-1.5 bg-black/30 hover:bg-black/50 text-white rounded-lg transition backdrop-blur-sm">
@@ -62,7 +59,6 @@
                     </div>
                 </div>
 
-                <!-- Loading Spinner -->
                 <div wire:loading wire:target="newCoverPhoto" 
                      class="absolute inset-0 bg-black/50 flex items-center justify-center">
                     <svg class="animate-spin h-10 w-10 text-white" fill="none" viewBox="0 0 24 24">
@@ -72,14 +68,9 @@
                 </div>
             </div>
 
-            <!-- Profile Info -->
-            <div class="  mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Increased margin-top to separate from cover photo -->
+            <div class="mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="relative -mt-12 sm:-mt-14 md:-mt-16 pb-4 sm:pb-5">
-                    
-                    <!-- Avatar & Name Row -->
                     <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
-                        <!-- Avatar - Larger -->
                         <div class="relative shrink-0">
                             @if ($user->avatar)
                                 <img src="{{ Storage::url($user->avatar) }}" 
@@ -114,7 +105,6 @@
                             </a>
                         </div>
 
-                        <!-- Name & Status - With margin top to not overlay cover -->
                         <div class="flex-1 min-w-0 mt-2 sm:mt-3 md:mt-4">
                             <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                                 <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $user->name }}</h1>
@@ -126,7 +116,6 @@
                             <p class="text-sm sm:text-base text-gray-600 mt-0.5">{{ $user->email }}</p>
                         </div>
 
-                        <!-- Edit Button -->
                         <a href="{{ route('owner.update_profile') }}" 
                            class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#1E7A4A] text-white rounded-xl hover:bg-[#16653D] transition text-sm font-medium shadow-sm hover:shadow-md shrink-0 self-start sm:self-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,11 +125,10 @@
                         </a>
                     </div>
 
-                    <!-- Bio - Under Avatar -->
                     <div class="mt-4 sm:mt-5">
                         <div class="bg-gray-50 rounded-xl px-4 sm:px-5 py-3 sm:py-4 border border-gray-100">
                             <div class="flex items-start gap-2.5">
-                                <svg class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
                                 </svg>
                                 <div>
@@ -157,11 +145,9 @@
             </div>
         </div>
 
-        <!-- Profile Content - Personal Information -->
         <div class="bg-gray-50 border-t border-gray-100">
             <div class="mx-auto py-2 8">
                 <div class="gap-6">
-                    <!-- Personal Information -->
                     <div class="lg:col-span-2">
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                             <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
@@ -205,8 +191,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>

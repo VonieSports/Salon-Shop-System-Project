@@ -14,18 +14,12 @@ trait BusinessHoursTrait
         return [];
     }
 
-    /**
-     * Check if business has hours set
-     */
     public function hasBusinessHours(): bool
     {
         $hours = $this->getBusinessHours();
         return !empty($hours);
     }
 
-    /**
-     * Get formatted business hours for display
-     */
     public function getFormattedBusinessHours(): array
     {
         $hours = $this->getBusinessHours();

@@ -26,14 +26,14 @@
                 @endif
 
                 <form wire:submit="updateProfile" enctype="multipart/form-data">
-                    <!-- Profile Preview Section - Same as Profile View -->
+                    <!-- Profile Preview Section -->
                     <div class="mb-8 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
                         <!-- Cover Photo -->
-                        <div class="relative h-40 sm:h-48 md:h-56 bg-gradient-to-r from-[#1E7A4A] to-emerald-400">
+                        <div class="relative h-40 sm:h-48 md:h-56 bg-gradient-to-r from-[#1E7A4A] to-emerald-400 group">
                             @if($cover_photo)
-                                <img src="{{ Storage::url($cover_photo) }}" class="w-full h-full object-cover">
-                            @elseif($newCoverPhoto)
-                                <img src="{{ $newCoverPhoto->temporaryUrl() }}" class="w-full h-full object-cover">
+                                <img src="{{ $cover_photo->temporaryUrl() }}" class="w-full h-full object-cover">
+                            @elseif($existing_cover_photo)
+                                <img src="{{ Storage::url($existing_cover_photo) }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-[#1E7A4A] to-emerald-500">
                                     <svg class="w-12 h-12 sm:w-16 sm:h-16 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -42,29 +42,43 @@
                                 </div>
                             @endif
 
-                            <!-- Cover Photo Upload Button -->
-                            <div class="absolute bottom-4 right-4 flex gap-2">
-                                <label for="cover-photo-upload" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-black/50 hover:bg-black/70 text-white rounded-lg text-sm font-medium transition backdrop-blur-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-                                    </svg>
-                                    <span class="hidden sm:inline">Change Cover</span>
-                                    <span class="sm:hidden">Cover</span>
-                                </label>
-                                <input id="cover-photo-upload" type="file" wire:model="newCoverPhoto" accept="image/*" class="hidden">
-
-                                @if($cover_photo)
-                                    <button type="button" wire:click="removeCoverPhoto" class="inline-flex items-center gap-2 px-4 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                            <!-- 🔥 NEW: Clickable Overlay for Cover Photo -->
+                            <label class="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-300 cursor-pointer flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-95 group-hover:scale-100 flex flex-col items-center gap-2">
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
                                         </svg>
-                                        <span class="hidden sm:inline">Remove</span>
-                                    </button>
-                                @endif
+                                    </div>
+                                    <span class="text-white text-xs sm:text-sm font-medium">
+                                        {{ $existing_cover_photo ? 'Change Cover Photo' : 'Upload Cover Photo' }}
+                                    </span>
+                                </div>
+                                <input type="file" wire:model="cover_photo" accept="image/*" class="hidden">
+                            </label>
+
+                            <!-- 🔥 Remove Button - Small X on corner when cover exists -->
+                            @if($existing_cover_photo)
+                                <button type="button" 
+                                        wire:click="removeCoverPhoto" 
+                                        class="absolute top-3 right-3 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg transition opacity-0 group-hover:opacity-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+
+                            <!-- Loading Spinner -->
+                            <div wire:loading wire:target="cover_photo" 
+                                 class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <svg class="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
                             </div>
 
-                            @error('newCoverPhoto')
-                                <span class="text-red-500 text-xs mt-1 block absolute bottom-16 right-4 bg-white/90 px-2 py-1 rounded shadow">{{ $message }}</span>
+                            @error('cover_photo')
+                                <span class="text-red-500 text-xs mt-1 block absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 px-3 py-1 rounded shadow">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -72,12 +86,12 @@
                         <div class="relative px-4 sm:px-6 pb-6">
                             <div class="flex flex-col sm:flex-row items-center sm:items-end -mt-12 sm:-mt-16 mb-4">
                                 <!-- Avatar -->
-                                <div class="relative">
+                                <div class="relative group">
                                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-lg">
-                                        @if($newAvatar)
-                                            <img src="{{ $newAvatar->temporaryUrl() }}" class="w-full h-full object-cover">
-                                        @elseif($avatar)
-                                            <img src="{{ Storage::url($avatar) }}" class="w-full h-full object-cover">
+                                        @if($avatar)
+                                            <img src="{{ $avatar->temporaryUrl() }}" class="w-full h-full object-cover">
+                                        @elseif($existing_avatar)
+                                            <img src="{{ Storage::url($existing_avatar) }}" class="w-full h-full object-cover">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center bg-emerald-100">
                                                 <span class="text-3xl sm:text-4xl font-bold text-[#1E7A4A]">
@@ -87,15 +101,29 @@
                                         @endif
                                     </div>
 
-                                    <!-- Avatar Upload Button -->
-                                    <label for="avatar-upload" class="absolute bottom-0 right-0 p-1.5 bg-[#1E7A4A] rounded-full cursor-pointer hover:bg-[#16633c] transition shadow-lg">
-                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-                                        </svg>
+                                    <!-- Avatar Upload Overlay -->
+                                    <label class="absolute inset-0 rounded-full bg-black/0 hover:bg-black/40 transition-all duration-300 cursor-pointer flex items-center justify-center">
+                                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <input type="file" wire:model="avatar" accept="image/*" class="hidden">
                                     </label>
-                                    <input id="avatar-upload" type="file" wire:model="newAvatar" accept="image/*" class="hidden">
+
+                                    @if($existing_avatar)
+                                        <button type="button" 
+                                                wire:click="removeAvatar" 
+                                                class="absolute -top-1 -right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition shadow-md">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    @endif
                                     
-                                    @error('newAvatar')
+                                    @error('avatar')
                                         <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -119,7 +147,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
                                     </svg>
                                     <div class="flex-1">
-                                        <p class="text-sm text-gray-700">{{ $bio ?? $user->bio ?? 'No bio added yet' }}</p>
+                                        <p class="text-sm text-gray-700">{{ $bio ?? 'No bio added yet' }}</p>
                                     </div>
                                 </div>
                             </div>

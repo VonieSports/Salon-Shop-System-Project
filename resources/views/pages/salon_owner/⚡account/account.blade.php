@@ -1,10 +1,6 @@
-{{-- resources/views/livewire/owner/employee-accounts.blade.php --}}
-
 <div class="min-h-screen bg-gray-50">
     <div class="w-full">
-        <div class="bg-white shadow-sm border-x-0 sm:border-x border-gray-200 overflow-hidden">
-            
-            <!-- Header -->
+        <div class="bg-white shadow-sm border-x-0 sm:border-x border-gray-200 overflow-hidden lg:rounded-2xl">
             <div class="px-3 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-[#1E7A4A]">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div>
@@ -16,14 +12,15 @@
                         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                        <span>Add Employee</span>
+                        <span class="hidden sm:inline">Add Employee</span>
+                        <span class="sm:hidden">Add</span>
                     </a>
                 </div>
             </div>
 
             <!-- Stats -->
             <div class="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-100">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-3 gap-3">
                     <div class="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
                         <p class="text-xs text-gray-500 uppercase tracking-wider">Total</p>
                         <p class="text-lg sm:text-xl font-bold text-gray-900">{{ $totalEmployees }}</p>
@@ -31,10 +28,6 @@
                     <div class="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
                         <p class="text-xs text-gray-500 uppercase tracking-wider">Active</p>
                         <p class="text-lg sm:text-xl font-bold text-green-600">{{ $activeEmployees }}</p>
-                    </div>
-                    <div class="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">Online Now</p>
-                        <p class="text-lg sm:text-xl font-bold text-blue-600">{{ $onlineEmployees }}</p>
                     </div>
                     <div class="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
                         <p class="text-xs text-gray-500 uppercase tracking-wider">Inactive</p>
@@ -60,9 +53,9 @@
                     <select wire:model.live="roleFilter"
                             class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A] transition bg-white w-full sm:w-auto min-w-[140px] appearance-none">
                         <option value="all">All Roles</option>
-                        <option value="employee"> Employees</option>
-                        <option value="owner"> Owner</option>
-                        <option value="admin"> Admin</option>
+                        <option value="employee">Employees</option>
+                        <option value="owner">Owner</option>
+                        <option value="admin">Admin</option>
                     </select>
                 </div>
 
@@ -76,11 +69,10 @@
                         <p class="text-gray-400 text-sm mt-1">Start by adding your first team member</p>
                     </div>
                 @else
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                         @foreach($this->employees as $employee)
                             @php 
                                 $user = $employee->user;
-                                // Use the User's status trait directly
                                 $status = $user ? $user->status : [
                                     'badge_class' => 'bg-gray-100 text-gray-500',
                                     'dot_class' => 'bg-gray-400',
@@ -93,77 +85,58 @@
                             @endphp
                             <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 overflow-hidden">
                                 <!-- Cover Photo Banner -->
-                                <div class="relative h-20 bg-gradient-to-r from-[#1E7A4A] to-emerald-400">
+                                <div class="relative h-16 sm:h-20 bg-gradient-to-r from-[#1E7A4A] to-emerald-400">
                                     @if($user && $user->cover_photo)
                                         <img src="{{ Storage::url($user->cover_photo) }}" 
                                              class="w-full h-full object-cover"
                                              alt="Cover photo">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-[#1E7A4A] to-emerald-500">
-                                            <svg class="w-8 h-8 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
                                             </svg>
                                         </div>
                                     @endif
-                                    
-                                    <!-- Role Badge - Moved to top of cover -->
-                                    <div class="absolute top-2 left-2">
-                                        @if($isOwner)
-                                            <span class="px-2 py-0.5 text-xs font-semibold bg-purple-100 text-purple-700 rounded-full shadow-sm"> Owner</span>
-                                        @elseif($isAdmin)
-                                            <span class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full shadow-sm"> Admin</span>
-                                        @else
-                                            <span class="px-2 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full shadow-sm"> Employee</span>
-                                        @endif
-                                    </div>
-
-                                    <!-- Status dot - Moved to top right of cover -->
-                                    <div class="absolute top-2 right-2">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shadow-sm {{ $status['badge_class'] ?? 'bg-gray-100 text-gray-500' }}">
-                                            <span class="w-1.5 h-1.5 rounded-full {{ $status['dot_class'] ?? 'bg-gray-400' }}"></span>
-                                            {{ $status['label'] ?? 'Unknown' }}
-                                        </span>
-                                    </div>
                                 </div>
 
                                 <!-- Card Body -->
-                                <div class="px-4 pb-4">
+                                <div class="px-3 sm:px-4 pb-3 sm:pb-4">
                                     <!-- Avatar - Overlapping cover -->
-                                    <div class="relative inline-block -mt-10">
-                                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-md">
+                                    <div class="relative inline-block -mt-8 sm:-mt-10">
+                                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-md">
                                             @if($user && $user->avatar)
                                                 <img src="{{ Storage::url($user->avatar) }}" class="w-full h-full object-cover">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center bg-emerald-100">
-                                                    <span class="text-xl sm:text-2xl font-bold text-[#1E7A4A]">
+                                                    <span class="text-sm sm:text-xl font-bold text-[#1E7A4A]">
                                                         {{ strtoupper(substr($user?->name ?? 'U', 0, 1)) }}
                                                     </span>
                                                 </div>
                                             @endif
                                         </div>
                                         @if($status['is_online'] ?? false)
-                                            <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
+                                            <span class="absolute bottom-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
                                         @endif
                                     </div>
 
                                     <!-- Name & Position -->
                                     <div class="mt-1">
-                                        <h3 class="text-base font-semibold text-gray-900">{{ $user?->name ?? 'Unknown' }}</h3>
-                                        <p class="text-sm text-gray-500">{{ $employee->position ?? 'No Position' }}</p>
+                                        <h3 class="text-sm sm:text-base font-semibold text-gray-900 truncate">{{ $user?->name ?? 'Unknown' }}</h3>
+                                        <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $employee->position ?? 'No Position' }}</p>
                                     </div>
 
-                                    <!-- Bio Summary -->
+                                    <!-- Bio Summary - Hidden on mobile -->
                                     @if($user && $user->bio)
-                                        <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ Str::limit($user->bio, 60) }}</p>
+                                        <p class="text-xs text-gray-600 mt-1 line-clamp-2 hidden sm:block">{{ Str::limit($user->bio, 60) }}</p>
                                     @endif
                                     
-                                    <!-- Joined date -->
-                                    <p class="text-xs text-gray-400 mt-1">
+                                    <!-- Joined date - Hidden on mobile -->
+                                    <p class="text-xs text-gray-400 mt-1 hidden sm:block">
                                         Joined {{ $employee->hired_at ? $employee->hired_at->format('M d, Y') : 'N/A' }}
                                     </p>
 
-                                    <!-- Contact Info -->
-                                    <div class="mt-3 space-y-1 text-sm border-t border-gray-100 pt-3">
+                                    <!-- Contact Info - Hidden on mobile -->
+                                    <div class="mt-2 space-y-0.5 text-sm border-t border-gray-100 pt-2 hidden sm:block">
                                         <div class="flex items-center gap-2 text-gray-600">
                                             <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -180,17 +153,12 @@
                                         @endif
                                     </div>
 
-                                    <!-- Last Login -->
-                                    <div class="text-xs text-gray-400 mt-1">
-                                        Last login: {{ $user?->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="flex gap-2 mt-3 pt-2 border-t border-gray-100">
-                                        <a href="#" class="flex-1 text-center px-3 py-1.5 text-xs font-medium text-[#1E7A4A] bg-emerald-50 hover:bg-emerald-100 rounded-lg transition">
+                                    <div class="flex gap-2 mt-2 pt-2 border-t border-gray-100">
+                                        <button wire:click="openProfileModal({{ $employee->id }})" 
+                                                class="flex-1 text-center px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium text-[#1E7A4A] bg-emerald-50 hover:bg-emerald-100 rounded-lg transition">
                                             View Profile
-                                        </a>
-                                        <a href="#" class="flex-1 text-center px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                                        </button>
+                                        <a href="#" class="flex-1 text-center px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
                                             Message
                                         </a>
                                     </div>
@@ -198,8 +166,6 @@
                             </div>
                         @endforeach
                     </div>
-
-                    <!-- Pagination -->
                     <div class="mt-6 border-t border-gray-100 pt-4">
                         {{ $this->employees->links() }}
                     </div>
@@ -207,4 +173,6 @@
             </div>
         </div>
     </div>
+
+    @include('layouts.partials.employee-info-modal')
 </div>

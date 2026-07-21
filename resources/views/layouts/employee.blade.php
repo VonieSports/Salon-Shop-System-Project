@@ -1,3 +1,5 @@
+{{-- resources/views/layouts/employee.blade.php --}}
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -17,7 +19,7 @@
             <div class="flex-1 flex flex-col overflow-hidden">
                 @include('layouts.employee.header')
                 
-                <main class="flex-1 lg:p-6 overflow-x-hidden overflow-y-auto bg-gray-100">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 lg:p-6">
                     {{ $slot }}
                 </main>
             </div>

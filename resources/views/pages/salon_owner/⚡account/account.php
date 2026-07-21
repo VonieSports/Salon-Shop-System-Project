@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Models\User;
@@ -13,9 +12,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 
+
 new #[Layout('layouts.salon_owner')] class extends Component
 {
-   use WithPagination;
+    use WithPagination;
 
     #[Url(as: 'q')]
     public string $search = '';
@@ -27,6 +27,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $activeEmployees = 0;
     public $onlineEmployees = 0;
 
+    // Modal properties
+    public $showProfileModal = false;
+    public $selectedEmployee = null;
+
     public function mount(): void
     {
         $tenant = Auth::user()->tenant;
@@ -34,7 +38,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
         
         $this->tenantId = $tenant->id;
         
-        // Calculate stats
         $this->totalEmployees = Employee::where('tenant_id', $this->tenantId)->count();
         $this->activeEmployees = Employee::where('tenant_id', $this->tenantId)->where('is_active', true)->count();
         $this->onlineEmployees = Employee::where('tenant_id', $this->tenantId)
@@ -49,7 +52,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     #[Computed]
     public function employees()
     {
-        $query = Employee::with(['user', 'user.roles'])
+        $query = Employee::with(['user', 'user.roles', 'user.permissions'])
             ->where('tenant_id', $this->tenantId);
 
         if ($this->search) {
@@ -67,5 +70,21 @@ new #[Layout('layouts.salon_owner')] class extends Component
         }
 
         return $query->latest('hired_at')->paginate(12);
+    }
+
+    public function openProfileModal($employeeId)
+    {
+        $this->selectedEmployee = Employee::with(['user', 'user.roles', 'user.permissions'])
+            ->where('tenant_id', $this->tenantId)
+            ->where('id', $employeeId)
+            ->first();
+        
+        $this->showProfileModal = true;
+    }
+
+    public function closeProfileModal()
+    {
+        $this->showProfileModal = false;
+        $this->selectedEmployee = null;
     }
 };

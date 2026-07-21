@@ -54,7 +54,7 @@ class User extends Authenticatable
         ];
     }
 
-      public function tenant(): HasOne
+    public function tenant(): HasOne
     {
         return $this->hasOne(Tenant::class);
     }
@@ -71,8 +71,7 @@ class User extends Authenticatable
 
     public function tenantsWithAccess(): BelongsToMany
 {
-    return $this->belongsToMany(Tenant::class, 'tenant_users')->withPivot('role')
-    ->withTimestamps();
+    return $this->belongsToMany(Tenant::class, 'tenant_users')->withPivot('role')->withTimestamps();
 }
 
 }

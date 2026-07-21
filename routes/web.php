@@ -49,18 +49,35 @@ Route::middleware('setup.complete')->group(function () {
     Route::livewire('/archive', 'pages::salon_owner.archive')->name('owner.archive');
     Route::livewire('/settings', 'pages::salon_owner.setting')->name('owner.setting');
     Route::livewire('/notification', 'pages::salon_owner.notification')->name('owner.notification');
+    Route::livewire('/customer/review', 'pages::salon_owner.customer-review')->name('owner.customer_review');
+    Route::livewire('/walkin', 'pages::salon_owner.walkin-customer')->name('owner.walkin_customer');
 });
 });
-    
 Route::prefix('employee')->middleware(['employee'])->group(function () {
     Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
     Route::livewire('/profile', 'pages::employee.profile')->name('employee.profile');
     Route::livewire('/update/profile', 'pages::employee.update-profile')->name('employee.update_profile');
     Route::livewire('/business_info', 'pages::employee.business-info')->name('employee.business_info');
-    Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
-    Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
-    Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
-    
+    Route::livewire('/business_setup', 'pages::employee.business-setup')->name('employee.business_setup');
+    Route::livewire('/account', 'pages::employee.account')->name('employee.account');
+    Route::livewire('/employee/table', 'pages::employee.enployee')->name('employee.employee_table');
+    Route::livewire('/branch/table', 'pages::employee.branch-table')->name('employee.branch_table');
+    Route::livewire('/category/management', 'pages::employee.category-management')->name('employee.category_management');
+    Route::livewire('/create/branch', 'pages::employee.create-branch')->name('employee.create_branch');
+    Route::livewire('/create/employee', 'pages::employee.create-employee')->name('employee.create_employee');
+    Route::livewire('/create/walkin', 'pages::employee.create-walkin')->name('employee.create_walkin');
+    Route::livewire('/create/product', 'pages::employee.create-product')->name('employee.create_product');
+    Route::livewire('/create/service', 'pages::employee.create-service')->name('employee.create_service');
+    Route::livewire('/customer/review', 'pages::employee.customer-review')->name('employee.customer_review');
+    Route::livewire('/schedule', 'pages::employee.employee-schedule')->name('employee.employe_schedule');
+    Route::livewire('/inventory', 'pages::employee.inventory')->name('employee.inventory');
+    Route::livewire('/notiication', 'pages::employee.notification')->name('employee.notification');
+    Route::livewire('/product/management', 'pages::employee.product-management')->name('employee.product_management');
+    Route::livewire('/service/management', 'pages::employee.servie-management')->name('employee.service_management');
+    Route::livewire('/update/employee', 'pages::employee.update-employee')->name('employee.update_employee');   
+    Route::livewire('/update/product', 'pages::employee.update-product')->name('employee.update_product');
+    Route::livewire('/update/service', 'pages::employee.update-service')->name('employee.update_service');
+    Route::livewire('/inventory', 'pages::employee.inventory')->name('employee.inventory');                               
 });
 });
 

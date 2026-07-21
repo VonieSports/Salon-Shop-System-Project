@@ -6,7 +6,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h1 class="text-xl sm:text-2xl font-semibold text-white">Edit Profile</h1>
-                        <p class="text-white/80 text-xs sm:text-sm mt-0.5">Update your personal and business information</p>
+                        <p class="text-white/80 text-xs sm:text-sm mt-0.5">Update your personal information and profile photo</p>
                     </div>
                     <a href="{{ route('owner.profile') }}" 
                        class="text-white/80 hover:text-white transition flex items-center gap-1.5 text-sm font-medium self-start sm:self-auto">
@@ -26,46 +26,175 @@
                 @endif
 
                 <form wire:submit="updateProfile" enctype="multipart/form-data">
-                    <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 space-y-6">
+                    <!-- Profile Preview Section -->
+                    <div class="mb-8 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+                        <!-- Cover Photo -->
+                        <div class="relative h-40 sm:h-48 md:h-56 bg-gradient-to- from-[#1E7A4A] to-emerald-400 group">
+                            @if($cover_photo)
+                                <img src="{{ $cover_photo->temporaryUrl() }}" class="w-full h-full object-cover">
+                            @elseif($existing_cover_photo)
+                                <img src="{{ Storage::url($existing_cover_photo) }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center bg-gradient-to- from-[#1E7A4A] to-emerald-500">
+                                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                                    </svg>
+                                </div>
+                            @endif
+
+                            <!-- 🔥 Clickable Overlay for Cover Photo -->
+                            <label class="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-300 cursor-pointer flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-95 group-hover:scale-100 flex flex-col items-center gap-2">
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-white text-xs sm:text-sm font-medium">
+                                        {{ $existing_cover_photo ? 'Change Cover Photo' : 'Upload Cover Photo' }}
+                                    </span>
+                                </div>
+                                <input type="file" wire:model="cover_photo" accept="image/*" class="hidden">
+                            </label>
+
+                            <!-- 🔥 Remove Button - Small X on corner when cover exists -->
+                            @if($existing_cover_photo)
+                                <button type="button" 
+                                        wire:click="removeCoverPhoto" 
+                                        class="absolute top-3 right-3 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg transition opacity-0 group-hover:opacity-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+
+                            <!-- Loading Spinner -->
+                            <div wire:loading wire:target="cover_photo" 
+                                 class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <svg class="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+
+                            @error('cover_photo')
+                                <span class="text-red-500 text-xs mt-1 block absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 px-3 py-1 rounded shadow">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Profile Info Overlay -->
+                        <div class="relative px-4 sm:px-6 pb-6">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-end -mt-12 sm:-mt-16 mb-4">
+                                <!-- Avatar -->
+                                <div class="relative group">
+                                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-lg">
+                                        @if($avatar)
+                                            <img src="{{ $avatar->temporaryUrl() }}" class="w-full h-full object-cover">
+                                        @elseif($existing_avatar)
+                                            <img src="{{ Storage::url($existing_avatar) }}" class="w-full h-full object-cover">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center bg-emerald-100">
+                                                <span class="text-3xl sm:text-4xl font-bold text-[#1E7A4A]">
+                                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <label class="absolute inset-0 rounded-full bg-black/0 hover:bg-black/40 transition-all duration-300 cursor-pointer flex items-center justify-center">
+                                        <div class="opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <input type="file" wire:model="avatar" accept="image/*" class="hidden">
+                                    </label>
+
+                                    @if($existing_avatar)
+                                        <button type="button" 
+                                                wire:click="removeAvatar" 
+                                                class="absolute -top-1 -right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition shadow-md">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    @endif
+                                    
+                                    @error('avatar')
+                                        <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Name & Status -->
+                                <div class="sm:ml-6 mt-4 sm:mt-0 text-center sm:text-left flex-1">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                                        <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
+                                        <span class="px-3 py-1 text-xs rounded-full {{ $status['badge_class'] ?? 'bg-gray-100 text-gray-500' }}">
+                                            {{ $status['label'] ?? 'Offline' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-500">{{ $tenant?->name ?? 'Owner' }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Bio -->
+                            <div class="mt-2 px-4 py-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
+                                    </svg>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-700">{{ $user_bio ?? 'No bio added yet' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Form -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <!-- Personal Information -->
                             <div>
                                 <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Personal Information</h2>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                                <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
                                         <input type="text" wire:model="user_name" 
-                                               placeholder="Ronald Richards"
                                                class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
                                         @error('user_name') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-500">*</span></label>
                                         <input type="email" wire:model="user_email" 
-                                               placeholder="RonaldRich@example.com"
                                                class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
                                         @error('user_email') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
                                         <input type="text" wire:model="user_phone" 
-                                               placeholder="(219) 555-0114"
                                                class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
                                         @error('user_phone') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
                                         <input type="text" wire:model="user_address" 
-                                               placeholder="California"
                                                class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
                                         @error('user_address') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Bio -->
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Bio Edit -->
                             <div>
-                                <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-3">Bio</h2>
-                                <textarea wire:model="user_bio" rows="5" 
+                                <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Bio</h2>
+                                <textarea wire:model="user_bio" rows="4" 
                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm"
                                           placeholder="Describe yourself..."></textarea>
                                 @error('user_bio') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -74,10 +203,10 @@
                                 </div>
                             </div>
 
-                            <!-- Password -->
-                            <div class="border-t border-gray-200 pt-6">
+                            <!-- Change Password -->
+                            <div>
                                 <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Change Password</h2>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                                <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Current Password</label>
                                         <input type="password" wire:model="current_password" 
@@ -92,7 +221,7 @@
                                                class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
                                         @error('new_password') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                     </div>
-                                    <div class="sm:col-span-2">
+                                    <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm New Password</label>
                                         <input type="password" wire:model="new_password_confirmation" 
                                                placeholder="Confirm new password"
@@ -101,106 +230,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Right Column - Photos -->
-                        <div class="lg:col-span-1 space-y-6">
-                            <!-- Avatar Upload -->
-                            <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200">
-                                <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-3">Profile Photo</h2>
-                                
-                                <div class="flex flex-col items-center">
-                                    <div class="relative mb-3">
-                                        @if ($avatar)
-                                            <img src="{{ $avatar->temporaryUrl() }}" 
-                                                 class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-[#1E7A4A] shadow-lg">
-                                        @elseif ($existing_avatar)
-                                            <img src="{{ Storage::url($existing_avatar) }}" 
-                                                 class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-gray-200 shadow-lg">
-                                        @else
-                                            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-gray-200 shadow-lg">
-                                                <span class="text-2xl sm:text-3xl font-semibold text-gray-500">
-                                                    {{ strtoupper(substr($user->name ?? 'U', 0, 2)) }}
-                                                </span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <label class="cursor-pointer w-full text-center px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1E7A4A] text-white rounded-lg hover:bg-[#16653D] transition text-sm font-medium">
-                                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                        </svg>
-                                        Choose Photo
-                                        <input type="file" wire:model="avatar" accept="image/*" class="hidden">
-                                    </label>
-                                    
-                                    @if($existing_avatar)
-                                        <button type="button" wire:click="removeAvatar" 
-                                                class="mt-2 text-xs text-red-500 hover:text-red-700 transition font-medium">
-                                            Remove Photo
-                                        </button>
-                                    @endif
-                                    
-                                    <p class="text-xs text-gray-400 mt-2 text-center">At least 800×800 px recommended.<br>JPG or PNG is allowed.</p>
-                                    
-                                    @error('avatar') <span class="text-red-500 text-sm mt-1 block text-center">{{ $message }}</span> @enderror
-                                    @if ($avatar)
-                                        <p class="text-xs sm:text-sm text-green-600 mt-2 text-center font-medium">✓ {{ $avatar->getClientOriginalName() }}</p>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Cover Photo Upload -->
-                            <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-200">
-                                <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-3">Cover Photo</h2>
-                                
-                                <div class="flex flex-col items-center">
-                                    <div class="relative mb-3 w-full">
-                                        @if ($cover_photo)
-                                            <img src="{{ $cover_photo->temporaryUrl() }}" 
-                                                 class="w-full h-20 sm:h-24 rounded-xl object-cover border-2 border-[#1E7A4A] shadow-lg">
-                                        @elseif ($existing_cover_photo)
-                                            <img src="{{ Storage::url($existing_cover_photo) }}" 
-                                                 class="w-full h-20 sm:h-24 rounded-xl object-cover border-2 border-gray-200 shadow-lg">
-                                        @else
-                                            <div class="w-full h-20 sm:h-24 rounded-xl bg-gradient-to-r from-[#1E7A4A]/10 to-emerald-400/10 flex items-center justify-center border-2 border-dashed border-gray-300">
-                                                <div class="text-center">
-                                                    <svg class="w-8 h-8 text-gray-400 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
-                                                    </svg>
-                                                    <p class="text-xs text-gray-400 mt-1">No Cover</p>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <label class="cursor-pointer w-full text-center px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1E7A4A] text-white rounded-lg hover:bg-[#16653D] transition text-sm font-medium">
-                                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                        </svg>
-                                        Choose Cover
-                                        <input type="file" wire:model="cover_photo" accept="image/*" class="hidden">
-                                    </label>
-                                    
-                                    @if($existing_cover_photo)
-                                        <button type="button" wire:click="removeCoverPhoto" 
-                                                class="mt-2 text-xs text-red-500 hover:text-red-700 transition font-medium">
-                                            Remove Cover
-                                        </button>
-                                    @endif
-                                    
-                                    <p class="text-xs text-gray-400 mt-2 text-center">Recommended: 1200×400 px<br>JPG or PNG is allowed.</p>
-                                    
-                                    @error('cover_photo') <span class="text-red-500 text-sm mt-1 block text-center">{{ $message }}</span> @enderror
-                                    @if ($cover_photo)
-                                        <p class="text-xs sm:text-sm text-green-600 mt-2 text-center font-medium">✓ {{ $cover_photo->getClientOriginalName() }}</p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Save Button -->
-                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-3 mt-6 pt-5 border-t border-gray-200">
+                    <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-3 mt-8 pt-5 border-t border-gray-200">
                         <a href="{{ route('owner.profile') }}" 
                            class="w-full sm:w-auto text-center px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
                             Cancel

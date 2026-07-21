@@ -1,8 +1,12 @@
-<div class="w-full ">
+{{-- resources/views/livewire/employee/profile-info.blade.php --}}
+
+<div>
+    <div class="w-full">
+        <!-- Profile Header with Cover Photo -->
         <div class="relative w-full bg-white overflow-hidden lg:rounded-2xl">
             <div class="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 bg-gradient-to-r from-[#1E7A4A] to-emerald-500">
-                @if ($user->cover_photo)
-                    <img src="{{ Storage::url($user->cover_photo) }}" 
+                @if ($this->coverPhoto)
+                    <img src="{{ Storage::url($this->coverPhoto) }}" 
                          alt="Cover Photo"
                          class="w-full h-full object-cover">
                 @else
@@ -45,7 +49,7 @@
                                    @change="open = false">
                         </label>
 
-                        @if($user->cover_photo)
+                        @if($this->coverPhoto)
                             <div class="border-t border-gray-100 my-0.5"></div>
                             <button wire:click="removeCoverPhoto" 
                                     @click="open = false"
@@ -77,8 +81,8 @@
                     <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
                         <!-- Avatar -->
                         <div class="relative shrink-0">
-                            @if ($user->avatar)
-                                <img src="{{ Storage::url($user->avatar) }}" 
+                            @if ($this->avatar)
+                                <img src="{{ Storage::url($this->avatar) }}" 
                                      alt="{{ $user->name }}"
                                      class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-white object-cover shadow-xl">
                             @else
@@ -140,13 +144,12 @@
             </div>
         </div>
 
-        <!-- Profile Content -->
         <div class="bg-gray-50 border-t border-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="mx-auto py-2">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
                     <!-- Personal Information -->
                     <div class="lg:col-span-2">
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white lg:rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                             <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                                 <div class="flex items-center gap-2.5">
                                     <svg class="w-5 h-5 text-[#1E7A4A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,9 +193,9 @@
                     </div>
 
                     <!-- Right Column -->
-                    <div class="space-y-6">
+                    <div class="space-y-1">
                         <!-- Employment Card -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white lg:rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                             <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                                 <div class="flex items-center gap-2.5">
                                     <svg class="w-5 h-5 text-[#1E7A4A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,9 +228,8 @@
                     </div>
                 </div>
 
-                <!-- Permissions Card - Full Width -->
-                <div class="mt-6">
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="mt-2">
+                    <div class="bg-white lg:rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                             <div class="flex items-center gap-2.5">
                                 <svg class="w-5 h-5 text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -266,3 +268,4 @@
             </div>
         </div>
     </div>
+</div>
