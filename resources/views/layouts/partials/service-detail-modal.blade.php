@@ -18,10 +18,10 @@
         <div class="flex items-center justify-center min-h-screen p-3 sm:p-4 md:p-6">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeItem"></div>
             
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden mx-auto">
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden mx-auto">
                 @if ($post && $service)
                     <!-- Header -->
-                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-white shrink-0">
+                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-100 bg-white shrink-0">
                         <button wire:click="closeItem" class="p-2 rounded-full hover:bg-gray-100 transition">
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -44,7 +44,7 @@
 
                             <a href="{{ route('owner.update_service', $post->id) }}"
                                class="px-4 py-1.5 bg-[#1E7A4A] text-white rounded-full hover:bg-[#16633c] transition text-sm font-medium">
-                                Edit
+                                Update
                             </a>
 
                             <div class="relative" x-data="{ open: false }">
@@ -55,10 +55,10 @@
                                 </button>
                                 <div x-show="open" @click.away="open = false" x-cloak
                                      class="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-10">
-                                    <button wire:click="deleteItem({{ $post->id }})"
-                                            onclick="return confirm('Delete this service? This cannot be undone.')"
-                                            class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
-                                        Delete Service
+                                   <button wire:click="deleteItem({{ $post->id }})"
+                                        onclick="return confirm('Archive this service? You can restore it later from the Archive page.')"
+                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                                        Delete this item
                                     </button>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                     </div>
 
                     <!-- Content -->
-                    <div class="overflow-y-auto p-4 sm:p-6" style="max-height: calc(95vh - 130px);">
+                    <div class="overflow-y-auto p-4 sm:p-6" style="max-height: calc(92vh - 110px);">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                             <!-- Left: Images -->
                             <div class="space-y-4">
@@ -102,7 +102,7 @@
                                 <!-- Option Images -->
                                 @if($hasVariantImages)
                                     <div>
-                                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2.5">Option Images</p>
+                                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2">Option Images</p>
                                         <div class="grid grid-cols-4 gap-2">
                                             @php
                                                 $imagesToShow = $variantImages->take(4);
@@ -120,7 +120,7 @@
                                                         <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center cursor-pointer hover:bg-black/60 transition"
                                                              @click="showVariantGallery = true">
                                                             <span class="text-xl font-bold text-white">+{{ $remainingCount }}</span>
-                                                            <span class="text-[10px] text-white/70">View all</span>
+                                                            <span class="text-xs text-white/70">View all</span>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -143,48 +143,55 @@
                             <!-- Right: Details -->
                             <div class="space-y-4">
                                 <div>
-                                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">{{ $post->name }}</h1>
-                                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">{{ $post->name }}</h1>
+                                    <div class="flex items-center gap-2 mt-1 flex-wrap">
                                         <span class="text-sm text-gray-500">{{ $post->serviceCategory?->name ?? 'Uncategorized' }}</span>
                                     </div>
                                 </div>
 
                                 <!-- Price & Duration -->
-                                <div class="flex flex-wrap items-baseline gap-4">
+                                <div class="flex flex-wrap items-center gap-6 p-4 bg-gray-50 rounded-xl">
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider block">Price</span>
                                         <span class="text-2xl font-bold text-[#1E7A4A]">${{ number_format($service->price ?? 0, 2) }}</span>
                                     </div>
-                                    <div class="w-px h-10 bg-gray-200"></div>
+                                    <div class="w-px h-10 bg-gray-300"></div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider block">Duration</span>
-                                        <span class="text-lg font-semibold text-gray-800">{{ $service->duration_minutes ? $service->duration_minutes . ' min' : '—' }}</span>
+                                        <span class="text-xl font-semibold text-gray-800">{{ $service->duration_minutes ? $service->duration_minutes . ' min' : '—' }}</span>
                                     </div>
+                                    @if($variants && $variants->count() > 0)
+                                        <div class="w-px h-10 bg-gray-300"></div>
+                                        <div>
+                                            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider block">Options</span>
+                                            <span class="text-xl font-semibold text-gray-800">{{ $variants->count() }}</span>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <!-- Details Grid -->
-                                <div class="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-3 border-t border-gray-100">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-3 border-t border-gray-100">
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Category</span>
-                                        <p class="text-sm text-gray-800 mt-0.5">{{ $post->serviceCategory?->name ?? 'Uncategorized' }}</p>
+                                        <p class="text-sm text-gray-800 mt-1">{{ $post->serviceCategory?->name ?? 'Uncategorized' }}</p>
                                     </div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Status</span>
-                                        <p class="text-sm text-gray-800 mt-0.5">
-                                            <span class="inline-flex items-center gap-1.5">
-                                                <span class="w-2 h-2 rounded-full {{ $service->is_active ? 'bg-emerald-500' : 'bg-yellow-500' }}"></span>
+                                        <p class="text-sm text-gray-800 mt-1">
+                                            <span class="inline-flex items-center gap-2">
+                                                <span class="w-2.5 h-2.5 rounded-full {{ $service->is_active ? 'bg-emerald-500' : 'bg-yellow-500' }}"></span>
                                                 <span>{{ $service->is_active ? 'Active' : 'Inactive' }}</span>
                                             </span>
                                         </p>
                                     </div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Added</span>
-                                        <p class="text-sm text-gray-800 mt-0.5">{{ $post->created_at->format('M d, Y') }}</p>
+                                        <p class="text-sm text-gray-800 mt-1">{{ $post->created_at->format('M d, Y') }}</p>
                                     </div>
-                                    @if($variants && $variants->count() > 0)
+                                    @if($service->booking_buffer_minutes)
                                         <div>
-                                            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Options</span>
-                                            <p class="text-sm text-gray-800 font-semibold mt-0.5">{{ $variants->count() }}</p>
+                                            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Buffer Time</span>
+                                            <p class="text-sm text-gray-800 mt-1">{{ $service->booking_buffer_minutes }} min</p>
                                         </div>
                                     @endif
                                 </div>

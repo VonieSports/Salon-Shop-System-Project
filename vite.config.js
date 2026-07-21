@@ -17,7 +17,7 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        host: '192.168.0.104',
+        host: 'salon-shop-system-project.test',
         port: 5173,
         strictPort: true,
         watch: {

@@ -5,22 +5,20 @@ use Livewire\Component;
 
 new class extends Component
 {
-    public string $email    = '';
+     public string $email = '';
     public string $password = '';
-    public bool   $remember = false;
+    public bool $remember = false;
 
     protected array $rules = [
-        'email'    => 'required|email',
-        'password' => 'required|string|min:6',
-    ]; 
+        'email' => 'required|email',
+        'password' => 'required|string|min:8',
+    ];
 
     protected array $messages = [
-        'email.required'    => 'Email is required.',
-        'email.email'       => 'Enter a valid email address.',
-        'email.unique'      => 'This email is already in use.',
+        'email.required' => 'Email is required.',
+        'email.email' => 'Enter a valid email address.',
         'password.required' => 'Password is required.',
-        'password.incorrect' => 'The provided password is incorrect.',
-        'password.min'      => 'Password must be at least 6 characters.',
+        'password.min' => 'Password must be at least 8 characters.',
     ];
 
     public function login()
@@ -35,22 +33,42 @@ new class extends Component
 
             $user = Auth::user();
 
-            if (! $user->hasRole('owner')) {
+            // Check if user is active - owners can never be deactivated
+            if (!$user->is_active && !$user->hasRole('owner')) {
                 Auth::logout();
-                $this->addError('email', 'This portal is for shop owners only.');
+                $this->addError('email', 'Your account has been deactivated. Please contact your administrator.');
                 return;
+            }
+
+            // If owner is inactive, reactivate them automatically
+            if ($user->hasRole('owner') && !$user->is_active) {
+                $user->update(['is_active' => true]);
             }
 
             // Update login metadata
             $user->update([
-                'is_active'    => true,
                 'last_login_at' => now(),
+                'last_logout_at' => null,
             ]);
 
-            return redirect()->route('owner.dashboard');
+            // Redirect based on role
+            if ($user->hasRole('owner')) {
+                return redirect()->route('owner.dashboard');
+            } elseif ($user->hasRole('employee')) {
+                $employee = $user->employeeProfile;
+                if (!$employee || !$employee->tenant_id) {
+                    Auth::logout();
+                    $this->addError('email', 'Employee account is not properly configured.');
+                    return;
+                }
+                return redirect()->route('employee.dashboard');
+            }
+
+            Auth::logout();
+            $this->addError('email', 'Account role not recognized.');
+            return;
         }
 
         $this->addError('email', 'Invalid email or password.');
     }
-
 };

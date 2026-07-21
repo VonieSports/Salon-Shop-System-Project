@@ -16,7 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'employee' => \App\Http\Middleware\EmployeeMiddleware::class,
             'customer' => \App\Http\Middleware\CustomerMiddleware::class,
             'owner' => \App\Http\Middleware\OwnerMiddleware::class,
-             'setup.complete' => \App\Http\Middleware\EnsureBusinessSetup::class,
+            'setup.complete' => \App\Http\Middleware\EnsureBusinessSetup::class,
+            'track.activity' => \App\Http\Middleware\TrackUserActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

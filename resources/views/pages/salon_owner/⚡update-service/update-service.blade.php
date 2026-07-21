@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto p-4 sm:p-6">
+    <div class=" mx-auto ">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <!-- Header -->
             <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-[#1E7A4A]">

@@ -9,8 +9,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $user;
     public $tenant;
 
-    public function mount(){
-
+    public function mount()
+    {
         $this->user = Auth::user();
         $this->tenant = $this->user->tenant;
     }

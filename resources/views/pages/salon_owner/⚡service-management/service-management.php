@@ -4,8 +4,6 @@ use App\Models\ItemVariant;
 use App\Models\Post;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -71,6 +69,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->where('tenant_id', $this->tenantId)
             ->where('created_by', Auth::id())
             ->where('type', 'service')
+            ->whereNull('archived_at')
             ->when($this->search !== '', fn ($q) => $q->where('name', 'like', '%' . $this->search . '%'))
             ->when($this->dateFilter === 'today', fn ($q) => $q->whereDate('created_at', today()))
             ->when($this->dateFilter === 'week', fn ($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
@@ -192,34 +191,28 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->selectAll = false;
     }
 
+    /**
+     * Archives instead of deleting — the underlying Service/ItemVariant
+     * rows stay intact so the item can be restored from the Archive page.
+     */
     public function bulkDelete(): void
     {
         if (empty($this->selectedIds)) {
             return;
         }
 
-        $posts = Post::where('tenant_id', $this->tenantId)
+        $count = Post::where('tenant_id', $this->tenantId)
             ->where('created_by', Auth::id())
             ->where('type', 'service')
             ->whereIn('id', $this->selectedIds)
-            ->get();
+            ->update(['archived_at' => now()]);
 
-        try {
-            DB::transaction(function () use ($posts) {
-                foreach ($posts as $post) {
-                    ItemVariant::where('service_id', $post->inventory_id)->delete();
-                    Service::where('id', $post->inventory_id)->delete();
-                    $post->delete();
-                }
-            });
-
-            $count = $posts->count();
+        if ($count > 0) {
             $this->clearSelection();
             unset($this->items);
-            session()->flash('message', "{$count} service(s) deleted successfully.");
-        } catch (\Exception $e) {
-            Log::error('Error bulk deleting services', ['error' => $e->getMessage()]);
-            session()->flash('error', 'Failed to delete selected services. Please try again.');
+            session()->flash('message', "{$count} service(s) archived successfully. You can restore them from the Archive page.");
+        } else {
+            session()->flash('error', 'Failed to archive selected services.');
         }
     }
 
@@ -236,24 +229,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
             return;
         }
 
-        try {
-            DB::transaction(function () use ($post) {
-                ItemVariant::where('service_id', $post->inventory_id)->delete();
-                Service::where('id', $post->inventory_id)->delete();
-                $post->delete();
-            });
+        $post->update(['archived_at' => now()]);
 
-            if ($this->selectedPostId === $postId) {
-                $this->selectedPostId = null;
-            }
-
-            $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $postId]));
-
-            unset($this->items);
-            session()->flash('message', 'Service deleted successfully.');
-        } catch (\Exception $e) {
-            Log::error('Error deleting service', ['error' => $e->getMessage(), 'post_id' => $postId]);
-            session()->flash('error', 'Failed to delete service. Please try again.');
+        if ($this->selectedPostId === $postId) {
+            $this->selectedPostId = null;
         }
+
+        $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $postId]));
+
+        unset($this->items);
+        session()->flash('message', 'Service archived successfully. You can restore it from the Archive page.');
     }
 };

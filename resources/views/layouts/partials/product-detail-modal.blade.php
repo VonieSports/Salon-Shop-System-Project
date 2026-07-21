@@ -15,13 +15,11 @@
 
 @if ($selectedPostId)
     <div class="fixed inset-0 z-50 overflow-y-auto" x-data="{ showVariantGallery: false }">
-        <div class="flex items-center justify-center min-h-screen p-3 sm:p-4 md:p-6">
+        <div class="flex items-center justify-center min-h-screen p-2 sm:p-3 md:p-4">
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeItem"></div>
-            
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden mx-auto">
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] overflow-hidden mx-auto">
                 @if ($post)
-                    <!-- Header -->
-                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-white shrink-0">
+                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-100 bg-white shrink-0">
                         <button wire:click="closeItem" class="p-2 rounded-full hover:bg-gray-100 transition">
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -29,7 +27,6 @@
                         </button>
 
                         <div class="flex items-center gap-2 sm:gap-3">
-                            <!-- Status -->
                             <div class="flex items-center gap-2">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" wire:click="toggleStatus({{ $post->id }})" 
@@ -44,7 +41,7 @@
 
                             <a href="{{ route('owner.update_product', $post->id) }}"
                                class="px-4 py-1.5 bg-[#1E7A4A] text-white rounded-full hover:bg-[#16633c] transition text-sm font-medium">
-                                Edit
+                             Update
                             </a>
 
                             <div class="relative" x-data="{ open: false }">
@@ -54,11 +51,11 @@
                                     </svg>
                                 </button>
                                 <div x-show="open" @click.away="open = false" x-cloak
-                                     class="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-10">
+                                     class="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                                     <button wire:click="deleteItem({{ $post->id }})"
-                                            onclick="return confirm('Delete this product? This cannot be undone.')"
-                                            class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
-                                        Delete Product
+                                            onclick="return confirm('Archive this product? You can restore it later from the Archive page.')"
+                                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                                        Delete this item
                                     </button>
                                 </div>
                             </div>
@@ -78,12 +75,9 @@
                         </div>
                     </div>
 
-                    <!-- Content -->
-                    <div class="overflow-y-auto p-4 sm:p-6" style="max-height: calc(95vh - 130px);">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                            <!-- Left: Images -->
+                    <div class="overflow-y-auto p-4 sm:p-6" style="max-height: calc(92vh - 110px);">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                             <div class="space-y-4">
-                                <!-- Main Image -->
                                 <div class="aspect-square bg-gray-50 rounded-xl overflow-hidden relative border border-gray-200">
                                     @if($gallery->isNotEmpty() && isset($gallery[0]) && $gallery[0])
                                         <img src="{{ Storage::url($gallery[0]) }}" 
@@ -99,10 +93,9 @@
                                     @endif
                                 </div>
 
-                                <!-- Variant Images -->
                                 @if($hasVariantImages)
                                     <div>
-                                        <p class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-2.5">Variant Images</p>
+                                        <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Variant Images</p>
                                         <div class="grid grid-cols-4 gap-2">
                                             @php
                                                 $imagesToShow = $variantImages->take(4);
@@ -120,7 +113,7 @@
                                                         <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center cursor-pointer hover:bg-black/60 transition"
                                                              @click="showVariantGallery = true">
                                                             <span class="text-xl font-bold text-white">+{{ $remainingCount }}</span>
-                                                            <span class="text-[10px] text-white/70">View all</span>
+                                                            <span class="text-xs text-white/70">View all</span>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -140,16 +133,14 @@
                                 @endif
                             </div>
 
-                            <!-- Right: Details -->
                             <div class="space-y-4">
                                 <div>
-                                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900">{{ $post->name }}</h1>
-                                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">{{ $post->name }}</h1>
+                                    <div class="flex items-center gap-2 mt-1 flex-wrap">
                                         <span class="text-sm text-gray-500">{{ $post->productCategory?->name ?? 'Uncategorized' }}</span>
                                     </div>
                                 </div>
 
-                                <!-- Price -->
                                 <div class="flex items-baseline gap-3">
                                     <span class="text-2xl font-bold text-[#1E7A4A]">${{ number_format($post->price ?? 0, 2) }}</span>
                                     @if($product && $product->cost_price)
@@ -157,23 +148,22 @@
                                     @endif
                                 </div>
 
-                                <!-- Details Grid -->
-                                <div class="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-3 border-t border-gray-100">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-3 border-t border-gray-100">
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Category</span>
-                                        <p class="text-sm text-gray-800 mt-0.5">{{ $post->productCategory?->name ?? 'Uncategorized' }}</p>
+                                        <p class="text-sm text-gray-800 mt-1 truncate">{{ $post->productCategory?->name ?? 'Uncategorized' }}</p>
                                     </div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">SKU</span>
-                                        <p class="text-sm text-gray-800 font-mono mt-0.5">{{ $product ? $product->sku : 'N/A' }}</p>
+                                        <p class="text-sm text-gray-800 font-mono mt-1 truncate">{{ $product ? $product->sku : 'N/A' }}</p>
                                     </div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Stock</span>
-                                        <p class="text-sm text-gray-800 font-semibold mt-0.5">{{ $product ? $product->stock : 0 }}</p>
+                                        <p class="text-sm text-gray-800 font-semibold mt-1">{{ $product ? $product->stock : 0 }}</p>
                                     </div>
                                     <div>
                                         <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Added</span>
-                                        <p class="text-sm text-gray-800 mt-0.5">{{ $post->created_at->format('M d, Y') }}</p>
+                                        <p class="text-sm text-gray-800 mt-1">{{ $post->created_at->format('M d, Y') }}</p>
                                     </div>
                                 </div>
                                 

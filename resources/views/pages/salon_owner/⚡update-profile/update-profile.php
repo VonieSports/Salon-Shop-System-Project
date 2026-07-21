@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.salon_owner')] class extends Component
 {
-   use WithFileUploads;
+    use WithFileUploads;
 
     public $user_name;
     public $user_email;
@@ -21,12 +21,14 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $new_password;
     public $new_password_confirmation;
     public $avatar;
+    public $cover_photo;
+    public $existing_avatar;
+    public $existing_cover_photo;
 
     public $tenant_name;
     public $tenant_phone;
     public $tenant_email;
     public $tenant_address;
-    public $tenant_logo;
 
     public $user;
     public $tenant;
@@ -41,6 +43,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->user_phone = $this->user->phone;
         $this->user_address = $this->user->address;
         $this->user_bio = $this->user->bio;
+        $this->existing_avatar = $this->user->avatar;
+        $this->existing_cover_photo = $this->user->cover_photo;
 
         if ($this->tenant) {
             $this->tenant_name = $this->tenant->name;
@@ -62,12 +66,9 @@ new #[Layout('layouts.salon_owner')] class extends Component
             'user_address' => 'nullable|string|max:500',
             'user_bio' => 'nullable|string|max:500',
             'avatar' => 'nullable|image|max:2048',
+            'cover_photo' => 'nullable|image|max:5120',
             'current_password' => 'nullable|required_with:new_password|current_password',
             'new_password' => 'nullable|min:8|confirmed',
-            'tenant_name' => 'nullable|string|max:255',
-            'tenant_phone' => 'nullable|string|max:11|min:11',
-            'tenant_address' => 'nullable|string|max:500',
-            'tenant_logo' => 'nullable|image|max:2048',
         ];
 
         if ($tenant) {
@@ -77,6 +78,16 @@ new #[Layout('layouts.salon_owner')] class extends Component
         }
 
         return $rules;
+    }
+
+    protected function messages()
+    {
+        return [
+            'cover_photo.image' => 'Cover photo must be an image file.',
+            'cover_photo.max' => 'Cover photo must not exceed 5MB.',
+            'avatar.image' => 'Profile photo must be an image file.',
+            'avatar.max' => 'Profile photo must not exceed 2MB.',
+        ];
     }
 
     public function updateProfile()
@@ -103,7 +114,20 @@ new #[Layout('layouts.salon_owner')] class extends Component
                 if ($user->avatar) {
                     Storage::disk('public')->delete($user->avatar);
                 }
-                $user->update(['avatar' => $this->avatar->store('avatars', 'public')]);
+                $avatarPath = $this->avatar->store('avatars', 'public');
+                $user->update(['avatar' => $avatarPath]);
+                $this->existing_avatar = $avatarPath;
+                $this->avatar = null;
+            }
+
+            if ($this->cover_photo) {
+                if ($user->cover_photo) {
+                    Storage::disk('public')->delete($user->cover_photo);
+                }
+                $coverPath = $this->cover_photo->store('cover_photos', 'public');
+                $user->update(['cover_photo' => $coverPath]);
+                $this->existing_cover_photo = $coverPath;
+                $this->cover_photo = null;
             }
 
             if ($tenant) {
@@ -113,20 +137,34 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'email' => $this->tenant_email,
                     'address' => $this->tenant_address,
                 ]);
-
-                if ($this->tenant_logo) {
-                    if ($tenant->logo) {
-                        Storage::disk('public')->delete($tenant->logo);
-                    }
-                    $tenant->update(['logo' => $this->tenant_logo->store('tenant-logos', 'public')]);
-                }
             }
         });
 
         $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
+ 
         $this->user = Auth::user()->load('tenant');
         $this->tenant = $this->user->tenant;
         
         session()->flash('success', 'Profile updated successfully!');
+    }
+
+    public function removeAvatar()
+    {
+        if ($this->user->avatar) {
+            Storage::disk('public')->delete($this->user->avatar);
+            $this->user->update(['avatar' => null]);
+            $this->existing_avatar = null;
+            session()->flash('success', 'Profile photo removed successfully!');
+        }
+    }
+
+    public function removeCoverPhoto()
+    {
+        if ($this->user->cover_photo) {
+            Storage::disk('public')->delete($this->user->cover_photo);
+            $this->user->update(['cover_photo' => null]);
+            $this->existing_cover_photo = null;
+            session()->flash('success', 'Cover photo removed successfully!');
+        }
     }
 };

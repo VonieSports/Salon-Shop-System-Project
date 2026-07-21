@@ -12,30 +12,52 @@ new #[Layout('layouts.salon_owner')] class extends Component
 {
     use WithFileUploads;
 
-   public $tenant;
+    public $tenant;
     public $business_name;
     public $business_email;
     public $business_phone;
     public $business_address;
+    public $business_type;
+    public $description;
     public $business_logo;
     public $existing_logo;
     public $is_setup_complete = false;
     public $is_editing = false;
+    public $business_hours = [];
+    public $activeTab = 'info';
+    public $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']; 
+    public $dayLabels = [ 'monday' => 'Monday','tuesday' => 'Tuesday','wednesday' => 'Wednesday','thursday' => 'Thursday','friday' => 'Friday','saturday' => 'Saturday','sunday' => 'Sunday'];
 
     public function mount()
     {
         $this->tenant = Auth::user()->tenant;
         
         if ($this->tenant) {
-            $this->business_name = $this->tenant->name;
-            $this->business_email = $this->tenant->email;
-            $this->business_phone = $this->tenant->phone;
-            $this->business_address = $this->tenant->address;
-            $this->existing_logo = $this->tenant->logo;
-            $this->is_setup_complete = $this->tenant->business_setup_completed;
+            if ($this->tenant->business_setup_completed) {
+                $this->business_name = $this->tenant->name;
+                $this->business_email = $this->tenant->email;
+                $this->business_phone = $this->tenant->phone;
+                $this->business_address = $this->tenant->address;
+                $this->business_type = $this->tenant->business_type;
+                $this->description = $this->tenant->description;
+                $this->existing_logo = $this->tenant->logo;
+                $this->is_setup_complete = true;
+                $this->business_hours = $this->tenant->business_hours ?? [];
+            } else {
+                $this->business_name = null;
+                $this->business_email = null;
+                $this->business_phone = null;
+                $this->business_address = null;
+                $this->business_type = null;
+                $this->description = null;
+                $this->existing_logo = null;
+                $this->is_setup_complete = false;
+                
+                $this->business_hours = [];
+            }
             $this->is_editing = !$this->is_setup_complete;
         } else {
-            $this->is_editing = true;
+            return redirect()->route('owner.dashboard');
         }
     }
 
@@ -48,8 +70,45 @@ new #[Layout('layouts.salon_owner')] class extends Component
             'business_email' => "nullable|email|unique:tenants,email,{$tenantId}",
             'business_phone' => 'nullable|string|max:11|min:11',
             'business_address' => 'nullable|string|max:500',
+            'business_type' => 'nullable|string|max:100',
+            'description' => 'nullable|string|max:1000',
             'business_logo' => 'nullable|image|max:2048',
+            'business_hours.*.open' => 'nullable|string',
+            'business_hours.*.close' => 'nullable|string',
         ];
+    }
+
+    public function addDay($day)
+    {
+        if (!isset($this->business_hours[$day])) {
+            $this->business_hours[$day] = [
+                'open' => '',
+                'close' => '',
+                'closed' => false,
+            ];
+        }
+    }
+
+    public function removeDay($day)
+    {
+        if (isset($this->business_hours[$day])) {
+            unset($this->business_hours[$day]);
+        }
+    }
+
+    public function toggleDayClosed($day)
+    {
+        if (isset($this->business_hours[$day])) {
+            $this->business_hours[$day]['closed'] = !($this->business_hours[$day]['closed'] ?? false);
+            
+            if ($this->business_hours[$day]['closed']) {
+                $this->business_hours[$day]['open'] = null;
+                $this->business_hours[$day]['close'] = null;
+            } else {
+                $this->business_hours[$day]['open'] = '';
+                $this->business_hours[$day]['close'] = '';
+            }
+        }
     }
 
     public function saveBusinessInfo()
@@ -59,6 +118,17 @@ new #[Layout('layouts.salon_owner')] class extends Component
         DB::transaction(function () {
             $user = Auth::user();
             
+            $hoursToSave = [];
+            foreach ($this->business_hours as $day => $hours) {
+                if ($hours['open'] || $hours['close'] || $hours['closed']) {
+                    $hoursToSave[$day] = [
+                        'open' => $hours['open'] ?? null,
+                        'close' => $hours['close'] ?? null,
+                        'closed' => $hours['closed'] ?? false,
+                    ];
+                }
+            }
+
             if (!$this->tenant) {
                 $this->tenant = Tenant::create([
                     'user_id' => $user->id,
@@ -67,6 +137,9 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'email' => $this->business_email,
                     'phone' => $this->business_phone,
                     'address' => $this->business_address,
+                    'business_type' => $this->business_type,
+                    'description' => $this->description,
+                    'business_hours' => $hoursToSave,
                     'is_active' => true,
                     'business_setup_completed' => true,
                     'verification_status' => 'pending',
@@ -78,6 +151,9 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'email' => $this->business_email,
                     'phone' => $this->business_phone,
                     'address' => $this->business_address,
+                    'business_type' => $this->business_type,
+                    'description' => $this->description,
+                    'business_hours' => $hoursToSave,
                     'business_setup_completed' => true,
                     'submitted_at' => now(),
                 ]);
@@ -103,12 +179,24 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function cancelEdit()
     {
-        if ($this->tenant) {
+        if ($this->tenant && $this->tenant->business_setup_completed) {
             $this->business_name = $this->tenant->name;
             $this->business_email = $this->tenant->email;
             $this->business_phone = $this->tenant->phone;
             $this->business_address = $this->tenant->address;
+            $this->business_type = $this->tenant->business_type;
+            $this->description = $this->tenant->description;
             $this->existing_logo = $this->tenant->logo;
+            $this->business_hours = $this->tenant->business_hours ?? [];
+        } else {
+            $this->business_name = null;
+            $this->business_email = null;
+            $this->business_phone = null;
+            $this->business_address = null;
+            $this->business_type = null;
+            $this->description = null;
+            $this->existing_logo = null;
+            $this->business_hours = [];
         }
         $this->business_logo = null;
         $this->is_editing = false;

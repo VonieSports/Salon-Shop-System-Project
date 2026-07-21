@@ -1,19 +1,22 @@
 <?php
 
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 new class extends Component
 {
-
-    public string $name                  = '';
+ public string $name                  = '';
     public string $email                 = '';
     public string $password              = '';
     public string $password_confirmation = '';
     public bool   $showPassword          = false;
     public bool   $showConfirm           = false;
+    public string $errorMessage          = '';
  
     protected function rules(): array
     {
@@ -40,26 +43,51 @@ new class extends Component
     public function updated($field): void
     {
         $this->validateOnly($field);
+        $this->errorMessage = ''; 
     }
  
     public function register()
     {
         $this->validate();
- 
-        $user = User::create([
-            'name'      => trim($this->name),
-            'email'     => strtolower(trim($this->email)),
-            'password'  => Hash::make($this->password),
-            'is_active' => true,
-        ]);
- 
-        $user->assignRole('owner');
- 
-        Auth::login($user);
-        session()->regenerate();
- 
-        $user->update(['last_login_at' => now()]);
- 
-        return redirect()->route('owner.dashboard');
+        $this->errorMessage = '';
+
+        try {
+            DB::transaction(function () {
+                $user = User::create([
+                    'name'      => trim($this->name),
+                    'email'     => strtolower(trim($this->email)),
+                    'password'  => Hash::make($this->password),
+                    'is_active' => true,
+                ]);
+
+                $user->assignRole('owner');
+
+                $slug = Str::slug('business-' . uniqid());
+                $tenant = Tenant::create([
+                    'user_id' => $user->id,
+                    'name' => null, 
+                    'slug' => $slug,
+                    'email' => null, 
+                    'phone' => null, 
+                    'address' => null,
+                    'is_active' => true,
+                    'business_setup_completed' => false,
+                    'verification_status' => 'pending',
+                ]);
+
+                Auth::login($user);
+                session()->regenerate();
+                $user->update(['last_login_at' => now()]);
+            });
+
+            return redirect()->route('owner.dashboard')->with('success', 'Account created successfully! Please complete your business setup.');
+
+        } catch (\Exception $e) {
+            $this->errorMessage = 'Registration failed: ' . $e->getMessage();
+            \Log::error('Registration error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 };

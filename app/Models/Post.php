@@ -26,12 +26,14 @@ class Post extends Model
         'description',
         'status',
         'reject_reason',
+        'archived_at',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'archived_at' => 'datetime',
     ];
 
      public function tenant(): BelongsTo

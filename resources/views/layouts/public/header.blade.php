@@ -1,16 +1,16 @@
 <div>
-
-<!-- Top utility bar -->
 <div class="bg-[#1E7A4A] text-white text-xs">
   <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-10 py-3 flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center gap-3 sm:gap-5 flex-wrap">
       <a href="#" class="hover:underline whitespace-nowrap">Customer Service</a>
       <span class="opacity-40 hidden xs:inline">|</span>
-      <!-- Contact Us - hidden on mobile, shown on sm+ -->
-      <span class="hidden sm:flex items-center gap-1 flex-wrap">Contact Us <a href="tel:+639096575772" class="underline font-medium whitespace-nowrap">020390 657 5772</a></span>
+      <span class="hidden sm:flex items-center gap-1">
+        <span class="opacity-40 mx-1">|</span>
+        <a href="{{ route('owner.login.page') }}" class="hover:underline whitespace-nowrap">Seller Centre</a>
+         <span class="opacity-40 mx-1">|</span>
+       <a href="{{ route('owner.register.page') }}" class="hover:underline whitespace-nowrap">Become a Seller</a>
+      </span>
     </div>
-    
-    <!-- Social Media Icons - Always visible -->
     <div class="flex items-center gap-2 sm:gap-4">
       <span class="text-white/80 text-xs font-medium">Follow us:</span>
       <a href="#" class="text-white/80 hover:text-white transition-colors" aria-label="YouTube">
@@ -34,23 +34,17 @@
         </svg>
       </a>
     </div>
-    
-    <!-- Sign in - REMOVED from top utility bar -->
   </div>
 </div>
 
-<!-- Header / Nav -->
 <header class="bg-white border-b border-gray-100 relative z-50">
   <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-10 py-3 sm:py-4 flex items-center gap-3 sm:gap-6">
-    
-    <!-- Mobile Menu Toggle (hamburger) - now on the LEFT before logo -->
     <button id="menuToggle" type="button" class="lg:hidden flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 text-gray-700 hover:text-emerald-800 shrink-0 order-1">
       <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
 
-    <!-- Logo -->
     <a href="#" class="flex items-center gap-2 shrink-0 order-2 lg:order-1">
       <svg class="w-6 h-6 sm:w-7 sm:h-7 text-emerald-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-1.5 2-4 3-4 6a4 4 0 008 0c0-3-2.5-4-4-6z"/>
@@ -59,7 +53,6 @@
       <span class="font-serif-display text-xl sm:text-2xl font-bold text-emerald-800 tracking-tight whitespace-nowrap">Style Station</span>
     </a>
 
-    <!-- Nav links - hidden on mobile -->
     <nav class="hidden lg:flex items-center justify-center flex-1 gap-5 xl:gap-7 text-sm font-medium text-gray-700 order-2">
       <a href="#" class="relative py-1 hover:text-emerald-800 transition">Home<span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-emerald-800 rounded-full opacity-0 hover:opacity-100"></span></a>
       <a href="#" class="relative py-1 hover:text-emerald-800 transition">Shop<span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-emerald-800 rounded-full opacity-0 hover:opacity-100"></span></a>
@@ -70,16 +63,13 @@
       <a href="#" class="relative py-1 hover:text-emerald-800 transition">Contact<span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-emerald-800 rounded-full opacity-0 hover:opacity-100"></span></a>
     </nav>
 
-    <!-- Right icons -->
     <div class="flex items-center gap-2 sm:gap-4 shrink-0 ml-auto order-3">
-      <!-- Search icon -->
       <button id="searchToggle" class="text-gray-700 hover:text-emerald-800 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
       </button>
       
-      <!-- Desktop search -->
       <div class="hidden lg:flex relative">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -87,14 +77,12 @@
         <input type="text" placeholder="Search..." class="w-36 xl:w-48 pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
       </div>
       
-      <!-- Heart -->
       <button class="text-gray-700 hover:text-emerald-800 transition hidden xs:block">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
         </svg>
       </button>
       
-      <!-- Cart -->
       <button class="text-gray-700 hover:text-emerald-800 transition relative">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -102,7 +90,6 @@
         <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">3</span>
       </button>
       
-      <!-- Bell -->
       <button class="text-gray-700 hover:text-emerald-800 transition relative hidden xs:block">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -110,15 +97,11 @@
         <span class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-600 rounded-full"></span>
       </button>
       
-      <!-- Sign in - hidden on mobile, shown on tablet+ -->
-      <a href="#" class="hidden sm:block bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-md whitespace-nowrap">Sign in</a>
-      
-      <!-- Mobile Sign In Button -->
-      <a href="#" class="lg:hidden bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-md whitespace-nowrap">Sign in</a>
+      <a href="{{ route('login.page') }}" class="hidden sm:block bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-md whitespace-nowrap">Sign in</a>
+      <a href="{{ route('login.page') }}" class="lg:hidden bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-md whitespace-nowrap">Sign in</a>
     </div>
   </div>
 
-  <!-- Mobile menu -->
   <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-100 bg-white">
     <div class="px-4 sm:px-6 py-4 space-y-3">
       <nav class="flex flex-col space-y-2 text-sm font-medium text-gray-700">
@@ -129,6 +112,8 @@
         <a href="#" class="py-2 hover:text-emerald-800 transition border-b border-gray-50 flex items-center justify-between">Categories<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></a>
         <a href="#" class="py-2 hover:text-emerald-800 transition border-b border-gray-50">About</a>
         <a href="#" class="py-2 hover:text-emerald-800 transition">Contact</a>
+         <a href="#" class="py-2 hover:text-emerald-800 transition border-b border-gray-50">Seller Centre</a>
+        <a href="#" class="py-2 hover:text-emerald-800 transition">Become a Seller</a>
       </nav>
       
       <!-- Social Media in Mobile Menu -->

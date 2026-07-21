@@ -115,6 +115,12 @@ public function categories()
 
     public function save(): void
     {
+        $this->name = trim($this->name);
+        $this->description = trim($this->description ?? '');
+        $this->cost_price = (float) preg_replace('/[^0-9.]/', '', $this->cost_price);
+        $this->selling_price = (float) preg_replace('/[^0-9.]/', '', $this->selling_price);
+        $this->stock = (int) preg_replace('/[^0-9]/', '', $this->stock);
+
         $this->validate();
 
         try {

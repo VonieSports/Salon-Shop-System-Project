@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Tenant;
+use App\OnlineStatusTrait;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -22,17 +23,19 @@ use Spatie\Permission\Traits\HasRoles;
     'address',
     'bio',
     'avatar',
+    'cover_photo',
     'password',
     'is_active',
     'last_login_at',
     'last_logout_at',
+    'last_activity_at',
     'email_verified_at',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, OnlineStatusTrait;
 
     /**
      * Get the attributes that should be cast.
@@ -45,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at'     => 'datetime',
             'last_logout_at'    => 'datetime',
+            'last_activity_at'  => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
         ];
@@ -67,8 +71,8 @@ class User extends Authenticatable
 
     public function tenantsWithAccess(): BelongsToMany
 {
-    return $this->belongsToMany(Tenant::class, 'tenant_users')
-        ->withPivot('role')
-        ->withTimestamps();
+    return $this->belongsToMany(Tenant::class, 'tenant_users')->withPivot('role')
+    ->withTimestamps();
 }
+
 }

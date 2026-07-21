@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->text('description')->nullable();
             $table->string('status')->default('draft'); 
+            $table->timestamp('archived_at')->nullable();
             $table->text('reject_reason')->nullable();
             $table->timestamps();
             $table->index(['inventory_type', 'inventory_id']);

@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\BusinessHoursTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Tenant extends Model
 {
+     use BusinessHoursTrait;
+     
       protected $fillable = [
         'user_id',
         'name',
@@ -20,6 +22,9 @@ class Tenant extends Model
         'logo',
         'is_active',
         'business_setup_completed',
+        'business_hours',
+        'business_type',
+        'description',
         'verification_status',
         'rejection_reason',
         'submitted_at',
@@ -28,6 +33,7 @@ class Tenant extends Model
      protected $casts = [
         'is_active' => 'boolean',
         'business_setup_completed' => 'boolean',
+        'business_hours' => 'array',
         'submitted_at' => 'datetime',
     ];
 

@@ -1,12 +1,8 @@
 <?php
 
 use App\Models\Post;
-use App\Models\Product;  // ← ADD THIS LINE
-use App\Models\ItemVariant;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -30,7 +26,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public ?int $selectedPostId = null;
 
-    // Public properties for modal (no Computed)
     public $selectedPost = null;
     public $selectedProduct = null;
     public $selectedVariants = [];
@@ -42,6 +37,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
         abort_unless($tenant?->business_setup_completed, 403, 'Please complete your business setup first.');
         $this->tenantId = $tenant->id;
     }
+
     public $showVariantGallery = false;
 
     public function openVariantGallery()
@@ -53,15 +49,11 @@ new #[Layout('layouts.salon_owner')] class extends Component
     {
         $this->showVariantGallery = false;
     }
+
     public function getItemsProperty()
     {
-        return Post::query()
-            ->with('productCategory:id,name')
-            ->where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->when($this->search !== '', fn($q) => $q->where('name', 'like', '%' . $this->search . '%'))
-            ->when($this->dateFilter === 'today', fn($q) => $q->whereDate('created_at', today()))
+        return Post::query()->with('productCategory:id,name')->where('tenant_id', $this->tenantId)->where('created_by', Auth::id())
+            ->where('type', 'product')->whereNull('archived_at')->when($this->search !== '', fn($q) => $q->where('name', 'like', '%' . $this->search . '%'))->when($this->dateFilter === 'today', fn($q) => $q->whereDate('created_at', today()))
             ->when($this->dateFilter === 'week', fn($q) => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]))
             ->when($this->dateFilter === 'month', fn($q) => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year))
             ->when($this->dateFilter === 'custom' && $this->customDateFrom, fn($q) => $q->whereDate('created_at', '>=', $this->customDateFrom))
@@ -74,14 +66,9 @@ new #[Layout('layouts.salon_owner')] class extends Component
     {
         $this->selectedPostId = $postId;
 
-        // Load the post with category
-        $this->selectedPost = Post::with(['productCategory:id,name'])
-            ->where('tenant_id', $this->tenantId)
-            ->where('id', $postId)
-            ->where('type', 'product')
-            ->first();
+        $this->selectedPost = Post::with(['productCategory:id,name'])->where('tenant_id', $this->tenantId)->where('id', $postId)
+            ->where('type', 'product')->first();
 
-        // Load the actual Product using inventory_id from the post
         if ($this->selectedPost && $this->selectedPost->inventory_id) {
             $this->selectedProduct = Product::find($this->selectedPost->inventory_id);
             $this->selectedVariants = $this->selectedProduct?->variants ?? collect();
@@ -90,7 +77,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
             $this->selectedVariants = collect();
         }
 
-        // Build gallery from post image
         $gallery = collect();
         if ($this->selectedPost && $this->selectedPost->image) {
             $gallery = collect([$this->selectedPost->image])->filter()->values();
@@ -108,28 +94,25 @@ new #[Layout('layouts.salon_owner')] class extends Component
     }
 
     public function navigateItem(string $direction): void
-{
+    {
+        $items = $this->items;
+        $ids = $items->getCollection()->pluck('id')->toArray();
+        $currentIndex = array_search($this->selectedPostId, $ids, true);
 
-    $items = $this->items; 
-    $ids = $items->getCollection()->pluck('id')->toArray();
-    $currentIndex = array_search($this->selectedPostId, $ids, true);
+        if ($currentIndex === false) {
+            return;
+        }
 
-    if ($currentIndex === false) {
-        return;
+        $newIndex = $direction === 'next' ? $currentIndex + 1 : $currentIndex - 1;
+
+        if (isset($ids[$newIndex])) {
+            $this->viewItem($ids[$newIndex]);
+        }
     }
 
-    $newIndex = $direction === 'next' ? $currentIndex + 1 : $currentIndex - 1;
-
-    if (isset($ids[$newIndex])) {
-        $this->viewItem($ids[$newIndex]);
-    }
-}
     public function toggleStatus(int $postId): void
     {
-        $post = Post::where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->find($postId);
+        $post = Post::where('tenant_id', $this->tenantId)->where('created_by', Auth::id())->where('type', 'product')->find($postId);
 
         if (!$post) {
             return;
@@ -163,36 +146,27 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->selectAll = false;
     }
 
-    // ===== SIMPLE DELETION METHODS =====
-
-    /**
-     * Delete a single product - SIMPLE
-     */
     public function deleteItem(int $postId): void
     {
-        $deleted = Post::where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->where('id', $postId)
-            ->delete();
+        $post = Post::where('tenant_id', $this->tenantId)->where('created_by', Auth::id())->where('type', 'product')
+            ->where('id', $postId)->first();
 
-        if ($deleted) {
+        if ($post) {
+            $post->update(['archived_at' => now()]);
+
             if ($this->selectedPostId === $postId) {
-                $this->selectedPostId = null;
+                $this->closeItem();
             }
 
             $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $postId]));
 
             unset($this->items);
-            session()->flash('message', 'Product deleted successfully.');
+            session()->flash('message', 'Product archived successfully. You can restore it from the Archive page.');
         } else {
             session()->flash('error', 'Product not found.');
         }
     }
 
-    /**
-     * Delete multiple selected products - SIMPLE
-     */
     public function bulkDelete(): void
     {
         if (empty($this->selectedIds)) {
@@ -200,18 +174,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
             return;
         }
 
-        $count = Post::where('tenant_id', $this->tenantId)
-            ->where('created_by', Auth::id())
-            ->where('type', 'product')
-            ->whereIn('id', $this->selectedIds)
-            ->delete();
+        $count = Post::where('tenant_id', $this->tenantId)->where('created_by', Auth::id())->where('type', 'product')
+            ->whereIn('id', $this->selectedIds)->update(['archived_at' => now()]);
 
         if ($count > 0) {
             $this->clearSelection();
             unset($this->items);
-            session()->flash('message', "{$count} product(s) deleted successfully.");
+            session()->flash('message', "{$count} product(s) archived successfully. You can restore them from the Archive page.");
         } else {
-            session()->flash('error', 'Failed to delete selected products.');
+            session()->flash('error', 'Failed to archive selected products.');
         }
     }
 };

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('service_id')->nullable()->constrained('services')->nullOnDelete();
             $table->json('attributes')->nullable();
             $table->string('sku')->nullable();
-            $table->integer('stock')->default(0);
+            $table->integer('stock')->nullable();
             $table->decimal('price_adjustment', 10, 2)->default(0);
             $table->integer('duration_adjustment')->default(0);
             $table->string('image')->nullable();

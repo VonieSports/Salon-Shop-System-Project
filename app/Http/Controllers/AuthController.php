@@ -13,7 +13,6 @@ class AuthController extends Controller
 
         if ($user) {
             $user->update([
-                'is_active' => false,
                 'last_logout_at' => now(),
             ]);
         }

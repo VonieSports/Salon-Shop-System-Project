@@ -104,10 +104,6 @@
               class="w-full bg-[#1E7A4A] hover:bg-emerald-900 text-white font-medium py-3 rounded-md transition flex items-center justify-center gap-2">
               <span wire:loading.remove>Login</span>
               <span wire:loading class="flex items-center gap-2">
-                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
                 Logging in...
               </span>
             </button>

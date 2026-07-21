@@ -1,6 +1,4 @@
 <header class="bg-white border-b border-gray-200 h-[60px] sm:h-[68px] flex items-center px-3 sm:px-5 md:px-6 lg:px-6 gap-2 sm:gap-3 md:gap-4 lg:gap-4 shrink-0 z-20 sticky top-0 shadow-sm">
-    
-    <!-- Hamburger - Smaller Touch Target -->
     <button @click="sidebarOpen = !sidebarOpen"
         class="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition shrink-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -8,7 +6,6 @@
         </svg>
     </button>
 
-    <!-- Logo - Mobile Only -->
     <div class="flex items-center gap-2 shrink-0 lg:hidden">
         <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -55,7 +52,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                     <input type="text" 
-                           placeholder="Search products, services..."
+                           placeholder="Search"
                            class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-50 border border-gray-200 
                                   focus:outline-none focus:bg-white focus:border-emerald-400
                                   transition placeholder-gray-400"
@@ -94,7 +91,6 @@
         </div>
     </div>
 
-    <!-- Desktop: Search Bar -->
     <div class="hidden lg:flex flex-1 items-center max-w-sm ml-auto">
         <div class="relative w-full">
             <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" 
@@ -102,24 +98,20 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text" 
-                   placeholder="Search products, services..."
+                   placeholder="Search"
                    class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 
                           focus:outline-none focus:bg-white focus:border-emerald-400
                           transition placeholder-gray-400">
         </div>
     </div>
 
-    <!-- Right Side Icons - Smaller -->
-    <div class="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-2.5 ml-auto shrink-0">
-
-        <!-- Filter Icon -->
+    <div class="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-2.5 ml-auto shrink-0">>
         <button class="hidden lg:flex p-2 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
             </svg>
         </button>
 
-        {{-- Notifications --}}
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
                 class="p-2 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 transition relative">
@@ -155,7 +147,6 @@
             </div>
         </div>
 
-        <!-- Profile Dropdown - Smaller -->
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
                 class="flex items-center gap-1.5 px-1.5 py-1 rounded-lg hover:bg-gray-100 transition">
@@ -208,6 +199,5 @@
                 </form>
             </div>
         </div>
-
     </div>
 </header>

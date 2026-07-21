@@ -13,7 +13,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-new #[Layout('layoust.salon_owner')] class extends Component
+new #[Layout('layouts.salon_owner')] class extends Component
 {
 
    use WithFileUploads;
