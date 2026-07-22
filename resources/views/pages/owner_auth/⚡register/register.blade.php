@@ -2,16 +2,12 @@
 <div>
     <div>
 <section class="relative overflow-hidden">
-
   <div class="absolute inset-0 z-0 bg-emerald-50/70"
        style="background-image: url('/images/herobg.png'); background-size: cover; background-position: center; opacity: 0.1;">
   </div>
   <div class="absolute inset-0 z-[1] bg-gradient-to-t from-white via-white/10 to-[#1E7A4A]/15"></div>
-
   <div class="relative z-10 max-w-[1700px] mx-auto px-6 lg:px-10 py-16 lg:py-24">
     <div class="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
-
-      {{-- Left copy --}}
       <div class="w-full lg:w-auto lg:max-w-md shrink-0">
         <h1 class="font-serif-display text-5xl sm:text-6xl font-bold leading-[1.05] text-gray-900">
           Grow Your <span class="text-emerald-700">Salon</span>
@@ -45,8 +41,6 @@
           <p class="text-center text-sm text-gray-500 mt-1">Register your account to start selling, purchasing and booking</p>
 
           <form wire:submit.prevent="register" class="mt-7 space-y-4">
-
-            {{-- Name --}}
             <div>
               <label class="block text-sm font-medium text-gray-800 mb-1.5">Name</label>
               <input type="text"
@@ -59,7 +53,6 @@
               @enderror
             </div>
 
-            {{-- Email --}}
             <div>
               <label class="block text-sm font-medium text-gray-800 mb-1.5">Email</label>
               <input type="email"
@@ -72,7 +65,6 @@
               @enderror
             </div>
 
-            {{-- Password --}}
             <div>
               <label class="block text-sm font-medium text-gray-800 mb-1.5">Password</label>
               <div class="relative">

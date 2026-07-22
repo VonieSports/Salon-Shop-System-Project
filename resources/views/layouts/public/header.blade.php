@@ -64,39 +64,45 @@
     </nav>
 
     <div class="flex items-center gap-2 sm:gap-4 shrink-0 ml-auto order-3">
-      <button id="searchToggle" class="text-gray-700 hover:text-emerald-800 transition">
+      <!-- Search: icon-triggered dropdown, only shown below desktop where the persistent bar (below) takes over -->
+      <button id="searchToggle" class="lg:hidden text-gray-700 hover:text-emerald-800 transition" aria-label="Open search">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
       </button>
-      
+
+      <!-- Persistent compact search bar, desktop only -->
       <div class="hidden lg:flex relative">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input type="text" placeholder="Search..." class="w-36 xl:w-48 pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
       </div>
-      
-      <button class="text-gray-700 hover:text-emerald-800 transition hidden xs:block">
+
+      <!-- Favorite / Wishlist -->
+      <button class="text-gray-700 hover:text-emerald-800 transition relative" aria-label="Wishlist">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
         </svg>
+        <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">2</span>
       </button>
-      
-      <button class="text-gray-700 hover:text-emerald-800 transition relative">
+
+      <!-- Cart -->
+      <button class="text-gray-700 hover:text-emerald-800 transition relative" aria-label="Cart">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
         </svg>
         <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">3</span>
       </button>
-      
-      <button class="text-gray-700 hover:text-emerald-800 transition relative hidden xs:block">
+
+      <!-- Notifications -->
+      <button class="text-gray-700 hover:text-emerald-800 transition relative" aria-label="Notifications">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
         </svg>
-        <span class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-600 rounded-full"></span>
+        <span class="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">5</span>
       </button>
-      
+
       <a href="{{ route('login.page') }}" class="hidden sm:block bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-md whitespace-nowrap">Sign in</a>
       <a href="{{ route('login.page') }}" class="lg:hidden bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-md whitespace-nowrap">Sign in</a>
     </div>
@@ -115,8 +121,7 @@
          <a href="#" class="py-2 hover:text-emerald-800 transition border-b border-gray-50">Seller Centre</a>
         <a href="#" class="py-2 hover:text-emerald-800 transition">Become a Seller</a>
       </nav>
-      
-      <!-- Social Media in Mobile Menu -->
+
       <div class="pt-4 border-t border-gray-100">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Follow us</p>
         <div class="flex items-center gap-4">
@@ -142,40 +147,37 @@
           </a>
         </div>
       </div>
-      
+
       <a href="#" class="block w-full bg-[#1E7A4A] hover:bg-emerald-800 text-white text-sm font-medium px-6 py-2.5 rounded-md text-center mt-3">Sign in</a>
     </div>
   </div>
 
-  <!-- Mobile Search Overlay -->
-  <div id="searchOverlay" class="fixed inset-0 bg-white z-[100] hidden">
-    <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
-      <!-- Back/Close button -->
-      <button id="searchClose" class="p-1 text-gray-600 hover:text-gray-900">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-      
-      <!-- Search input -->
-      <div class="flex-1 relative">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <input id="searchInput" type="text" placeholder="Search products, services..." class="w-full pl-9 pr-3 py-2 text-base border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500">
-      </div>
-      
-      <!-- Search button -->
-      <button id="searchSubmit" class="bg-[#1E7A4A] text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap">Search</button>
-    </div>
-    
-    <!-- Recent searches -->
-    <div class="px-4 py-6 text-sm text-gray-500">
-      <p class="font-medium text-gray-700 mb-3">Recent searches</p>
-      <div class="flex flex-wrap gap-2">
-        <span class="bg-gray-100 px-3 py-1 rounded-full">Hair salon</span>
-        <span class="bg-gray-100 px-3 py-1 rounded-full">Nail art</span>
-        <span class="bg-gray-100 px-3 py-1 rounded-full">Skincare</span>
+  <!-- Compact centered search dropdown (YouTube-style) -->
+  <div id="searchDropdown" class="hidden fixed inset-0 z-[100]">
+    <div id="searchBackdrop" class="absolute inset-0 bg-gray-900/30 backdrop-blur-sm"></div>
+
+    <div class="relative flex justify-center px-4 pt-20 sm:pt-24">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Search products, services..." class="flex-1 text-sm focus:outline-none">
+          <button id="searchClose" class="p-1 text-gray-400 hover:text-gray-600 shrink-0" aria-label="Close search">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="px-4 py-4">
+          <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Recent searches</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="search-suggestion bg-gray-100 hover:bg-gray-200 transition px-3 py-1.5 rounded-full text-sm text-gray-700">Hair salon</button>
+            <button type="button" class="search-suggestion bg-gray-100 hover:bg-gray-200 transition px-3 py-1.5 rounded-full text-sm text-gray-700">Nail art</button>
+            <button type="button" class="search-suggestion bg-gray-100 hover:bg-gray-200 transition px-3 py-1.5 rounded-full text-sm text-gray-700">Skincare</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -184,21 +186,20 @@
 </div>
 
 <script>
-// Menu toggle
+// Mobile hamburger menu
 function toggleMenu() {
-  const menu = document.getElementById('mobileMenu');
-  menu.classList.toggle('hidden');
+  document.getElementById('mobileMenu').classList.toggle('hidden');
 }
 
-// Search functions
+// Search dropdown
 function openSearch() {
-  document.getElementById('searchOverlay').classList.remove('hidden');
+  document.getElementById('searchDropdown').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+  setTimeout(() => document.getElementById('searchInput').focus(), 50);
 }
 
 function closeSearch() {
-  document.getElementById('searchOverlay').classList.add('hidden');
+  document.getElementById('searchDropdown').classList.add('hidden');
   document.body.style.overflow = '';
   document.getElementById('searchInput').value = '';
 }
@@ -211,19 +212,21 @@ function doSearch() {
   }
 }
 
-// Event listeners
 document.getElementById('menuToggle').addEventListener('click', toggleMenu);
 document.getElementById('searchToggle').addEventListener('click', openSearch);
 document.getElementById('searchClose').addEventListener('click', closeSearch);
-document.getElementById('searchSubmit').addEventListener('click', doSearch);
+document.getElementById('searchBackdrop').addEventListener('click', closeSearch);
 
-document.getElementById('searchInput').addEventListener('keydown', function(e) {
+document.getElementById('searchInput').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') doSearch();
   if (e.key === 'Escape') closeSearch();
 });
 
-// Close on overlay background click
-document.getElementById('searchOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeSearch();
+// Clicking a recent-search chip fills the input and searches immediately
+document.querySelectorAll('.search-suggestion').forEach(function (chip) {
+  chip.addEventListener('click', function () {
+    document.getElementById('searchInput').value = chip.textContent.trim();
+    doSearch();
+  });
 });
 </script>

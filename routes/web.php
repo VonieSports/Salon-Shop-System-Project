@@ -25,6 +25,7 @@ Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
 Route::middleware(['auth', 'track.activity'])->group(function () {
 Route::prefix('owner')->middleware(['owner'])->group(function () {
     Route::livewire('/dashboard', 'pages::salon_owner.dashboard')->name('owner.dashboard');
+    Route::livewire('/chat', 'pages::salon_owner.chat')->name('owner.chat');
     Route::livewire('/profile', 'pages::salon_owner.profile')->name('owner.profile');
     Route::livewire('/business_info', 'pages::salon_owner.business-info')->name('owner.business_info');
     Route::livewire('/business_setup', 'pages::salon_owner.business-setup')->name('owner.business_setup');
@@ -55,6 +56,7 @@ Route::middleware('setup.complete')->group(function () {
 });
 Route::prefix('employee')->middleware(['employee'])->group(function () {
     Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
+    Route::livewire('/chat', 'pages::employee.chat')->name('employee.chat');
     Route::livewire('/profile', 'pages::employee.profile')->name('employee.profile');
     Route::livewire('/update/profile', 'pages::employee.update-profile')->name('employee.update_profile');
     Route::livewire('/business_info', 'pages::employee.business-info')->name('employee.business_info');

@@ -26,6 +26,7 @@ use Spatie\Permission\Traits\HasRoles;
     'cover_photo',
     'password',
     'is_active',
+    'is_blocked', 
     'last_login_at',
     'last_logout_at',
     'last_activity_at',
@@ -51,6 +52,7 @@ class User extends Authenticatable
             'last_activity_at'  => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
+            'is_blocked'        => 'boolean',
         ];
     }
 
@@ -73,5 +75,16 @@ class User extends Authenticatable
 {
     return $this->belongsToMany(Tenant::class, 'tenant_users')->withPivot('role')->withTimestamps();
 }
+   public function blockedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_blocks', 'user_id', 'blocked_user_id')
+            ->withTimestamps();
+    }
+
+    public function blockedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_blocks', 'blocked_user_id', 'user_id')
+            ->withTimestamps();
+    }
 
 }

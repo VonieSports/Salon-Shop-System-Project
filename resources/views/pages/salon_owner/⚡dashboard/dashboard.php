@@ -12,12 +12,12 @@ use App\Models\ItemVariant;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Review;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 new #[Layout('layouts.salon_owner')] class extends Component
 {
-    
     public $tenant;
     public $showSetupModal = false;
     public ?int $tenantId = null;
@@ -32,17 +32,25 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function mount()
     {
         $user = Auth::user();
+        
+        // Get tenant from user relationship
         $this->tenant = $user->tenant;
+        
+        // If tenant is null, try to find it manually
+        if (!$this->tenant) {
+            $this->tenant = Tenant::where('user_id', $user->id)->first();
+        }
+        
+        // If still no tenant, redirect to setup
+        if (!$this->tenant) {
+            return redirect()->route('owner.business.setup')->with('error', 'Please complete your business setup first.');
+        }
 
-        $this->showSetupModal = !$this->tenant || !$this->tenant->business_setup_completed;
-
-        $tenant = Auth::user()->tenant;
-        abort_unless($tenant, 403, 'No tenant assigned.');
-        $this->tenantId = $tenant->id;
+        $this->tenantId = $this->tenant->id;
+        $this->showSetupModal = !$this->tenant->business_setup_completed;
     }
 
-  
-  public function updatedDateRange(): void
+    public function updatedDateRange(): void
     {
         unset($this->analytics);
         unset($this->chartData);
@@ -301,7 +309,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->map(function ($order) {
                 return [
                     'id' => $order->id,
-                    'order_number' => $order->order_number,
+                    'order_number' => $order->order_number ?? 'ORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
                     'customer_name' => $order->customer?->name ?? 'Guest',
                     'total' => $order->total,
                     'status' => $order->status,
@@ -317,7 +325,5 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->where('created_by', Auth::id())
             ->count();
     }
-   
 
-  
 };

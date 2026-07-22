@@ -4,24 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Message extends Model
+class ConversationParticipant extends Model
 {
-      protected $fillable = [
+    protected $fillable = [
         'conversation_id',
         'user_id',
-        'content',
-        'type',
-        'file_path',
-        'file_name',
-        'is_read',
-        'read_at',
+        'last_read_at',
+        'is_active',
+        'left_at',
     ];
 
     protected $casts = [
-        'is_read' => 'boolean',
-        'read_at' => 'datetime',
+        'last_read_at' => 'datetime',
+        'left_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function conversation(): BelongsTo
@@ -32,10 +29,5 @@ class Message extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function reads(): HasMany
-    {
-        return $this->hasMany(MessageRead::class);
     }
 }

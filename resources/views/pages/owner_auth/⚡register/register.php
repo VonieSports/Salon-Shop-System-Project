@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 
 new class extends Component
 {
- public string $name                  = '';
+    public string $name                  = '';
     public string $email                 = '';
     public string $password              = '';
     public string $password_confirmation = '';
@@ -60,14 +62,17 @@ new class extends Component
                     'is_active' => true,
                 ]);
 
-                $user->assignRole('owner');
+                Log::info('User created: ' . $user->id);
+                $role = Role::firstOrCreate(['name' => 'owner', 'guard_name' => 'web']);
+                $user->assignRole($role);
+                Log::info('Role assigned to user: ' . $user->id);
 
-                $slug = Str::slug('business-' . uniqid());
+                $slug = Str::slug(trim($this->name) . '-' . uniqid());
                 $tenant = Tenant::create([
                     'user_id' => $user->id,
-                    'name' => null, 
+                    'name' => trim($this->name) . "",
                     'slug' => $slug,
-                    'email' => null, 
+                    'email' => strtolower(trim($this->email)),
                     'phone' => null, 
                     'address' => null,
                     'is_active' => true,
@@ -75,8 +80,11 @@ new class extends Component
                     'verification_status' => 'pending',
                 ]);
 
+                Log::info('Tenant created: ' . $tenant->id . ' for user: ' . $user->id);
+
                 Auth::login($user);
                 session()->regenerate();
+          
                 $user->update(['last_login_at' => now()]);
             });
 
@@ -84,7 +92,7 @@ new class extends Component
 
         } catch (\Exception $e) {
             $this->errorMessage = 'Registration failed: ' . $e->getMessage();
-            \Log::error('Registration error', [
+            Log::error('Registration error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
