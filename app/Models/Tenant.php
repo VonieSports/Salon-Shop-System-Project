@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\InventoryLog;
+use App\Models\Expenses;
 use App\BusinessHoursTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -93,4 +94,15 @@ class Tenant extends Model
     return $this->belongsToMany(User::class, 'tenant_users')
     ->withPivot('role')->withTimestamps();
 }
+
+
+    public function inventoryLogs(): HasMany
+    {
+        return $this->hasMany(InventoryLog::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expenses::class);
+    }
 }

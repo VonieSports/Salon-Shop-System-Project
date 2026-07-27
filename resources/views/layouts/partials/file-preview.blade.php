@@ -6,7 +6,6 @@
          @click.away="$wire.set('previewFile', null)"
          @keydown.escape.window="$wire.set('previewFile', null)">
         <div class="relative max-w-[90vw] max-h-[90vh]">
-            <!-- Close button -->
             <button @click="$wire.set('previewFile', null)" 
                     class="absolute -top-12 right-0 text-white hover:text-gray-300 transition p-2 z-10">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

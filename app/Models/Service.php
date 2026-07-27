@@ -39,6 +39,11 @@ class Service extends Model
         return $this->belongsTo(ServiceCategory::class, 'service_category_id');
     }
 
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ItemVariant::class);
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);

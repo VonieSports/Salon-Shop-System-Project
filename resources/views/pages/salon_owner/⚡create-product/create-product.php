@@ -14,6 +14,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Models\Tenant;
 
 new #[Layout('layouts.salon_owner')] class extends Component
 {
@@ -35,7 +36,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function mount(): void
     {
-        $tenant = Auth::user()->tenant;
+        $user = Auth::user();
+        $tenant = $user->tenant ?? Tenant::where('user_id', $user->id)->first();
 
         abort_unless($tenant?->business_setup_completed, 403, 'Please complete your business setup first.');
 
@@ -53,8 +55,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'product_category_id' => 'required|exists:product_categories,id',
-            'cost_price' => 'required|numeric|min:1',
-            'selling_price' => 'required|numeric|min:1|gte:cost_price',
+            'cost_price' => 'required|numeric|min:0.01',
+            'selling_price' => 'required|numeric|min:0.01|gte:cost_price',
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
             'status' => 'required|in:draft,published',
@@ -80,15 +82,14 @@ new #[Layout('layouts.salon_owner')] class extends Component
         ];
     }
 
-   #[Computed]
-public function categories()
-{
-    return ProductCategory::where('tenant_id', Auth::user()->tenant->id)
-        ->select('id', 'name')
-        ->orderBy('name')
-        ->get();
-}
-
+    #[Computed]
+    public function categories()
+    {
+        return ProductCategory::where('tenant_id', $this->tenantId)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+    }
 
     public function createCategory(): void
     {
@@ -113,13 +114,13 @@ public function categories()
         session()->flash('message', 'Category created successfully!');
     }
 
-    public function save(): void
+    public function save()
     {
         $this->name = trim($this->name);
         $this->description = trim($this->description ?? '');
-        $this->cost_price = (float) preg_replace('/[^0-9.]/', '', $this->cost_price);
-        $this->selling_price = (float) preg_replace('/[^0-9.]/', '', $this->selling_price);
-        $this->stock = (int) preg_replace('/[^0-9]/', '', $this->stock);
+        $this->cost_price = (float) $this->cost_price;
+        $this->selling_price = (float) $this->selling_price;
+        $this->stock = (int) $this->stock;
 
         $this->validate();
 
@@ -158,13 +159,14 @@ public function categories()
                     }
                 }
 
+                // Create Post record for marketplace
                 Post::create([
                     'tenant_id' => $this->tenantId,
                     'created_by' => Auth::id(),
                     'product_category_id' => $this->product_category_id,
                     'type' => 'product',
-                    'inventory_type' => 'App\\Models\\Product', 
-                    'inventory_id' => $product->id,   
+                    'inventory_type' => 'App\\Models\\Product',
+                    'inventory_id' => $product->id,
                     'name' => $this->name,
                     'image' => $imagePath,
                     'price' => $this->selling_price,
@@ -176,18 +178,17 @@ public function categories()
             $count = $this->hasVariants ? count($this->variants) : 0;
             session()->flash('message', 'Product created successfully' . ($count ? " with {$count} variant(s)!" : '!'));
 
+            // Reset form
             $this->reset(['name', 'product_category_id', 'cost_price', 'selling_price', 'description', 'image', 'status', 'stock', 'hasVariants']);
             $this->resetVariantBuilder();
-            unset($this->inventoryProducts);
+            unset($this->categories);
+            
+            // Redirect to inventory
+            return redirect()->route('owner.inventory')->with('message', 'Product created successfully!');
+
         } catch (\Exception $e) {
             Log::error('Error saving product', ['error' => $e->getMessage(), 'tenant_id' => $this->tenantId]);
             session()->flash('error', 'Failed to save product. Please try again.');
         }
     }
-
-    public function editProduct(int $postId)
-    {
-        return redirect()->route('owner.update_product', $postId);
-    }
-
 };

@@ -1,8 +1,8 @@
 {{-- resources/views/layouts/employee/header.blade.php --}}
 
 <header class="bg-white border-b border-gray-200 h-[60px] sm:h-[68px] flex items-center px-3 sm:px-5 md:px-6 lg:px-6 gap-2 sm:gap-3 md:gap-4 lg:gap-4 shrink-0 z-20 sticky top-0 shadow-sm">
-    <button @click="sidebarOpen = !sidebarOpen"
-        class="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition shrink-0">
+     <button @click="toggleSidebar()"
+            class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition shrink-0 focus:outline-none focus:ring-2 focus:ring-emerald-500">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>

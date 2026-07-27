@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'setup.complete' => \App\Http\Middleware\EnsureBusinessSetup::class,
             'track.activity' => \App\Http\Middleware\TrackUserActivity::class,
         ]);
+        $middleware->redirectGuestsTo(fn () => route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

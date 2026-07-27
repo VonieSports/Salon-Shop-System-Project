@@ -33,68 +33,74 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-1.5 sm:p-2 space-y-0.5 sm:space-y-1">
-                @forelse($conversations as $conversation)
-                    <div wire:click="selectConversation({{ $conversation->id }})"
-                         class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl hover:bg-gray-100 transition cursor-pointer {{ $selectedConversation && $selectedConversation->id == $conversation->id ? 'bg-gray-100' : '' }}">
-                        <div class="relative flex-shrink-0">
-                            @if($conversation->type == 'group')
-                                <div class="w-9 h-9 sm:w-10 sm:h-11 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                                    {{ substr($conversation->name, 0, 2) }}
-                                </div>
-                            @else
-                                @php
-                                    $participant = $conversation->participants()->where('user_id', '!=', auth()->id())->first();
-                                @endphp
-                                @if($participant && $participant->avatar)
-                                    <img src="{{ Storage::url($participant->avatar) }}" 
-                                         class="w-9 h-9 sm:w-10 sm:h-11 rounded-full object-cover border-2 border-gray-200">
-                                @else
-                                    <div class="w-9 h-9 sm:w-10 sm:h-11 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs sm:text-sm">
-                                        {{ strtoupper(substr($participant->name ?? 'U', 0, 1)) }}
-                                    </div>
-                                @endif
-                            @endif
-                            @if($conversation->unread_count > 0)
-                                <span class="absolute -top-0.5 -right-0.5 w-4 h-4 sm:w-5 sm:h-5 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full flex items-center justify-center">
-                                    {{ $conversation->unread_count }}
-                                </span>
-                            @endif
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between">
-                                <p class="text-xs sm:text-sm font-semibold text-gray-900 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
-                                    {{ $conversation->display_name }}
-                                </p>
-                                @if($conversation->last_message_at)
-                                    <span class="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 ml-1 sm:ml-2">
-                                        {{ $conversation->last_message_at->diffForHumans() }}
-                                    </span>
-                                @endif
-                            </div>
-                            <p class="text-[11px] sm:text-sm text-gray-500 truncate">
-                                @if($conversation->lastMessage)
-                                    {{ $conversation->lastMessage->user_id == auth()->id() ? 'You: ' : '' }}
-                                    {{ $conversation->lastMessage->type == 'file' ? '📎 ' : '' }}
-                                    {{ Str::limit($conversation->lastMessage->content, 30) }}
-                                @else
-                                    No messages yet
-                                @endif
-                            </p>
-                        </div>
+          <div class="flex-1 overflow-y-auto p-1.5 sm:p-2 space-y-0.5 sm:space-y-1">
+    @forelse($conversations as $conversation)
+        @php
+            $otherUser = $conversation->participants->firstWhere('id', '!=', auth()->id());
+            $displayName = $conversation->display_name ?? ($otherUser ? $otherUser->name : 'Unknown');
+            $displayAvatar = $conversation->display_avatar ?? ($otherUser ? $otherUser->avatar : null);
+        @endphp
+        <div wire:click="selectConversation({{ $conversation->id }})"
+             class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl hover:bg-gray-100 transition cursor-pointer {{ $selectedConversation && $selectedConversation->id == $conversation->id ? 'bg-gray-100' : '' }}">
+            <div class="relative flex-shrink-0">
+                @if($conversation->type == 'group')
+                    <div class="w-9 h-9 sm:w-10 sm:h-11 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
+                        {{ substr($conversation->name ?? 'G', 0, 2) }}
                     </div>
-                @empty
-                    <div class="text-center py-8 sm:py-12">
-                        <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h4l4 4 4-4h4a2 2 0 002-2V4a2 2 0 00-2-2z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01"/>
-                        </svg>
-                        <p class="text-gray-500 text-xs sm:text-sm">No conversations yet</p>
-                        <p class="text-gray-400 text-[10px] sm:text-xs mt-1">Start a new chat to connect</p>
-                    </div>
-                @endforelse
+                @else
+                    @if($displayAvatar)
+                        <img src="{{ Storage::url($displayAvatar) }}" 
+                             class="w-9 h-9 sm:w-10 sm:h-11 rounded-full object-cover border-2 border-gray-200">
+                    @else
+                        <div class="w-9 h-9 sm:w-10 sm:h-11 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold text-xs sm:text-sm">
+                            {{ strtoupper(substr($displayName, 0, 1)) }}
+                        </div>
+                    @endif
+                @endif
+                @if($conversation->unread_count > 0)
+                    <span class="absolute -top-0.5 -right-0.5 w-4 h-4 sm:w-5 sm:h-5 bg-red-500 text-white text-[9px] sm:text-xs font-bold rounded-full flex items-center justify-center">
+                        {{ $conversation->unread_count }}
+                    </span>
+                @endif
             </div>
+
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs sm:text-sm font-semibold text-gray-900 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
+                        @if($conversation->type == 'group')
+                            {{ $conversation->name ?? 'Group' }}
+                        @else
+                            {{ $displayName }}
+                        @endif
+                    </p>
+                    @if($conversation->last_message_at)
+                        <span class="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 ml-1 sm:ml-2">
+                            {{ $conversation->last_message_at->diffForHumans() }}
+                        </span>
+                    @endif
+                </div>
+                <p class="text-[11px] sm:text-sm text-gray-500 truncate">
+                    @if($conversation->lastMessage)
+                        {{ $conversation->lastMessage->user_id == auth()->id() ? 'You: ' : '' }}
+                        {{ $conversation->lastMessage->type == 'file' ? '📎 ' : '' }}
+                        {{ Str::limit($conversation->lastMessage->content, 30) }}
+                    @else
+                        No messages yet
+                    @endif
+                </p>
+            </div>
+        </div>
+    @empty
+        <div class="text-center py-8 sm:py-12">
+            <svg class="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h4l4 4 4-4h4a2 2 0 002-2V4a2 2 0 00-2-2z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01"/>
+            </svg>
+            <p class="text-gray-500 text-xs sm:text-sm">No conversations yet</p>
+            <p class="text-gray-400 text-[10px] sm:text-xs mt-1">Start a new chat to connect</p>
+        </div>
+    @endforelse
+</div>
         </div>
         <div class="flex-1 flex flex-col bg-white {{ (!$selectedConversation || $showSidebar) ? 'hidden sm:flex' : 'flex' }}">
             @if($selectedConversation)

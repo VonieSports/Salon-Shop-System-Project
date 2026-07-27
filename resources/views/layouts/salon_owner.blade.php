@@ -42,7 +42,7 @@
         }
     }" 
     x-init="init()" 
-    class="bg-gray-100 overflow-x-hidden">
+    class="bg-gray-100 overflow-x-hidden ">
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar -->
             <div x-show="sidebarOpen" 
@@ -67,11 +67,11 @@
                  class="fixed inset-0 z-40 bg-black/50 lg:hidden">
             </div>
             
-            <div class="flex-1 flex flex-col overflow-hidden w-full min-w-0 transition-all duration-300 ease-in-out"
+            <div class=" flex flex-col overflow-hidden w-full min-w-0 transition-all duration-300 ease-in-out"
                  :class="sidebarOpen && window.innerWidth >= 1024 ? 'ml-0' : 'ml-0'">
                 @include('layouts.salon_owner.header')
                 
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 lg:p-6">
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-0 lg:p-4">
                     {{ $slot }}
                 </main>
             </div>

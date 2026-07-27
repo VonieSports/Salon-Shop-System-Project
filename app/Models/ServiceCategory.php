@@ -35,7 +35,6 @@ class ServiceCategory extends Model
         return $this->hasMany(Post::class);
     }
 
-    // Scopes
     public function scopeActive($query)
     {
         return $query->where('status', 'active');

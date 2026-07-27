@@ -107,6 +107,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function updatedMemberSearch()
     {
+        // Refresh view
     }
 
     public function openMembersModal()
@@ -223,6 +224,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->selectedConversation = null;
         $this->showMembersModal = false;
         $this->showChatActions = false;
+        $this->loadConversations();
     }
 
     public function sendMessage()
@@ -357,4 +359,5 @@ new #[Layout('layouts.salon_owner')] class extends Component
             $this->selectedUsers = [$value];
         }
     }
+
 };

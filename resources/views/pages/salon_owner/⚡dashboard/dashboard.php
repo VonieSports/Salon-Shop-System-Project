@@ -32,18 +32,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function mount()
     {
         $user = Auth::user();
-        
-        // Get tenant from user relationship
+    
         $this->tenant = $user->tenant;
         
-        // If tenant is null, try to find it manually
         if (!$this->tenant) {
             $this->tenant = Tenant::where('user_id', $user->id)->first();
         }
-        
-        // If still no tenant, redirect to setup
+    
         if (!$this->tenant) {
-            return redirect()->route('owner.business.setup')->with('error', 'Please complete your business setup first.');
+            return redirect()->route('owner.business_setup')->with('error', 'Please complete your business setup first.');
         }
 
         $this->tenantId = $this->tenant->id;

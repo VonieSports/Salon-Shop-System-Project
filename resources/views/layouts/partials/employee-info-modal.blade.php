@@ -6,13 +6,9 @@
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
             <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
         </div>
-
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-        <!-- Make modal scrollable with max-h -->
         <div class="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full max-h-[90vh] flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
             
-            <!-- Modal Header - Fixed -->
             <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between shrink-0">
                 <h3 class="text-lg font-semibold text-gray-900">Employee Details</h3>
                 <button wire:click="closeProfileModal" class="text-gray-400 hover:text-gray-600 transition p-1 rounded-lg hover:bg-gray-100">
@@ -22,7 +18,6 @@
                 </button>
             </div>
 
-            <!-- Modal Body - Scrollable -->
             <div class="px-6 py-6 overflow-y-auto flex-1">
                 <!-- Cover Photo -->
                 <div class="relative h-36 sm:h-44 bg-gradient-to-r from-[#1E7A4A] to-emerald-400 rounded-xl overflow-hidden">
@@ -60,11 +55,7 @@
                         <h4 class="text-lg font-bold text-gray-900">{{ $selectedEmployee->user?->name ?? 'Unknown' }}</h4>
                         <p class="text-sm text-gray-500">{{ $selectedEmployee->position ?? 'No Position' }}</p>
                     </div>
-                    
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium {{ $selectedEmployee->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }} rounded-full mb-1 shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $selectedEmployee->is_active ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
-                        {{ $selectedEmployee->is_active ? 'Active' : 'Inactive' }}
-                    </span>
+             
                 </div>
 
                 <!-- Details Grid -->
@@ -97,13 +88,7 @@
                         <label class="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Commission Eligible</label>
                         <p class="text-sm text-gray-900">{{ $selectedEmployee->is_commission_eligible ? '✅ Yes' : '❌ No' }}</p>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Account Status</label>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium {{ $selectedEmployee->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }} rounded-full">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $selectedEmployee->is_active ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
-                            {{ $selectedEmployee->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                    </div>
+                  
                 </div>
 
                 <!-- Bio -->

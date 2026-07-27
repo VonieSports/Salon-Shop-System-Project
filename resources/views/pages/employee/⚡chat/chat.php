@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 new #[Layout('layouts.employee')] class extends Component
 {
-   use WithFileUploads;
+    use WithFileUploads;
 
     public $tenantId;
     public $conversations = [];
@@ -29,6 +29,8 @@ new #[Layout('layouts.employee')] class extends Component
     public $searchTerm = '';
     public $previewFile = null;
     public $showSidebar = true;
+    public $errorMessage = '';
+    public $successMessage = '';
  
     public $showMembersModal = false;
     public $memberSearch = '';
@@ -40,7 +42,14 @@ new #[Layout('layouts.employee')] class extends Component
     public function mount()
     {
         $user = auth()->user();
-        $this->tenantId = $user->tenant->id;
+        $employee = Employee::where('user_id', $user->id)->first();
+        
+        if (!$employee) {
+            $this->errorMessage = 'No employee record found. Please contact your administrator.';
+            return;
+        }
+        
+        $this->tenantId = $employee->tenant_id;
         $this->loadConversations();
         $this->loadUsers();
     }
@@ -60,6 +69,8 @@ new #[Layout('layouts.employee')] class extends Component
     public function selectConversation($conversationId)
     {
         $this->loading = true;
+        $this->errorMessage = '';
+        $this->successMessage = '';
         
         $this->selectedConversation = Conversation::with(['messages.user', 'participants'])
             ->find($conversationId);
@@ -109,6 +120,7 @@ new #[Layout('layouts.employee')] class extends Component
 
     public function updatedMemberSearch()
     {
+        // Refresh view
     }
 
     public function openMembersModal()
@@ -125,7 +137,7 @@ new #[Layout('layouts.employee')] class extends Component
             $conversation = $this->selectedConversation;
             
             if ($conversation->participants->contains($userId)) {
-                session()->flash('error', 'User is already in this conversation.');
+                $this->errorMessage = 'User is already in this conversation.';
                 return;
             }
 
@@ -137,10 +149,10 @@ new #[Layout('layouts.employee')] class extends Component
                 ->find($conversation->id);
                 
             $this->loadAvailableUsersToAdd();
-            session()->flash('message', 'Member added successfully!');
+            $this->successMessage = 'Member added successfully!';
             
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to add member: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to add member: ' . $e->getMessage();
         }
     }
 
@@ -150,7 +162,7 @@ new #[Layout('layouts.employee')] class extends Component
             $conversation = $this->selectedConversation;
             
             if ($userId == auth()->id()) {
-                session()->flash('error', 'You cannot remove yourself.');
+                $this->errorMessage = 'You cannot remove yourself.';
                 return;
             }
 
@@ -162,10 +174,10 @@ new #[Layout('layouts.employee')] class extends Component
                 ->find($conversation->id);
                 
             $this->loadAvailableUsersToAdd();
-            session()->flash('message', 'Member removed successfully!');
+            $this->successMessage = 'Member removed successfully!';
             
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to remove member: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to remove member: ' . $e->getMessage();
         }
     }
 
@@ -183,17 +195,17 @@ new #[Layout('layouts.employee')] class extends Component
             if ($success) {
                 $user = User::find($userId);
                 $isBlocked = $chatService->isUserBlocked(auth()->id(), $userId);
-                session()->flash('message', $isBlocked ? 'User blocked successfully!' : 'User unblocked successfully!');
+                $this->successMessage = $isBlocked ? 'User blocked successfully!' : 'User unblocked successfully!';
                 $this->selectedConversation = Conversation::with(['messages.user', 'participants'])
                     ->find($this->selectedConversation->id);
             } else {
-                session()->flash('error', 'Failed to toggle block status.');
+                $this->errorMessage = 'Failed to toggle block status.';
             }
             
             $this->showChatActions = false;
             
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to toggle block status: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to toggle block status: ' . $e->getMessage();
         }
     }
 
@@ -204,17 +216,17 @@ new #[Layout('layouts.employee')] class extends Component
             $success = $chatService->deleteConversation($this->selectedConversation->id, auth()->id());
             
             if ($success) {
-                session()->flash('message', 'Conversation deleted successfully!');
+                $this->successMessage = 'Conversation deleted successfully!';
                 $this->selectedConversation = null;
                 $this->showSidebar = true;
                 $this->showChatActions = false;
                 $this->loadConversations();
             } else {
-                session()->flash('error', 'Failed to delete conversation.');
+                $this->errorMessage = 'Failed to delete conversation.';
             }
             
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to delete conversation: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to delete conversation: ' . $e->getMessage();
         }
     }
 
@@ -224,6 +236,7 @@ new #[Layout('layouts.employee')] class extends Component
         $this->selectedConversation = null;
         $this->showMembersModal = false;
         $this->showChatActions = false;
+        $this->loadConversations();
     }
 
     public function sendMessage()
@@ -234,12 +247,13 @@ new #[Layout('layouts.employee')] class extends Component
 
         try {
             $chatService = app(ChatService::class);
+            
             $otherUser = $this->selectedConversation->participants()
                 ->where('user_id', '!=', auth()->id())
                 ->first();
                 
             if ($otherUser && !$chatService->canCommunicate(auth()->id(), $otherUser->id)) {
-                session()->flash('error', 'You cannot send messages to this user.');
+                $this->errorMessage = 'You cannot send messages to this user.';
                 return;
             }
             
@@ -258,7 +272,7 @@ new #[Layout('layouts.employee')] class extends Component
             $this->loadConversations();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to send message: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to send message: ' . $e->getMessage();
         }
     }
 
@@ -289,6 +303,8 @@ new #[Layout('layouts.employee')] class extends Component
         $this->selectedUsers = [];
         $this->chatName = '';
         $this->isGroupChat = false;
+        $this->errorMessage = '';
+        $this->successMessage = '';
         $this->loadUsers();
     }
 
@@ -300,7 +316,7 @@ new #[Layout('layouts.employee')] class extends Component
             }
             
             if (empty($this->selectedUsers)) {
-                session()->flash('error', 'Please select a user to chat with.');
+                $this->errorMessage = 'Please select a user to chat with.';
                 return;
             }
 
@@ -311,7 +327,7 @@ new #[Layout('layouts.employee')] class extends Component
 
             if ($this->isGroupChat) {
                 if (empty($this->chatName)) {
-                    session()->flash('error', 'Please enter a group name.');
+                    $this->errorMessage = 'Please enter a group name.';
                     return;
                 }
                 $participants = array_merge([$userId], $this->selectedUsers);
@@ -324,7 +340,7 @@ new #[Layout('layouts.employee')] class extends Component
                 $otherUserId = (int) $this->selectedUsers[0];
                 
                 if ($otherUserId == $userId) {
-                    session()->flash('error', 'You cannot chat with yourself.');
+                    $this->errorMessage = 'You cannot chat with yourself.';
                     return;
                 }
                 
@@ -343,11 +359,11 @@ new #[Layout('layouts.employee')] class extends Component
             $this->selectConversation($conversation->id);
             $this->loadConversations();
             
-            session()->flash('message', 'Chat started successfully!');
+            $this->successMessage = 'Chat started successfully!';
             
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Failed to create chat: ' . $e->getMessage());
+            $this->errorMessage = 'Failed to create chat: ' . $e->getMessage();
         }
     }
 

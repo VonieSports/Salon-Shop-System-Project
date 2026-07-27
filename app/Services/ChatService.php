@@ -13,77 +13,28 @@ use Illuminate\Support\Facades\Log;
 
 class ChatService
 {
-
- protected $blockUserService;
-
-    public function __construct(BlockUserService $blockUserService)
-    {
-        $this->blockUserService = $blockUserService;
-    }
-
-     public function toggleBlockUser(int $userId, int $blockedUserId): bool
-    {
-        return $this->blockUserService->toggleBlock($userId, $blockedUserId);
-    }
-
-    public function isUserBlocked(int $userId, int $blockedUserId): bool
-    {
-        return $this->blockUserService->isBlocked($userId, $blockedUserId);
-    }
-
-    public function canCommunicate(int $userId, int $otherUserId): bool
-    {
-        return $this->blockUserService->canCommunicate($userId, $otherUserId);
-    }
-
-    public function deleteConversation(int $conversationId, int $userId): bool
-    {
-        try {
-            $conversation = Conversation::where('id', $conversationId)
-                ->whereHas('participants', function ($query) use ($userId) {
-                    $query->where('user_id', $userId);
-                })
-                ->first();
-
-            if (!$conversation) {
-                return false;
-            }
-
-            $conversation->participants()->updateExistingPivot($userId, [
-                'is_active' => false,
-                'left_at' => now(),
-            ]);
-
-            $activeParticipants = $conversation->participants()
-                ->wherePivot('is_active', true)
-                ->count();
-
-            if ($activeParticipants === 0) {
-                $conversation->delete();
-            }
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Delete conversation error: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    public function getOrCreateDirectConversation(int $userId, int $otherUserId, int $tenantId): Conversation
+ public function getOrCreateDirectConversation(int $userId, int $otherUserId, int $tenantId): Conversation
     {
         $conversation = Conversation::where('tenant_id', $tenantId)
             ->where('type', 'direct')
             ->whereHas('participants', function ($query) use ($userId) {
-                $query->where('user_id', $userId)
-                      ->where('conversation_participants.is_active', 1);
+                $query->where('user_id', $userId);
             })
             ->whereHas('participants', function ($query) use ($otherUserId) {
-                $query->where('user_id', $otherUserId)
-                      ->where('conversation_participants.is_active', 1);
+                $query->where('user_id', $otherUserId);
             })
             ->first();
 
         if ($conversation) {
+            $conversation->participants()->updateExistingPivot($userId, [
+                'is_active' => true,
+                'left_at' => null
+            ]);
+            $conversation->participants()->updateExistingPivot($otherUserId, [
+                'is_active' => true,
+                'left_at' => null
+            ]);
+            $conversation->update(['last_message_at' => now()]);
             return $conversation;
         }
 
@@ -124,47 +75,42 @@ class ChatService
         });
     }
 
- public function sendMessage(int $conversationId, int $userId, string $content, $file = null): Message
-{
-    return DB::transaction(function () use ($conversationId, $userId, $content, $file) {
-        $filePath = null;
-        $fileName = null;
-        $type = 'text';
+    public function sendMessage(int $conversationId, int $userId, string $content, $file = null): Message
+    {
+        return DB::transaction(function () use ($conversationId, $userId, $content, $file) {
+            $filePath = null;
+            $fileName = null;
+            $type = 'text';
 
-        if ($file) {
-            try {
+            if ($file) {
                 $filePath = $file->store('chat_files', 'public');
                 $fileName = $file->getClientOriginalName();
                 $type = 'file';
-            } catch (\Exception $e) {
-                Log::error('File upload error: ' . $e->getMessage());
-                throw new \Exception('Failed to upload file: ' . $e->getMessage());
             }
-        }
 
-        $messageContent = $content;
-        if (empty($messageContent) && $file) {
-            $messageContent = '📎 ' . ($fileName ?? 'File shared');
-        } elseif (empty($messageContent)) {
-            $messageContent = ' '; 
-        }
+            $messageContent = $content;
+            if (empty($messageContent) && $file) {
+                $messageContent = '📎 ' . ($fileName ?? 'File shared');
+            } elseif (empty($messageContent)) {
+                $messageContent = ' ';
+            }
 
-        $message = Message::create([
-            'conversation_id' => $conversationId,
-            'user_id' => $userId,
-            'content' => $messageContent,
-            'type' => $type,
-            'file_path' => $filePath,
-            'file_name' => $fileName,
-        ]);
+            $message = Message::create([
+                'conversation_id' => $conversationId,
+                'user_id' => $userId,
+                'content' => $messageContent,
+                'type' => $type,
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+            ]);
 
-        Conversation::where('id', $conversationId)->update([
-            'last_message_at' => now(),
-        ]);
+            Conversation::where('id', $conversationId)->update([
+                'last_message_at' => now(),
+            ]);
 
-        return $message;
-    });
-}
+            return $message;
+        });
+    }
 
     public function getMessages(int $conversationId)
     {
@@ -192,17 +138,17 @@ class ChatService
             });
     }
 
-     public function getUnreadCountFromOthers(int $conversationId, int $userId): int
+    public function getUnreadCountFromOthers(int $conversationId, int $userId): int
     {
         return Message::where('conversation_id', $conversationId)
-            ->where('user_id', '!=', $userId) // Only messages from OTHER users
+            ->where('user_id', '!=', $userId)
             ->whereDoesntHave('reads', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
             ->count();
     }
 
-      public function getUnreadCount(int $conversationId, int $userId): int
+    public function getUnreadCount(int $conversationId, int $userId): int
     {
         return Message::where('conversation_id', $conversationId)
             ->whereDoesntHave('reads', function ($query) use ($userId) {
@@ -230,14 +176,19 @@ class ChatService
     public function getConversationDisplayName(Conversation $conversation, int $userId): string
     {
         if ($conversation->type === 'group') {
-            return $conversation->name;
+            return $conversation->name ?? 'Group';
         }
 
         $otherUser = $conversation->participants()
             ->where('user_id', '!=', $userId)
             ->first();
 
-        return $otherUser ? $otherUser->name : 'Unknown';
+        if ($otherUser) {
+            return $otherUser->name;
+        }
+
+        $anyUser = $conversation->participants()->first();
+        return $anyUser ? $anyUser->name : 'Unknown';
     }
 
     public function getConversationAvatar(Conversation $conversation, int $userId): ?string
@@ -298,4 +249,115 @@ class ChatService
         });
     }
 
+    public function deleteConversation(int $conversationId, int $userId): bool
+    {
+        try {
+            $conversation = Conversation::where('id', $conversationId)
+                ->whereHas('participants', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->first();
+
+            if (!$conversation) {
+                return false;
+            }
+
+            $conversation->participants()->updateExistingPivot($userId, [
+                'is_active' => false,
+                'left_at' => now(),
+            ]);
+
+            $activeParticipants = $conversation->participants()
+                ->wherePivot('is_active', true)
+                ->count();
+
+            if ($activeParticipants === 0) {
+                $conversation->delete();
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+  public function toggleBlockUser(int $userId, int $blockedUserId): bool
+{
+    try {
+        $user = User::find($userId);
+        $blockedUser = User::find($blockedUserId);
+        
+        if (!$user || !$blockedUser) {
+            return false;
+        }
+
+        $isBlocked = $user->blockedUsers()->where('blocked_user_id', $blockedUserId)->exists();
+        
+        if ($isBlocked) {
+            $user->blockedUsers()->detach($blockedUserId);
+            
+            $isBlockedByOthers = $blockedUser->blockedBy()->exists();
+            if (!$isBlockedByOthers) {
+                $blockedUser->update(['is_blocked' => false]);
+            }
+
+            $conversation = Conversation::where('type', 'direct')
+                ->whereHas('participants', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->whereHas('participants', function ($query) use ($blockedUserId) {
+                    $query->where('user_id', $blockedUserId);
+                })
+                ->first();
+                
+            if ($conversation) {
+                $conversation->participants()->updateExistingPivot($blockedUserId, [
+                    'blocked_at' => null
+                ]);
+            }
+        } else {
+            $user->blockedUsers()->attach($blockedUserId);
+            $blockedUser->update(['is_blocked' => true]);
+            
+            $conversation = Conversation::where('type', 'direct')
+                ->whereHas('participants', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->whereHas('participants', function ($query) use ($blockedUserId) {
+                    $query->where('user_id', $blockedUserId);
+                })
+                ->first();
+                
+            if ($conversation) {
+                $conversation->participants()->updateExistingPivot($blockedUserId, [
+                    'blocked_at' => now()
+                ]);
+            }
+        }
+        
+        return true;
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
+  public function isUserBlocked(int $userId, int $blockedUserId): bool
+{
+    $user = User::find($userId);
+    if (!$user) {
+        return false;
+    }
+    return $user->blockedUsers()->where('blocked_user_id', $blockedUserId)->exists();
+}
+
+public function canCommunicate(int $userId, int $otherUserId): bool
+{
+    if ($this->isUserBlocked($userId, $otherUserId)) {
+        return false;
+    }
+    if ($this->isUserBlocked($otherUserId, $userId)) {
+        return false;
+    }
+    return true;
+}
 };

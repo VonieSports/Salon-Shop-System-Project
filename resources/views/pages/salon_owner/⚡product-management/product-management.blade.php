@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 p-4">
     <div class="mx-auto space-y-6">
 
         @if (session()->has('message'))

@@ -103,8 +103,8 @@
         <span class="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">5</span>
       </button>
 
-      <a href="{{ route('login.page') }}" class="hidden sm:block bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-md whitespace-nowrap">Sign in</a>
-      <a href="{{ route('login.page') }}" class="lg:hidden bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-md whitespace-nowrap">Sign in</a>
+      <a href="{{ route('login') }}" class="hidden sm:block bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-4 sm:px-6 py-2 sm:py-2.5 rounded-md whitespace-nowrap">Sign in</a>
+      <a href="{{ route('login') }}" class="lg:hidden bg-[#1E7A4A] hover:bg-emerald-800 transition text-white text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-md whitespace-nowrap">Sign in</a>
     </div>
   </div>
 

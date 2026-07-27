@@ -2,13 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\InventoryLog;
+use App\Models\ItemVariant;
+use App\Models\OrderItem;
+use App\Models\Post;
+use App\Models\ProductCategory;
+use App\Models\Tenant;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'tenant_id',
         'product_category_id',
         'name',
@@ -37,7 +45,7 @@ class Product extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function category(): BelongsTo
+    public function productCategory(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
@@ -47,17 +55,28 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function inventoryLogs(): HasMany
+    {
+        return $this->hasMany(InventoryLog::class);
+    }
+
     public function variants(): HasMany
-{
-    return $this->hasMany(ItemVariant::class);
-}
+    {
+        return $this->hasMany(ItemVariant::class);
+    }
 
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'inventory_id')
-            ->where('inventory_type', 'App\\Models\\Product');
+            ->where('inventory_type', Product::class);
     }
 
+     public function post(): HasOne
+    {
+        return $this->hasOne(Post::class, 'inventory_id')
+            ->where('inventory_type', Product::class);
+    }
+    
     public function scopeAvailable($query)
     {
         return $query->where('stock', '>', 0);
@@ -76,5 +95,19 @@ class Product extends Model
     public function scopeActive($query)
     {
         return $query->whereNull('archived_at');
+    }
+
+    protected function isLowStock(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock > 0 && $this->stock <= $this->low_stock_alert,
+        );
+    }
+
+    protected function isOutOfStock(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->stock <= 0,
+        );
     }
 }

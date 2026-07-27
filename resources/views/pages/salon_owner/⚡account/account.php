@@ -27,7 +27,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $activeEmployees = 0;
     public $onlineEmployees = 0;
 
-    // Modal properties
     public $showProfileModal = false;
     public $selectedEmployee = null;
 
