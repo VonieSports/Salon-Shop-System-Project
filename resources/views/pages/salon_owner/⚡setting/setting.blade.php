@@ -1,15 +1,10 @@
 <div>
     <div class="w-full ">
-        <!-- Header -->
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
             <p class="text-sm text-gray-500 mt-0.5">Manage your business preferences and configurations</p>
         </div>
-
-        <!-- Settings Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            <!-- General Settings -->
             <a href="" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -30,8 +25,6 @@
                     </svg>
                 </div>
             </a>
-
-            <!-- Business Settings -->
             <a href="" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -52,7 +45,6 @@
                 </div>
             </a>
 
-            <!-- Notification Settings -->
             <a href="" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -73,7 +65,6 @@
                 </div>
             </a>
 
-            <!-- Payment Settings -->
             <a href="" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -94,7 +85,6 @@
                 </div>
             </a>
 
-            <!-- Security Settings -->
             <a href="" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -115,7 +105,6 @@
                 </div>
             </a>
 
-            <!-- Archive Settings - With Arrow -->
             <a href="{{ route('owner.archive') }}" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -136,7 +125,6 @@
                 </div>
             </a>
 
-            <!-- Business Profile -->
             <a href="{{ route('owner.business_setup') }}" 
                class="group bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-emerald-200">
                 <div class="flex items-start justify-between">
@@ -156,7 +144,6 @@
                     </svg>
                 </div>
             </a>
-
         </div>
     </div>
 </div>

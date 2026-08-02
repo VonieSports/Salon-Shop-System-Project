@@ -102,7 +102,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->validate();
 
         DB::transaction(function () {
-            // Handle main image
             $imagePath = $this->existingImage;
             if ($this->image) {
                 if ($this->existingImage) {
@@ -111,7 +110,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
                 $imagePath = $this->image->store('products', 'public');
             }
 
-            // Update post
             $this->post->update([
                 'name' => $this->name,
                 'description' => $this->description,
@@ -120,7 +118,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
                 'price' => $this->selling_price,
             ]);
 
-            // Update product
             $this->product->update([
                 'product_category_id' => $this->category_id,
                 'name' => $this->name,
@@ -251,5 +248,4 @@ public function removeVariantImage($index)
     
     session()->flash('message', 'Image removed successfully.');
 }
-
 };

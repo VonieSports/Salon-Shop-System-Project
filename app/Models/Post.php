@@ -85,4 +85,8 @@ class Post extends Model
     {
         return $query->where('status', 'rejected');
     }
+     public function inventory(): MorphTo
+    {
+        return $this->morphTo('inventory', 'inventory_type', 'inventory_id');
+    }
 }

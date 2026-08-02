@@ -13,7 +13,6 @@
         <span class="font-bold text-lg text-gray-800 tracking-tight">BeautyNova</span>
     </div>
 
-    <!-- Business Info -->
     <div class="px-4 py-4 border-b border-gray-100 shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden">
@@ -217,7 +216,7 @@
                     Inventory
                 </a>
                 
-                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                <a href="{{ route('owner.business_info') }}" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>

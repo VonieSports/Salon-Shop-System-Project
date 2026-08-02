@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\HasGender;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Tenant;
@@ -18,6 +19,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable([
     'name',
+    'gender',
+    'birth_date',
     'email',
     'phone',
     'address',
@@ -26,7 +29,6 @@ use Spatie\Permission\Traits\HasRoles;
     'cover_photo',
     'password',
     'is_active',
-    'is_blocked', 
     'last_login_at',
     'last_logout_at',
     'last_activity_at',
@@ -36,7 +38,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, OnlineStatusTrait;
+    use HasFactory, Notifiable, HasRoles, OnlineStatusTrait, HasGender;
 
     /**
      * Get the attributes that should be cast.
@@ -52,9 +54,10 @@ class User extends Authenticatable
             'last_activity_at'  => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
-            'is_blocked'        => 'boolean',
+            'birth_date'        => 'date',
         ];
     }
+    
 
     public function tenant(): HasOne
     {
@@ -75,16 +78,5 @@ class User extends Authenticatable
 {
     return $this->belongsToMany(Tenant::class, 'tenant_users')->withPivot('role')->withTimestamps();
 }
-   public function blockedUsers(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_blocks', 'user_id', 'blocked_user_id')
-            ->withTimestamps();
-    }
-
-    public function blockedBy(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_blocks', 'blocked_user_id', 'user_id')
-            ->withTimestamps();
-    }
-
+ 
 }

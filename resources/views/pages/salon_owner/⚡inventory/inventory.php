@@ -5,6 +5,7 @@ use App\Models\ItemVariant;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Tenant;
 
 new #[Layout('layouts.salon_owner')] class extends Component
 {
@@ -46,7 +46,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $selectedVariants = null;
     public $selectedGallery = null;
 
-   public function mount()
+    public function mount()
     {
         $user = Auth::user();
     
@@ -102,8 +102,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
     #[Computed]
     public function products()
     {
-        return Product::query()
-            ->with(['productCategory:id,name', 'post:id,inventory_id'])
+        $products = Product::query()
+            ->with('productCategory:id,name')
             ->withCount('variants')
             ->where('tenant_id', $this->tenantId)
             ->whereNull('archived_at')
@@ -115,6 +115,19 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->when($this->stockFilter === 'out', fn ($q) => $q->where('stock', '<=', 0))
             ->orderBy('name')
             ->paginate(10, pageName: 'stockPage');
+
+        // Get post_ids for ALL products (including archived posts) to show the archive button
+        $postIdsByProduct = Post::where('tenant_id', $this->tenantId)
+            ->where('type', 'product')
+            ->whereIn('inventory_id', $products->pluck('id'))
+            ->pluck('id', 'inventory_id');
+
+        $products->getCollection()->transform(function ($product) use ($postIdsByProduct) {
+            $product->post_id = $postIdsByProduct->get($product->id);
+            return $product;
+        });
+
+        return $products;
     }
 
     #[Computed]
@@ -165,6 +178,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
         if (!$productId) {
             return;
         }
+
         $product = Product::where('tenant_id', $this->tenantId)
             ->withCount('variants')
             ->find($productId);
@@ -236,6 +250,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     $product = Product::where('tenant_id', $this->tenantId)
                         ->lockForUpdate()
                         ->findOrFail($variant->product_id);
+
                     $product->update([
                         'stock' => ItemVariant::where('product_id', $product->id)->sum('stock'),
                     ]);
@@ -339,12 +354,13 @@ new #[Layout('layouts.salon_owner')] class extends Component
             return;
         }
 
-        $product = Product::with('post')
-            ->where('tenant_id', $this->tenantId)
-            ->find($productId);
+        $postId = Post::where('tenant_id', $this->tenantId)
+            ->where('type', 'product')
+            ->where('inventory_id', $productId)
+            ->value('id');
 
-        if ($product?->post) {
-            $this->viewProduct($product->post->id);
+        if ($postId) {
+            $this->viewProduct($postId);
         }
     }
 
@@ -407,14 +423,22 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $post = Post::where('tenant_id', $this->tenantId)
             ->where('type', 'product')
+            ->whereNull('archived_at')
             ->find($postId);
 
         if (!$post) {
-            session()->flash('error', 'Product not found.');
+            session()->flash('error', 'Product not found or already archived.');
             return;
         }
 
-        $post->update(['archived_at' => now()]);
+        DB::transaction(function () use ($post) {
+            $post->update(['archived_at' => now()]);
+            if ($post->inventory_id) {
+                Product::where('tenant_id', $this->tenantId)
+                    ->where('id', $post->inventory_id)
+                    ->update(['archived_at' => now()]);
+            }
+        });
 
         if ($this->selectedPostId === $postId) {
             $this->closeItem();
@@ -422,6 +446,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         unset($this->products);
         unset($this->stats);
-        session()->flash('message', 'Product archived successfully. You can restore it from the Archive page.');
+        session()->flash('message', 'Product archived successfully.');
     }
 };

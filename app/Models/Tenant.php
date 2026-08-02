@@ -95,7 +95,6 @@ class Tenant extends Model
     ->withPivot('role')->withTimestamps();
 }
 
-
     public function inventoryLogs(): HasMany
     {
         return $this->hasMany(InventoryLog::class);

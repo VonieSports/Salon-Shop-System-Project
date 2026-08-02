@@ -2,6 +2,7 @@
 
 use App\Models\ItemVariant;
 use App\Models\Post;
+use App\Models\Product;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     #[Url(as: 'q')]
     public string $search = '';
 
-    public string $typeFilter = 'all'; // all | product | service
+    public string $typeFilter = 'all'; 
 
     public array $selectedIds = [];
     public bool $selectAll = false;
@@ -51,7 +52,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function items()
     {
         return Post::query()
-            ->with(['productCategory:id,name', 'serviceCategory:id,name'])
+            ->with(['productCategory:id,name', 'serviceCategory:id,name', 'inventory'])
             ->where('tenant_id', $this->tenantId)
             ->where('created_by', Auth::id())
             ->whereNotNull('archived_at')
@@ -94,6 +95,11 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $post->update(['archived_at' => null]);
 
+        $inventory = $post->inventory;
+        if ($inventory && method_exists($inventory, 'update')) {
+            $inventory->update(['archived_at' => null]);
+        }
+
         $this->selectedIds = array_values(array_diff($this->selectedIds, [(string) $postId]));
 
         unset($this->items);
@@ -107,18 +113,32 @@ new #[Layout('layouts.salon_owner')] class extends Component
             return;
         }
 
-        $count = Post::where('tenant_id', $this->tenantId)
+        $posts = Post::with('inventory')
+            ->where('tenant_id', $this->tenantId)
             ->where('created_by', Auth::id())
             ->whereNotNull('archived_at')
             ->whereIn('id', $this->selectedIds)
-            ->update(['archived_at' => null]);
+            ->get();
 
-        if ($count > 0) {
+        try {
+            DB::transaction(function () use ($posts) {
+                foreach ($posts as $post) {
+                    $post->update(['archived_at' => null]);
+
+                    $inventory = $post->inventory;
+                    if ($inventory && method_exists($inventory, 'update')) {
+                        $inventory->update(['archived_at' => null]);
+                    }
+                }
+            });
+
+            $count = $posts->count();
             $this->clearSelection();
             unset($this->items);
             session()->flash('message', "{$count} item(s) restored successfully.");
-        } else {
-            session()->flash('error', 'Failed to restore selected items.');
+        } catch (\Exception $e) {
+            Log::error('Error bulk restoring items', ['error' => $e->getMessage()]);
+            session()->flash('error', 'Failed to restore selected items. Please try again.');
         }
     }
 
@@ -137,13 +157,16 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         try {
             DB::transaction(function () use ($post) {
-                if ($post->type === 'product') {
-                    $post->inventory?->variants()->delete();
-                    $post->inventory?->delete();
-                } elseif ($post->type === 'service') {
-                    ItemVariant::where('service_id', $post->inventory_id)->delete();
-                    Service::where('id', $post->inventory_id)->delete();
+                $inventory = $post->inventory;
+                
+                if ($inventory) {
+                    if (method_exists($inventory, 'variants')) {
+                        $inventory->variants()->delete();
+                    }
+
+                    $inventory->delete();
                 }
+                
                 $post->delete();
             });
 
@@ -174,13 +197,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
         try {
             DB::transaction(function () use ($posts) {
                 foreach ($posts as $post) {
-                    if ($post->type === 'product') {
-                        $post->inventory?->variants()->delete();
-                        $post->inventory?->delete();
-                    } elseif ($post->type === 'service') {
-                        ItemVariant::where('service_id', $post->inventory_id)->delete();
-                        Service::where('id', $post->inventory_id)->delete();
+                    $inventory = $post->inventory;
+                    
+                    if ($inventory) {
+                        if (method_exists($inventory, 'variants')) {
+                            $inventory->variants()->delete();
+                        }
+                        $inventory->delete();
                     }
+                    
                     $post->delete();
                 }
             });

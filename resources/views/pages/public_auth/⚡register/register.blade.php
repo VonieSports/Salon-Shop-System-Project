@@ -149,17 +149,13 @@
                 Creating account...
               </span>
             </button>
-
           </form>
-
           <p class="text-center text-sm text-gray-600 mt-5">
             Already have an account?
-            <a href="{{ route('login.page') }}" class="text-[#1E7A4A] font-medium hover:underline">Sign in</a>
+            <a href="{{ route('login') }}" class="text-[#1E7A4A] font-medium hover:underline">Sign in</a>
           </p>
-
         </div>
       </div>
-
     </div>
   </div>
 </section>

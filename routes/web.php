@@ -17,16 +17,20 @@ Route::livewire('/profile', 'pages::customer.profile')->name('customer.profile')
 Route::livewire('/update/profile', 'pages::customer.update-profile')->name('customer.update_profile');
 Route::livewire('/cart', 'pages::customer.cart')->name('customer.cart');
 Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.cart');
+Route::livewire('/track_order', 'pages::customer.track-order')->name('customer.track_order');
+Route::livewire('/appointment', 'pages::customer.appointment')->name('customer.appointment');
+Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
+Route::livewire('/favourite', 'pages::customer.favourite')->name('customer.order_history');
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
 Route::prefix('owner')->middleware(['owner'])->group(function () {
 Route::livewire('/dashboard', 'pages::salon_owner.dashboard')->name('owner.dashboard');
-Route::livewire('/chat', 'pages::salon_owner.chat')->name('owner.chat');
 Route::livewire('/profile', 'pages::salon_owner.profile')->name('owner.profile');
 Route::livewire('/business_info', 'pages::salon_owner.business-info')->name('owner.business_info');
 Route::livewire('/business_setup', 'pages::salon_owner.business-setup')->name('owner.business_setup');
 Route::livewire('/update/profile', 'pages::salon_owner.update-profile')->name('owner.update_profile');   
+
 Route::middleware('setup.complete')->group(function () {
 Route::livewire('/employee', 'pages::salon_owner.employee')->name('owner.employee');
 Route::livewire('/account', 'pages::salon_owner.account')->name('owner.account');
@@ -53,7 +57,6 @@ Route::livewire('/walkin', 'pages::salon_owner.walkin-customer')->name('owner.wa
 });
 Route::prefix('employee')->middleware(['employee'])->group(function () {
 Route::livewire('/dashboard', 'pages::employee.dashboard')->name('employee.dashboard');
-Route::livewire('/chat', 'pages::employee.chat')->name('employee.chat');
 Route::livewire('/profile', 'pages::employee.profile')->name('employee.profile');
 Route::livewire('/update/profile', 'pages::employee.update-profile')->name('employee.update_profile');
 Route::livewire('/business_info', 'pages::employee.business-info')->name('employee.business_info');

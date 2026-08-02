@@ -14,6 +14,5 @@ new class extends Component
         $this->tenant = $this->user->tenant;
         
     }
-    
 
 };
