@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->text('description')->nullable();
+            $table->json('additional_info')->nullable();
             $table->string('status')->default('draft'); 
             $table->timestamp('archived_at')->nullable();
             $table->text('reject_reason')->nullable();

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->integer('low_stock_alert')->default(0);
             $table->text('notes')->nullable();
+            $table->json('additional_info')->nullable();
             $table->timestamp('archived_at')->nullable();
             $table->timestamps();
             $table->unique(['tenant_id', 'sku']);
