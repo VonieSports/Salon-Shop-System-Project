@@ -27,6 +27,7 @@ class Product extends Model
         'stock',
         'low_stock_alert',
         'notes',
+        'additional_info', 
         'archived_at',
     ];
 
@@ -38,6 +39,7 @@ class Product extends Model
         'archived_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'additional_info' => 'array',
     ];
 
     public function tenant(): BelongsTo

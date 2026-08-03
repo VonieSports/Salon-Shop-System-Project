@@ -16,11 +16,12 @@ Route::livewire('/dashboard', 'pages::customer.dashboard')->name('customer.dashb
 Route::livewire('/profile', 'pages::customer.profile')->name('customer.profile');
 Route::livewire('/update/profile', 'pages::customer.update-profile')->name('customer.update_profile');
 Route::livewire('/cart', 'pages::customer.cart')->name('customer.cart');
-Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.cart');
+Route::livewire('/item/{id}', 'pages::customer.item-detail')->name('customer.item_detail');
+Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.checkout');
 Route::livewire('/track_order', 'pages::customer.track-order')->name('customer.track_order');
 Route::livewire('/appointment', 'pages::customer.appointment')->name('customer.appointment');
 Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
-Route::livewire('/favourite', 'pages::customer.favourite')->name('customer.order_history');
+Route::livewire('/favourite', 'pages::customer.favourite')->name('customer.favourite');
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {

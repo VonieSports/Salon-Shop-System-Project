@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('service_category_id')->nullable()->constrained('service_categories')->nullOnDelete();
             $table->foreignId('product_category_id')->nullable()->constrained('product_categories')->nullOnDelete();
-            $table->string('type'); 
             $table->string('inventory_type')->nullable();
             $table->unsignedBigInteger('inventory_id')->nullable();
+            $table->string('type'); 
             $table->string('name');
             $table->string('image')->nullable();
             $table->decimal('price', 10, 2)->nullable();

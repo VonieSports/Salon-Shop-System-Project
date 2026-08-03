@@ -22,6 +22,9 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     private const LOW_STOCK_ALERT = 5;
 
+    public $additionalInfo = [];
+    public string $info_section_name = ''; 
+    public string $info_display_style = 'list';
     public string $name = '';
     public ?int $product_category_id = null;
     public float $cost_price = 0;
@@ -43,6 +46,20 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $this->tenantId = $tenant->id;
         $this->resetVariantBuilder();
+    }
+
+    public function addAdditionalInfo()
+    {
+        $this->additionalInfo[] = [
+            'label' => '',
+            'value' => '',
+        ];
+    }
+
+    public function removeAdditionalInfo($index)
+    {
+        unset($this->additionalInfo[$index]);
+        $this->additionalInfo = array_values($this->additionalInfo);
     }
 
     protected function defaultVariantFields(): array
@@ -124,8 +141,18 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $this->validate();
 
+        $filteredInfo = array_filter($this->additionalInfo, function($item) {
+            return !empty($item['label']) && !empty($item['value']);
+        });
+
+        $detailsPayload = [
+            'section_name' => $this->info_section_name,
+            'display_style' => $this->info_display_style,
+            'items' => $filteredInfo
+        ];
+
         try {
-            DB::transaction(function () {
+            DB::transaction(function () use ($detailsPayload, $filteredInfo) {
                 $imagePath = $this->image?->store('products', 'public');
                 $baseSku = 'PRD-' . strtoupper(Str::random(8));
 
@@ -140,6 +167,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'stock' => $this->hasVariants ? collect($this->variants)->sum('stock') : $this->stock,
                     'low_stock_alert' => self::LOW_STOCK_ALERT,
                     'notes' => $this->description,
+                    'additional_info' => $filteredInfo, 
                 ]);
 
                 if ($this->hasVariants) {
@@ -159,7 +187,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     }
                 }
 
-                // Create Post record for marketplace
                 Post::create([
                     'tenant_id' => $this->tenantId,
                     'created_by' => Auth::id(),
@@ -171,6 +198,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'image' => $imagePath,
                     'price' => $this->selling_price,
                     'description' => $this->description,
+                    'additional_info' => $detailsPayload, // <--- UPDATED PAYLOAD HERE
                     'status' => $this->status,
                 ]);
             });
@@ -178,12 +206,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
             $count = $this->hasVariants ? count($this->variants) : 0;
             session()->flash('message', 'Product created successfully' . ($count ? " with {$count} variant(s)!" : '!'));
 
-            // Reset form
-            $this->reset(['name', 'product_category_id', 'cost_price', 'selling_price', 'description', 'image', 'status', 'stock', 'hasVariants']);
+            $this->reset(['name', 'product_category_id', 'cost_price', 'selling_price', 'description', 'image', 'status', 'stock', 'hasVariants', 'additionalInfo', 'info_section_name', 'info_display_style']);
             $this->resetVariantBuilder();
             unset($this->categories);
             
-            // Redirect to inventory
             return redirect()->route('owner.inventory')->with('message', 'Product created successfully!');
 
         } catch (\Exception $e) {

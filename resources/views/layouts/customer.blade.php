@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>{{ $title ?? config('app.name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
     @livewireStyles
 </head>
 <body class="bg-gray-50 font-['Inter'] antialiased overflow-x-hidden"
-      x-data="{ mobileMenuOpen: false }">
+      x-data="{ mobileMenuOpen: false, searchOpen: false }">
 
     <!-- Fixed Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -39,8 +39,8 @@
     </div>
 
     <!-- Main Content -->
-    <main class="pt-[56px] sm:pt-[64px] lg:pt-[72px] min-h-screen">
-        <div class="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <main class="pt-[110px] sm:pt-[120px] lg:pt-[130px] min-h-screen">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             {{ $slot }}
         </div>
     </main>

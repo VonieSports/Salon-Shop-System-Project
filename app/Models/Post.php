@@ -24,6 +24,7 @@ class Post extends Model
         'image',
         'price',
         'description',
+        'additional_info',
         'status',
         'reject_reason',
         'archived_at',
@@ -34,6 +35,7 @@ class Post extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'archived_at' => 'datetime',
+        'additional_info' => 'array',
     ];
 
      public function tenant(): BelongsTo

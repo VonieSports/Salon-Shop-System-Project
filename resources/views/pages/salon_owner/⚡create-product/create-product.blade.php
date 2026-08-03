@@ -160,31 +160,36 @@
                 <!-- RIGHT COLUMN -->
                 <div class="lg:col-span-4 space-y-6 flex flex-col">
 
-                    <!-- Upload Image -->
+                                    <!-- Upload Image (Shopee 600x600 Style) -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100">
-                            <h3 class="text-base font-bold text-gray-900">Upload Image</h3>
+                            <h3 class="text-base font-bold text-gray-900">Images</h3>
                         </div>
                         <div class="p-6">
-                            <label class="group relative block aspect-square w-full rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 overflow-hidden cursor-pointer hover:border-[#1E7A4A] transition">
+                            <!-- 600x600 Box -->
+                            <label class="group relative block aspect-square w-full max-w-[300px] mx-auto rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden cursor-pointer hover:border-[#1E7A4A] transition">
                                 @if($image && $image->temporaryUrl())
-                                    <img src="{{ $image->temporaryUrl() }}" alt="Product preview" class="absolute inset-0 w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
-                                        <span class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium transition">Change image</span>
+                                    <img src="{{ $image->temporaryUrl() }}" alt="Product preview" class="absolute inset-0 w-full h-full object-contain">
+                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
+                                        <span class="opacity-0 group-hover:opacity-100 text-black text-sm font-medium transition bg-white/80 px-3 py-1 rounded">Change</span>
                                     </div>
                                 @else
                                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-[#1E7A4A] transition">
-                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h16M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z"/>
                                         </svg>
-                                        <span class="mt-2 text-sm font-medium">Click to upload</span>
-                                        <span class="text-xs text-gray-400 mt-0.5">PNG or JPG, up to 2MB</span>
+                                        <span class="text-sm font-medium">Upload main image</span>
                                     </div>
                                 @endif
                                 <input type="file" wire:model="image" accept="image/*" class="hidden">
                             </label>
-                            @error('image') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
-                            <div wire:loading wire:target="image" class="mt-2 text-xs text-gray-400">Uploading...</div>
+
+                            <!-- Shopee-style Requirement Text -->
+                            <div class="mt-3 text-center">
+                                <p class="text-[11px] text-gray-500">Dimensions: <span class="font-medium">600 x 600 px.</span> Maximum file size: <span class="font-medium">10 MB</span> (Up to 9 files). Format: JPG, JPEG, PNG</p>
+                                @error('image') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+                                <div wire:loading wire:target="image" class="mt-2 text-xs text-emerald-600 font-medium">Uploading image...</div>
+                            </div>
                         </div>
                     </div>
 
@@ -215,6 +220,79 @@
                 </div>
             </div>
 
+            <!-- Additional Information - Shopee Style Section -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-6">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900">Product Details & Highlights</h3>
+                            <p class="text-xs text-gray-500">Add custom headers, specs, and highlights (Like Shopee/TikTok)</p>
+                        </div>
+                        <span class="text-xs text-gray-400">Optional</span>
+                    </div>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    
+                    <!-- 1. Section Header Name -->
+                    <div>
+                        <label for="info_section_name" class="block text-xs font-medium text-gray-500 mb-1.5">Section Header Name</label>
+                        <input type="text" id="info_section_name" wire:model="info_section_name" 
+                               placeholder="e.g. About this product, Product Details, Specifications"
+                               class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm text-gray-900">
+                        <p class="text-[10px] text-gray-400 mt-1">Leave blank if you don't want a header.</p>
+                    </div>
+
+                    <!-- 2. Display Style Toggle -->
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs font-medium text-gray-500">Display as:</span>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="info_display_style" value="list" class="text-[#1E7A4A] focus:ring-[#1E7A4A]">
+                            <span class="text-sm text-gray-700">Bulleted List (Shopee style)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" wire:model="info_display_style" value="grid" class="text-[#1E7A4A] focus:ring-[#1E7A4A]">
+                            <span class="text-sm text-gray-700">Specification Table</span>
+                        </label>
+                    </div>
+
+                    <!-- 3. Dynamic Fields -->
+                    <div class="space-y-3 mt-2">
+                        @if(!empty($additionalInfo))
+                            @foreach($additionalInfo as $index => $info)
+                                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <input type="text" 
+                                               wire:model="additionalInfo.{{ $index }}.label" 
+                                               placeholder="Label (e.g., Brand, Material, Origin)"
+                                               class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A]/30 transition text-sm">
+                                        <input type="text" 
+                                               wire:model="additionalInfo.{{ $index }}.value" 
+                                               placeholder="Value (e.g., L'Oréal, Ceramic, China)"
+                                               class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A]/30 transition text-sm">
+                                    </div>
+                                    <button wire:click="removeAdditionalInfo({{ $index }})" 
+                                            class="text-red-400 hover:text-red-600 transition p-1">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        @endif
+
+                        <!-- Add New Field Button -->
+                        <button wire:click="addAdditionalInfo" 
+                                class="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-[#1E7A4A] hover:text-[#1E7A4A] transition text-sm font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Highlight / Specification
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <!-- Status Field -->
                 <div class="w-full sm:w-auto">
