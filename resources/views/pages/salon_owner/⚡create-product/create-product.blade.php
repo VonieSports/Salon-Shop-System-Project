@@ -1,6 +1,5 @@
 <div class="min-h-screen bg-gray-50" x-data="{ showCategoryModal: false }" x-on:category-created.window="showCategoryModal = false">
     <div class="mx-auto space-y-6">
-        <!-- Alert Messages -->
         @if (session()->has('message'))
             <div class="bg-green-50 text-green-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('message') }}</div>
         @endif
@@ -8,20 +7,13 @@
             <div class="bg-red-50 text-red-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('error') }}</div>
         @endif
 
-        <!-- Main Form -->
         <form wire:submit.prevent="save">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                <!-- LEFT COLUMN -->
                 <div class="lg:col-span-8 space-y-6">
-
-                    <!-- General Information with Header Attached -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        <!-- Header Section -->
                         <div class="px-6 py-5 border-b border-gray-100 bg-[#1E7A4A]">
                             <div class="flex items-center justify-between flex-wrap gap-4">
                                 <div class="flex items-center gap-3">
-                                    <!-- Back Button -->
                                     <a href="{{ route('owner.dashboard') }}" class="p-2 hover:bg-green-100 rounded-lg transition-colors">
                                         <svg class="w-5 h-5 text-neutral-50 hover:text-[#1E7A4A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -34,8 +26,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Form Fields -->
+
                         <div class="p-6 space-y-5">
                             <div>
                                 <label for="name" class="block text-xs font-medium text-gray-500 mb-1.5">Product Name</label>
@@ -53,7 +44,6 @@
                         </div>
                     </div>
 
-                    <!-- Pricing & Stock -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100">
                             <h3 class="text-base font-bold text-gray-900">Pricing &amp; Stock</h3>
@@ -64,7 +54,7 @@
                                     <label for="cost_price" class="block text-xs font-medium text-gray-500 mb-1.5">Cost Price</label>
                                     <div class="relative">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                                        <input type="number" id="cost_price" wire:model="cost_price" step="0.01" min="0"
+                                        <input type="number" id="cost_price" wire:model.blur="cost_price" step="0.01" min="0"
                                                class="w-full pl-8 pr-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
                                     </div>
                                     @error('cost_price') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -73,7 +63,7 @@
                                     <label for="selling_price" class="block text-xs font-medium text-gray-500 mb-1.5">Selling Price</label>
                                     <div class="relative">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                                        <input type="number" id="selling_price" wire:model="selling_price" step="0.01" min="0"
+                                        <input type="number" id="selling_price" wire:model.blur="selling_price" step="0.01" min="0"
                                                class="w-full pl-8 pr-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm">
                                     </div>
                                     @error('selling_price') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -97,7 +87,6 @@
                         </div>
                     </div>
 
-                    <!-- Product Variants -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="variants-section">
                         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                             <h3 class="text-base font-bold text-gray-900">Product Variants</h3>                            
@@ -157,17 +146,13 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN -->
                 <div class="lg:col-span-4 space-y-6 flex flex-col">
-
-                                    <!-- Upload Image (Shopee 600x600 Style) -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100">
                             <h3 class="text-base font-bold text-gray-900">Images</h3>
                         </div>
                         <div class="p-6">
-                            <!-- 600x600 Box -->
-                            <label class="group relative block aspect-square w-full max-w-[300px] mx-auto rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden cursor-pointer hover:border-[#1E7A4A] transition">
+                            <label class="group relative block aspect-square w-full max-w-75 mx-auto rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden cursor-pointer hover:border-[#1E7A4A] transition">
                                 @if($image && $image->temporaryUrl())
                                     <img src="{{ $image->temporaryUrl() }}" alt="Product preview" class="absolute inset-0 w-full h-full object-contain">
                                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition flex items-center justify-center">
@@ -184,7 +169,6 @@
                                 <input type="file" wire:model="image" accept="image/*" class="hidden">
                             </label>
 
-                            <!-- Shopee-style Requirement Text -->
                             <div class="mt-3 text-center">
                                 <p class="text-[11px] text-gray-500">Dimensions: <span class="font-medium">600 x 600 px.</span> Maximum file size: <span class="font-medium">10 MB</span> (Up to 9 files). Format: JPG, JPEG, PNG</p>
                                 @error('image') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -193,7 +177,6 @@
                         </div>
                     </div>
 
-                    <!-- Category -->
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-100">
                             <h3 class="text-base font-bold text-gray-900">Category</h3>
@@ -201,7 +184,7 @@
                         <div class="p-6 space-y-3">
                             <div>
                                 <label for="category" class="block text-xs font-medium text-gray-500 mb-1.5">Product Category</label>
-                                <select wire:model="product_category_id" 
+                                <select wire:model.blur="product_category_id" 
                                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#1E7A4A]/30">
                                     <option value="">Select category</option>
                                     @foreach($this->categories as $category)
@@ -220,55 +203,36 @@
                 </div>
             </div>
 
-            <!-- Additional Information - Shopee Style Section -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-6">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-base font-bold text-gray-900">Product Details & Highlights</h3>
-                            <p class="text-xs text-gray-500">Add custom headers, specs, and highlights (Like Shopee/TikTok)</p>
                         </div>
                         <span class="text-xs text-gray-400">Optional</span>
                     </div>
                 </div>
                 
                 <div class="p-6 space-y-4">
-                    
-                    <!-- 1. Section Header Name -->
                     <div>
-                        <label for="info_section_name" class="block text-xs font-medium text-gray-500 mb-1.5">Section Header Name</label>
+                        <label for="info_section_name" class="block text-xs font-medium text-gray-500 mb-1.5"> Name</label>
                         <input type="text" id="info_section_name" wire:model="info_section_name" 
-                               placeholder="e.g. About this product, Product Details, Specifications"
+                               placeholder="e.g. About this product"
                                class="w-full px-4 py-3 bg-gray-100 border border-transparent rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:bg-white focus:border-[#1E7A4A]/30 transition text-sm text-gray-900">
-                        <p class="text-[10px] text-gray-400 mt-1">Leave blank if you don't want a header.</p>
-                    </div>
+                    </div>  
 
-                    <!-- 2. Display Style Toggle -->
-                    <div class="flex items-center gap-4">
-                        <span class="text-xs font-medium text-gray-500">Display as:</span>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" wire:model="info_display_style" value="list" class="text-[#1E7A4A] focus:ring-[#1E7A4A]">
-                            <span class="text-sm text-gray-700">Bulleted List (Shopee style)</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" wire:model="info_display_style" value="grid" class="text-[#1E7A4A] focus:ring-[#1E7A4A]">
-                            <span class="text-sm text-gray-700">Specification Table</span>
-                        </label>
-                    </div>
-
-                    <!-- 3. Dynamic Fields -->
                     <div class="space-y-3 mt-2">
                         @if(!empty($additionalInfo))
                             @foreach($additionalInfo as $index => $info)
-                                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <div wire:key="info-row-{{ $index }}" class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
                                     <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         <input type="text" 
                                                wire:model="additionalInfo.{{ $index }}.label" 
-                                               placeholder="Label (e.g., Brand, Material, Origin)"
+                                               placeholder="Label (e.g., Brand)"
                                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A]/30 transition text-sm">
                                         <input type="text" 
                                                wire:model="additionalInfo.{{ $index }}.value" 
-                                               placeholder="Value (e.g., L'Oréal, Ceramic, China)"
+                                               placeholder="Value (e.g., L'Oréal)"
                                                class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A]/30 transition text-sm">
                                     </div>
                                     <button wire:click="removeAdditionalInfo({{ $index }})" 
@@ -281,8 +245,7 @@
                             @endforeach
                         @endif
 
-                        <!-- Add New Field Button -->
-                        <button wire:click="addAdditionalInfo" 
+                        <button type="button" wire:click="addAdditionalInfo" 
                                 class="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-[#1E7A4A] hover:text-[#1E7A4A] transition text-sm font-medium flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -294,13 +257,12 @@
             </div>
             
             <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <!-- Status Field -->
                 <div class="w-full sm:w-auto">
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
                     <div class="flex items-center gap-2 bg-gray-100 rounded-xl p-1 h-12">
                         <label class="flex items-center gap-2 cursor-pointer px-3 py-1 rounded-lg transition-colors duration-200 hover:bg-gray-200/50 flex-1">
                             <input type="radio" wire:model="status" value="draft" class="hidden peer">
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center flex-shrink-0 transition-colors duration-200 peer-checked:border-gray-500 peer-checked:bg-gray-200">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center shrink-0 transition-colors duration-200 peer-checked:border-gray-500 peer-checked:bg-gray-200">
                                 <div class="w-2.5 h-2.5 rounded-full bg-gray-600 transition-all duration-200 scale-0 peer-checked:scale-100"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-600 peer-checked:text-gray-900 transition-colors whitespace-nowrap">Draft</span>
@@ -308,7 +270,7 @@
 
                         <label class="flex items-center gap-2 cursor-pointer px-3 py-1 rounded-lg transition-colors duration-200 hover:bg-green-100/50 flex-1">
                             <input type="radio" wire:model="status" value="published" class="hidden peer">
-                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center flex-shrink-0 transition-colors duration-200 peer-checked:border-[#1E7A4A] peer-checked:bg-[#1E7A4A]/20">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center shrink-0 transition-colors duration-200 peer-checked:border-[#1E7A4A] peer-checked:bg-[#1E7A4A]/20">
                                 <div class="w-2.5 h-2.5 rounded-full bg-[#1E7A4A] transition-all duration-200 scale-0 peer-checked:scale-100"></div>
                             </div>
                             <span class="text-sm font-medium text-gray-600 peer-checked:text-[#1E7A4A] peer-checked:font-semibold transition-colors whitespace-nowrap">Published</span>
@@ -317,8 +279,7 @@
                     @error('status') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-3 w-full sm:w-auto flex-shrink-0">
+                <div class="flex items-center gap-3 w-full sm:w-auto shrink-0">
                     <a href="{{ route('owner.dashboard') }}" 
                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition text-sm font-medium w-full sm:w-auto whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -339,6 +300,5 @@
             </div>
         </form>
         @include('layouts.partials.category-modal')
-
     </div>
 </div>

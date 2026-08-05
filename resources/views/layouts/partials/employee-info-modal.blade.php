@@ -1,5 +1,3 @@
-{{-- resources/views/layouts/partials/employee-info-modal.blade.php --}}
-
 @if($showProfileModal && $selectedEmployee)
 <div class="fixed inset-0 z-50 overflow-y-auto" x-data="{ show: true }" x-show="show" x-cloak>
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -19,7 +17,6 @@
             </div>
 
             <div class="px-6 py-6 overflow-y-auto flex-1">
-                <!-- Cover Photo -->
                 <div class="relative h-36 sm:h-44 bg-gradient-to-r from-[#1E7A4A] to-emerald-400 rounded-xl overflow-hidden">
                     @if($selectedEmployee->user && $selectedEmployee->user->cover_photo)
                         <img src="{{ Storage::url($selectedEmployee->user->cover_photo) }}" class="w-full h-full object-cover">
@@ -32,7 +29,6 @@
                     @endif
                 </div>
 
-                <!-- Avatar - Overlapping Cover -->
                 <div class="relative flex items-end -mt-10 sm:-mt-12 px-1">
                     <div class="relative">
                         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-lg">
@@ -58,7 +54,6 @@
              
                 </div>
 
-                <!-- Details Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mt-5 pt-4 border-t border-gray-100">
                     <div>
                         <label class="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Full Name</label>
@@ -91,7 +86,6 @@
                   
                 </div>
 
-                <!-- Bio -->
                 @if($selectedEmployee->user && $selectedEmployee->user->bio)
                     <div class="mt-4 pt-4 border-t border-gray-100">
                         <label class="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Bio</label>
@@ -99,7 +93,6 @@
                     </div>
                 @endif
 
-                <!-- Permissions -->
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <label class="block text-[10px] font-medium text-gray-400 uppercase tracking-wider">Permissions</label>
                     <div class="flex flex-wrap gap-1.5 mt-2">
@@ -119,7 +112,6 @@
                 </div>
             </div>
 
-            <!-- Modal Footer - Fixed -->
             <div class="px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 shrink-0">
                 <button wire:click="closeProfileModal" 
                         class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition shadow-sm">

@@ -14,8 +14,8 @@ new #[Layout('layouts.customer')] class extends Component
     use WithPagination;
 
     public string $search = '';
-    public string $filter = 'all'; // all, products, services
-    public string $sort = 'newest'; // newest, price_low, price_high
+    public string $filter = 'all'; 
+    public string $sort = 'newest'; 
     public ?int $selectedCategory = null;
     public array $favorites = [];
 
@@ -63,14 +63,12 @@ new #[Layout('layouts.customer')] class extends Component
             ->where('status', 'published')
             ->whereNull('archived_at');
 
-        // Filter by type
         if ($this->filter === 'products') {
             $query->where('type', 'product');
         } elseif ($this->filter === 'services') {
             $query->where('type', 'service');
         }
 
-        // Search
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
@@ -78,12 +76,10 @@ new #[Layout('layouts.customer')] class extends Component
             });
         }
 
-        // Category filter
         if ($this->selectedCategory) {
             $query->where('product_category_id', $this->selectedCategory);
         }
 
-        // Sorting
         switch ($this->sort) {
             case 'price_low':
                 $query->orderBy('price', 'asc');
@@ -91,13 +87,12 @@ new #[Layout('layouts.customer')] class extends Component
             case 'price_high':
                 $query->orderBy('price', 'desc');
                 break;
-            default: // newest
+            default: 
                 $query->orderBy('created_at', 'desc');
                 break;
         }
 
         return $query->paginate(12);
     }
-
 
 };

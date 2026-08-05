@@ -29,7 +29,6 @@
                         </button>
 
                         <div class="flex items-center gap-2 sm:gap-3">
-                            <!-- Status -->
                             <div class="flex items-center gap-2">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" wire:click="toggleStatus({{ $post->id }})" 

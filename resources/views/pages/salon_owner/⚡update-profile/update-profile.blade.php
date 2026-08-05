@@ -1,7 +1,6 @@
 <div>
     <div class="w-full">
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
-            <!-- Header -->
             <div class="bg-[#1E7A4A] px-4 sm:px-6 py-4 sm:py-5">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
@@ -25,24 +24,21 @@
                     </div>
                 @endif
 
-                <form wire:submit="updateProfile" enctype="multipart/form-data">
-                    <!-- Profile Preview Section -->
+                <form wire:submit="updateProfile">
                     <div class="mb-8 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-                        <!-- Cover Photo -->
-                        <div class="relative h-40 sm:h-48 md:h-56 bg-gradient-to- from-[#1E7A4A] to-emerald-400 group">
+                        <div class="relative h-40 sm:h-48 md:h-56 bg-gradient-to-br from-[#1E7A4A] to-emerald-400 group">
                             @if($cover_photo)
                                 <img src="{{ $cover_photo->temporaryUrl() }}" class="w-full h-full object-cover">
                             @elseif($existing_cover_photo)
                                 <img src="{{ Storage::url($existing_cover_photo) }}" class="w-full h-full object-cover">
                             @else
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to- from-[#1E7A4A] to-emerald-500">
+                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E7A4A] to-emerald-500">
                                     <svg class="w-12 h-12 sm:w-16 sm:h-16 text-white/20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
                                     </svg>
                                 </div>
                             @endif
 
-                            <!-- 🔥 Clickable Overlay for Cover Photo -->
                             <label class="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-300 cursor-pointer flex items-center justify-center">
                                 <div class="opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-95 group-hover:scale-100 flex flex-col items-center gap-2">
                                     <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
@@ -57,7 +53,6 @@
                                 <input type="file" wire:model="cover_photo" accept="image/*" class="hidden">
                             </label>
 
-                            <!-- 🔥 Remove Button - Small X on corner when cover exists -->
                             @if($existing_cover_photo)
                                 <button type="button" 
                                         wire:click="removeCoverPhoto" 
@@ -67,25 +62,10 @@
                                     </svg>
                                 </button>
                             @endif
-
-                            <!-- Loading Spinner -->
-                            <div wire:loading wire:target="cover_photo" 
-                                 class="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <svg class="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-
-                            @error('cover_photo')
-                                <span class="text-red-500 text-xs mt-1 block absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 px-3 py-1 rounded shadow">{{ $message }}</span>
-                            @enderror
                         </div>
 
-                        <!-- Profile Info Overlay -->
                         <div class="relative px-4 sm:px-6 pb-6">
                             <div class="flex flex-col sm:flex-row items-center sm:items-end -mt-12 sm:-mt-16 mb-4">
-                                <!-- Avatar -->
                                 <div class="relative group">
                                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white bg-gray-100 shadow-lg">
                                         @if($avatar)
@@ -121,77 +101,63 @@
                                             </svg>
                                         </button>
                                     @endif
-                                    
-                                    @error('avatar')
-                                        <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
-                                    @enderror
                                 </div>
 
-                                <!-- Name & Status -->
                                 <div class="sm:ml-6 mt-4 sm:mt-0 text-center sm:text-left flex-1">
-                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                                        <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
-                                        <span class="px-3 py-1 text-xs rounded-full {{ $status['badge_class'] ?? 'bg-gray-100 text-gray-500' }}">
-                                            {{ $status['label'] ?? 'Offline' }}
-                                        </span>
-                                    </div>
+                                    <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
                                     <p class="text-gray-500">{{ $tenant?->name ?? 'Owner' }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Bio -->
-                            <div class="mt-2 px-4 py-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <div class="flex items-start gap-2">
-                                    <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <p class="text-sm text-gray-700">{{ $user_bio ?? 'No bio added yet' }}</p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Edit Form -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Left Column -->
                         <div class="space-y-6">
-                            <!-- Personal Information -->
-                            <div>
-                                <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Personal Information</h2>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
-                                        <input type="text" wire:model="user_name" 
-                                               class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
-                                        @error('user_name') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-500">*</span></label>
-                                        <input type="email" wire:model="user_email" 
-                                               class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
-                                        @error('user_email') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
-                                        <input type="text" wire:model="user_phone" 
-                                               class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
-                                        @error('user_phone') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
-                                        <input type="text" wire:model="user_address" 
-                                               class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
-                                        @error('user_address') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                                    </div>
+                            <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Personal Information</h2>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+                                    <input type="text" wire:model="user_name" 
+                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                    @error('user_name') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email <span class="text-red-500">*</span></label>
+                                    <input type="email" wire:model="user_email" 
+                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                    @error('user_email') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                                    <input type="text" wire:model="user_phone" 
+                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                    @error('user_phone') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Gender</label>
+                                    <select wire:model="user_gender" class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                        <option value="prefer_not_to_say">Prefer not to say</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    @error('user_gender') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Birthdate</label>
+                                    <input type="date" wire:model="user_birthdate" 
+                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                    @error('user_birthdate') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+                                    <input type="text" wire:model="user_address" 
+                                           class="w-full rounded-lg border border-gray-300 bg-white focus:border-[#1E7A4A] focus:ring-2 focus:ring-[#1E7A4A]/20 transition px-3 sm:px-4 py-2 sm:py-2.5 text-sm">
+                                    @error('user_address') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Column -->
                         <div class="space-y-6">
-                            <!-- Bio Edit -->
                             <div>
                                 <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Bio</h2>
                                 <textarea wire:model="user_bio" rows="4" 
@@ -203,7 +169,6 @@
                                 </div>
                             </div>
 
-                            <!-- Change Password -->
                             <div>
                                 <h2 class="text-sm font-semibold text-[#111827] uppercase tracking-wider mb-4">Change Password</h2>
                                 <div class="space-y-4">

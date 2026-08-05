@@ -1,3 +1,4 @@
+
 <?php
 
 use Livewire\Component;
@@ -13,6 +14,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
     use WithFileUploads;
 
     public $user_name;
+    public $user_gender; 
+    public $user_birthdate; 
     public $user_email;
     public $user_phone;
     public $user_address;
@@ -32,15 +35,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public $user;
     public $tenant;
-    public $status;
 
     public function mount()
     {
         $this->user = Auth::user()->load('tenant');
         $this->tenant = $this->user->tenant;
-        $this->status = $this->user->status;
 
         $this->user_name = $this->user->name;
+        $this->user_gender = $this->user->gender ?? 'prefer_not_to_say';
+        $this->user_birthdate = $this->user->birth_date?->format('Y-m-d');
         $this->user_email = $this->user->email;
         $this->user_phone = $this->user->phone;
         $this->user_address = $this->user->address;
@@ -63,6 +66,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $rules = [
             'user_name' => 'required|string|max:255',
+            'user_gender' => 'nullable|in:male,female,other,prefer_not_to_say',
+            'user_birthdate' => 'nullable|date|before:today',
             'user_email' => "required|email|unique:users,email,{$user->id}",
             'user_phone' => "nullable|string|max:11|min:11|unique:users,phone,{$user->id}",
             'user_address' => 'nullable|string|max:500',
@@ -85,6 +90,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     protected function messages()
     {
         return [
+            'user_birthdate.before' => 'Birthdate must be a date in the past.',
             'cover_photo.image' => 'Cover photo must be an image file.',
             'cover_photo.max' => 'Cover photo must not exceed 5MB.',
             'avatar.image' => 'Profile photo must be an image file.',
@@ -148,6 +154,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
             $user->update([
                 'name' => $this->user_name,
+                'gender' => $this->user_gender,
+                'birth_date' => $this->user_birthdate,
                 'email' => $this->user_email,
                 'phone' => $this->user_phone,
                 'address' => $this->user_address,

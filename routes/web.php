@@ -31,7 +31,6 @@ Route::livewire('/profile', 'pages::salon_owner.profile')->name('owner.profile')
 Route::livewire('/business_info', 'pages::salon_owner.business-info')->name('owner.business_info');
 Route::livewire('/business_setup', 'pages::salon_owner.business-setup')->name('owner.business_setup');
 Route::livewire('/update/profile', 'pages::salon_owner.update-profile')->name('owner.update_profile');   
-
 Route::middleware('setup.complete')->group(function () {
 Route::livewire('/employee', 'pages::salon_owner.employee')->name('owner.employee');
 Route::livewire('/account', 'pages::salon_owner.account')->name('owner.account');
@@ -63,7 +62,7 @@ Route::livewire('/update/profile', 'pages::employee.update-profile')->name('empl
 Route::livewire('/business_info', 'pages::employee.business-info')->name('employee.business_info');
 Route::livewire('/business_setup', 'pages::employee.business-setup')->name('employee.business_setup');
 Route::livewire('/account', 'pages::employee.account')->name('employee.account');
-Route::livewire('/employee/table', 'pages::employee.enployee')->name('employee.employee_table');
+Route::livewire('/employee/table', 'pages::employee.employee')->name('employee.employee_table');
 Route::livewire('/branch/table', 'pages::employee.branch-table')->name('employee.branch_table');
 Route::livewire('/category/management', 'pages::employee.category-management')->name('employee.category_management');
 Route::livewire('/create/branch', 'pages::employee.create-branch')->name('employee.create_branch');

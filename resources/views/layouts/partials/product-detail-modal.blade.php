@@ -41,7 +41,6 @@
 
                     <div class="overflow-y-auto p-4 sm:p-6" style="max-height: calc(92vh - 110px);">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                            <!-- Left Column - Images -->
                             <div class="space-y-3">
                                 <div class="aspect-square bg-gray-50 rounded-xl overflow-hidden relative border border-gray-200">
                                     @if($selectedGallery && count($selectedGallery) > 0)
@@ -62,13 +61,11 @@
                                 </div>
 
                                 @php
-                                    // Get MAIN product images only (not variants)
                                     $mainImages = collect([$selectedProduct?->image, $selectedPost->image])
                                         ->filter()
                                         ->unique()
                                         ->values();
                                     
-                                    // Get variant images - ONLY 4 max
                                     $variantImages = $selectedVariants ? $selectedVariants->filter(fn($v) => $v->image)->values() : collect();
                                     $totalVariantImages = $variantImages->count();
                                     $variantThumbnails = $variantImages->take(4);
@@ -77,7 +74,6 @@
 
                                 @if($mainImages->count() > 0 || $totalVariantImages > 0)
                                     <div class="grid grid-cols-5 gap-2">
-                                        <!-- Main Product Images - Same width as variants -->
                                         @foreach ($mainImages as $i => $img)
                                             <button type="button" @click="activeImage = {{ $i }}"
                                                     :class="activeImage === {{ $i }} ? 'ring-2 ring-[#1E7A4A]' : 'ring-1 ring-gray-200'"
@@ -86,7 +82,6 @@
                                             </button>
                                         @endforeach
 
-                                        <!-- ONLY 4 Variant Thumbnails - 4th has +X -->
                                         @foreach ($variantThumbnails as $index => $variant)
                                             @php
                                                 $variantIndex = $mainImages->count() + $index;
@@ -113,7 +108,6 @@
                                 @endif
                             </div>
 
-                            <!-- Right Column - Details -->
                             <div class="space-y-4">
                                 <div>
                                     <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">{{ $selectedPost->name }}</h1>

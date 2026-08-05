@@ -14,14 +14,7 @@
         </a>
     </div>
 
-    <!-- ========================================== -->
-    <!-- PRODUCT GRID SECTION                         -->
-    <!-- ========================================== -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-3 bg-white lg:gap-10 mb-6 lg:mb-10">
-
-        <!-- ========================================== -->
-        <!-- LEFT: IMAGES & THUMBNAILS                    -->
-        <!-- ========================================== -->
         <div class="space-y-4">
             <!-- Main Image Box -->
             <div class="relative lg:rounded-2xl overflow-hidden -mx-4 lg:mx-0 bg-gray-50 lg:bg-gray-50 lg:border lg:border-gray-200 shadow-sm lg:shadow-none aspect-[4/5] lg:aspect-square">
@@ -57,7 +50,6 @@
                 @endif
             </div>
 
-            <!-- Thumbnails Gallery (Clean row below image like the design) -->
             @if ($this->allImages->count() > 1)
                 <div class="flex gap-3 overflow-x-auto px-4 lg:px-0 pb-2">
                     @foreach ($this->allImages as $index => $img)
@@ -70,9 +62,6 @@
             @endif
         </div>
 
-        <!-- ========================================== -->
-        <!-- RIGHT: PRODUCT DETAILS                       -->
-        <!-- ========================================== -->
         <div class="space-y-5 pt-2 px-4 lg:px-6 bg-white">
             
             <!-- Brand / Shop Mini-Logo -->
@@ -108,7 +97,7 @@
             <!-- Clean Description Block -->
             @if ($post->description)
                 <div class="text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-4">
-                    <h3 class="text-xs font-bold text-gray-800 mb-1 uppercase tracking-wide">Product Description</h3>
+                    <h3 class="text-xs font-bold text-gray-800 mb-1 uppercase tracking-wide">Description</h3>
                     <p>{{ Str::limit($post->description, 240) }}</p>
                 </div>
             @endif
@@ -130,7 +119,7 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach ($values as $value)
                                     <button wire:key="attr-{{ $attributeName }}-{{ $value }}" wire:click="selectAttributeValue('{{ $attributeName }}', '{{ $value }}')"
-                                            class="px-5 py-2 text-sm font-medium rounded-lg border transition-all duration-200 {{ ($selectedAttributes[$attributeName] ?? '') === $value ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-gray-200 bg-white text-gray-700 hover:border-[#1E7A4A] hover:text-[#1E7A4A]' }}">
+                                            class="px-5 py-2 text-sm font-medium rounded-lg border transition-all duration-200 {{ ($selectedAttributes[$attributeName] ?? '') === $value ? 'border-[#1E7A4A] bg-[#1E7A4A] text-white shadow-md' : 'border-gray-200 bg-white text-gray-700 hover:border-[#1E7A4A] hover:text-[#1E7A4A]' }}">
                                         {{ $value }}
                                     </button>
                                 @endforeach
@@ -155,12 +144,12 @@
 
                 <!-- Buttons -->
                 <button wire:click="buyNow" @if($this->stockStatus === 'out') disabled @endif
-                        class="flex-1 py-3 bg-gray-900 text-white text-sm font-bold rounded-lg hover:bg-black transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="flex-1 py-3 bg-[#1E7A4A] text-white text-sm font-bold rounded-lg hover:bg-[#175e39] transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
                     Buy Now
                 </button>
                 
                 <button wire:click="addToCart" @if($this->stockStatus === 'out') disabled @endif
-                        class="flex-1 py-3 border-2 border-gray-200 text-gray-800 text-sm font-bold rounded-lg hover:border-[#1E7A4A] hover:text-[#1E7A4A] transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed bg-white">
+                        class="flex-1 py-3 border-2 border-gray-200 text-[#1E7A4A] text-sm font-bold rounded-lg hover:border-[#1E7A4A] hover:text-[#1E7A4A] transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed bg-white">
                     Add To Cart
                 </button>
             </div>
@@ -292,9 +281,6 @@
         </div>
     </div>
 
-      <!-- ========================================== -->
-    <!-- SHOP CARD WITH "MORE FROM THIS SHOP"         -->
-    <!-- ========================================== -->
     @if ($post->tenant)
         <div class="px-4 lg:px-0 mb-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-100">
@@ -343,21 +329,9 @@
             @endif
         </div>
     @endif
-    <!-- ========================================== -->
-    <!-- MOBILE STICKY BOTTOM BAR                     -->
-    <!-- ========================================== -->
+
     <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] px-4 py-3 lg:hidden">
         <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center border border-gray-200 rounded-full overflow-hidden h-9 shrink-0">
-                <button wire:click="decrementQuantity" class="px-3 h-full hover:bg-gray-50 transition text-gray-600">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
-                </button>
-                <span class="px-3 h-full flex items-center text-sm font-medium text-gray-900">{{ $quantity }}</span>
-                <button wire:click="incrementQuantity" class="px-3 h-full hover:bg-gray-50 transition text-gray-600">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                </button>
-            </div>
-
             <div class="flex items-center gap-2 flex-1">
                 <button wire:click="addToCart" @if($this->stockStatus === 'out') disabled @endif
                         class="flex-1 py-2 bg-white border-2 border-[#1E7A4A] text-[#1E7A4A] text-sm font-semibold rounded-full hover:bg-[#1E7A4A] hover:text-white transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">

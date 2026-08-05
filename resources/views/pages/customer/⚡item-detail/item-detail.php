@@ -18,13 +18,6 @@ new #[Layout('layouts.customer')] class extends Component
     public int $quantity = 1;
     public ?string $currentImage = null;
 
-    /**
-     * Placeholder rating data — there is no reviews table in the schema
-     * yet, so this is generated once in mount() rather than called
-     * separately in multiple places in the view (which previously
-     * produced two different, inconsistent numbers on the same page).
-     * Replace with a real query once a `reviews` table exists.
-     */
     public int $reviewCount = 0;
 
     public function mount($id): void
@@ -59,11 +52,6 @@ new #[Layout('layouts.customer')] class extends Component
         return $this->variants->firstWhere('id', $this->selectedVariantId);
     }
 
-    /**
-     * Built entirely from the $variants collection already loaded in
-     * mount() — zero database queries, including on image navigation
-     * clicks, which previously re-queried the database on every click.
-     */
     #[Computed]
     public function allImages()
     {
@@ -114,10 +102,6 @@ new #[Layout('layouts.customer')] class extends Component
         return $this->inventory->stock ?? 0;
     }
 
-    /**
-     * Single source of truth for the stock badge — replaces the
-     * hardcoded "In Stock" text that never reflected real data.
-     */
     #[Computed]
     public function stockStatus(): ?string
     {
@@ -145,10 +129,6 @@ new #[Layout('layouts.customer')] class extends Component
         return in_array($this->post->id, session()->get('favorites', []));
     }
 
-    /**
-     * Same tenant, different listing. Only Post-level columns are used
-     * in the view, so no eager load of `inventory` is needed here.
-     */
     #[Computed]
     public function shopProducts()
     {
@@ -166,11 +146,6 @@ new #[Layout('layouts.customer')] class extends Component
             ->get();
     }
 
-    /**
-     * Dropped the previous ->with('inventory') eager load here — the
-     * view never touches inventory fields for these cards, so it was
-     * an extra query producing data that was thrown away.
-     */
     #[Computed]
     public function recommendedProducts()
     {
@@ -257,11 +232,6 @@ new #[Layout('layouts.customer')] class extends Component
         unset($this->isFavorited);
     }
 
-    /**
-     * Replaces the broken inline "$set('quantity', max(1, $quantity - 1))"
-     * expression, which mixed PHP syntax into a context Livewire
-     * evaluates as JS — $quantity and max() are not valid there.
-     */
     public function incrementQuantity(): void
     {
         $maxQuantity = $this->stock ?? 99;

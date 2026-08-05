@@ -147,7 +147,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         $detailsPayload = [
             'section_name' => $this->info_section_name,
-            'display_style' => $this->info_display_style,
             'items' => $filteredInfo
         ];
 
@@ -198,7 +197,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
                     'image' => $imagePath,
                     'price' => $this->selling_price,
                     'description' => $this->description,
-                    'additional_info' => $detailsPayload, // <--- UPDATED PAYLOAD HERE
+                    'additional_info' => $detailsPayload,
                     'status' => $this->status,
                 ]);
             });

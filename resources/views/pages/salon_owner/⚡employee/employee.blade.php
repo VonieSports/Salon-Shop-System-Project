@@ -44,7 +44,7 @@
                     </div>
 
                     <select wire:model.live="statusFilter"
-                        class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A] transition bg-white w-full sm:w-auto min-w-[160px] appearance-none">
+                        class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#1E7A4A]/30 focus:border-[#1E7A4A] transition bg-white w-full sm:w-auto min-w-40 appearance-none">
                         <option value="all"> All Status</option>
                         <option value="online"> Online Now</option>
                         <option value="offline"> Offline</option>
@@ -66,7 +66,7 @@
                 </div>
                 @else
                 <div class="overflow-x-auto -mx-3 sm:mx-0">
-                    <table class="w-full min-w-[640px] sm:min-w-full">
+                    <table class="w-full min-w-160 sm:min-w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th
@@ -100,7 +100,7 @@
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-3 sm:px-4 py-3">
                                     <div class="flex items-center gap-2 sm:gap-3">
-                                        <div class="relative flex-shrink-0">
+                                        <div class="relative shrink-0">
                                             @if($user?->avatar)
                                             <img src="{{ Storage::url($user->avatar) }}"
                                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200">
@@ -122,9 +122,9 @@
                                         </div>
                                         <div class="min-w-0">
                                             <p
-                                                class="text-sm font-semibold text-gray-900 truncate max-w-[100px] sm:max-w-[150px]">
+                                                class="text-sm font-semibold text-gray-900 truncate max-w-25 sm:max-w-37.5">
                                                 {{ $user?->name ?? 'Unknown' }}</p>
-                                            <p class="text-xs text-gray-400 truncate max-w-[100px] sm:max-w-none">
+                                            <p class="text-xs text-gray-400 truncate max-w-25 sm:max-w-none">
                                                 @if(isset($status['is_online']) && $status['is_online'])
                                                 <span class="text-green-600 font-medium">● Online</span>
                                                 @elseif($user?->last_login_at)
@@ -138,7 +138,7 @@
                                 </td>
 
                                 <td class="px-3 sm:px-4 py-3 hidden sm:table-cell">
-                                    <p class="text-sm text-gray-600 truncate max-w-[150px]">{{ $user?->email ?? 'No
+                                    <p class="text-sm text-gray-600 truncate max-w-25">{{ $user?->email ?? 'No
                                         email' }}</p>
                                     <p class="text-xs text-gray-400">{{ $user?->phone ?? 'No phone' }}</p>
                                 </td>
@@ -214,36 +214,5 @@
             </div>
         </div>
     </div>
-
-    @if($showPermissionModal)
-    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Manage Permissions</h3>
-                <div class="mt-4">
-                    @foreach($allPermissions as $permission)
-                    <div class="mb-2">
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" wire:model="selectedPermissions" value="{{ $permission->name }}"
-                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            <span class="ml-2 text-sm text-gray-700">{{ ucfirst(str_replace('_', ' ',
-                                $permission->name)) }}</span>
-                        </label>
-                    </div>
-                    @endforeach
-                </div>
-                <div class="flex justify-end gap-2 mt-4">
-                    <button type="button" wire:click="closePermissionModal"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        Cancel
-                    </button>
-                    <button type="button" wire:click="savePermissions"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Save Permissions
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
+@include('layouts.partials.employee-permission-modal')
 </div>

@@ -1,5 +1,4 @@
-    <!-- Inventory Products -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-8">
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-8">
             <div class="px-6 py-4 border-b border-gray-100">
                 <h3 class="text-base font-bold text-gray-900">Inventory Products</h3>
                 <p class="text-xs text-gray-400 mt-0.5">{{ $this->inventoryProducts->count() }} products</p>

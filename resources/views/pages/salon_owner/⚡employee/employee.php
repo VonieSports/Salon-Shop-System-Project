@@ -97,12 +97,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->where('is_active', true)
             ->whereHas('user', function ($q) {
                 $q->whereNotNull('last_login_at')
-                    ->where(function ($sub) {
-                        $sub->whereNull('last_logout_at')
-                            ->orWhere('last_activity_at', '>=', now()->subMinutes(5));
-                    });
-            })
-            ->count();
+            ->where(function ($sub) {
+            $sub->whereNull('last_logout_at')
+            ->orWhere('last_activity_at', '>=', now()->subMinutes(5));
+        }); })->count();
     }
 
     public function toggleActive(int $id): void
@@ -194,7 +192,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
         }
 
         if ($employee->user->hasRole('owner')) {
-            session()->flash('error', 'Cannot modify owner permissions.');
+            session()->flash('error', 'Cannot modify this permissions.');
             $this->showPermissionModal = false;
             return;
         }
