@@ -44,29 +44,29 @@
     x-init="init()" 
     class="bg-gray-100 overflow-x-hidden ">
         <div class="flex h-screen overflow-hidden">
-            <!-- Sidebar -->
-            <div x-show="sidebarOpen" 
-                 x-transition:enter="transition-all duration-300 ease-in-out"
-                 x-transition:enter-start="-translate-x-full opacity-0"
-                 x-transition:enter-end="translate-x-0 opacity-100"
-                 x-transition:leave="transition-all duration-300 ease-in-out"
-                 x-transition:leave-start="translate-x-0 opacity-100"
-                 x-transition:leave-end="-translate-x-full opacity-0"
-                 class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 lg:relative lg:translate-x-0 lg:flex-shrink-0 overflow-y-auto overflow-x-hidden shadow-2xl lg:shadow-none">
-                @include('layouts.salon_owner.sidebar')
-            </div>
+         @if ($tenant && $tenant->business_setup_completed && $tenant->verification_status === 'approved')
+    <div x-show="sidebarOpen"
+         x-transition:enter="transition-all duration-300 ease-in-out"
+         x-transition:enter-start="-translate-x-full opacity-0"
+         x-transition:enter-end="translate-x-0 opacity-100"
+         x-transition:leave="transition-all duration-300 ease-in-out"
+         x-transition:leave-start="translate-x-0 opacity-100"
+         x-transition:leave-end="-translate-x-full opacity-0"
+         class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 lg:relative lg:translate-x-0 lg:flex-shrink-0 overflow-y-auto overflow-x-hidden shadow-2xl lg:shadow-none">
+        @include('layouts.salon_owner.sidebar')
+    </div>
 
-            <div x-show="sidebarOpen && window.innerWidth < 1024" 
-                 x-transition:enter="transition-opacity duration-300 ease-in-out"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition-opacity duration-300 ease-in-out"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 @click="closeSidebar()"
-                 class="fixed inset-0 z-40 bg-black/50 lg:hidden">
-            </div>
-            
+    <div x-show="sidebarOpen && window.innerWidth < 1024"
+         x-transition:enter="transition-opacity duration-300 ease-in-out"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity duration-300 ease-in-out"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="closeSidebar()"
+         class="fixed inset-0 z-40 bg-black/50 lg:hidden">
+    </div>
+@endif
             <div class=" flex flex-col overflow-hidden w-full min-w-0 transition-all duration-300 ease-in-out"
                  :class="sidebarOpen && window.innerWidth >= 1024 ? 'ml-0' : 'ml-0'">
                 @include('layouts.salon_owner.header')

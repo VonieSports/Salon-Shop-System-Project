@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Traits;
 
 trait HasGender
 {
@@ -15,17 +15,11 @@ trait HasGender
         };
     }
 
-    /**
-     * Get the user's age.
-     */
     public function getAgeAttribute(): ?int
     {
         return $this->birth_date?->age;
     }
 
-    /**
-     * Get all available gender options.
-     */
     public static function getGenderOptions(): array
     {
         return [
@@ -36,41 +30,27 @@ trait HasGender
         ];
     }
 
-    /**
-     * Check if user is male.
-     */
+
     public function isMale(): bool
     {
         return $this->gender === 'male';
     }
 
-    /**
-     * Check if user is female.
-     */
     public function isFemale(): bool
     {
         return $this->gender === 'female';
     }
 
-    /**
-     * Scope a query to only include male users.
-     */
     public function scopeMale($query)
     {
         return $query->where('gender', 'male');
     }
 
-    /**
-     * Scope a query to only include female users.
-     */
     public function scopeFemale($query)
     {
         return $query->where('gender', 'female');
     }
 
-    /**
-     * Scope a query to only include users with a specific gender.
-     */
     public function scopeGender($query, string $gender)
     {
         return $query->where('gender', $gender);

@@ -104,7 +104,6 @@
         </div>
     </div>
 
-    <!-- Desktop Search -->
     <div class="hidden lg:flex flex-1 items-center max-w-sm ml-auto">
         <div class="relative w-full">
             <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" 
@@ -119,7 +118,6 @@
         </div>
     </div>
 
-    <!-- Right Side Icons -->
     <div class="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-2.5 ml-auto shrink-0">
         <button class="hidden lg:flex p-2 rounded-lg text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -161,7 +159,19 @@
                 </div>
             </div>
         </div>
-
+    @if ($tenant)
+                <div class="hidden sm:flex items-center gap-2">
+                    @if (!$tenant->business_setup_completed)
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Setup Incomplete</span>
+                    @elseif ($tenant->verification_status === 'pending')
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Pending Review</span>
+                    @elseif ($tenant->verification_status === 'rejected')
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Rejected</span>
+                    @else
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Approved</span>
+                    @endif
+                </div>
+            @endif
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
                 class="flex items-center gap-1.5 px-1.5 py-1 rounded-lg hover:bg-gray-100 transition">

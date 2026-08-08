@@ -1,7 +1,4 @@
-@php
-    $tenant = Auth::user()->tenant;
-@endphp
-
+@if ($tenant && $tenant->business_setup_completed && $tenant->verification_status === 'approved')
 <aside class="flex flex-col h-full w-64 bg-white overflow-x-hidden">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-gray-200 shrink-0">
         <div class="w-9 h-9 rounded-lg bg-[#1E7A4A] flex items-center justify-center shrink-0">
@@ -12,7 +9,7 @@
         </div>
         <span class="font-bold text-lg text-gray-800 tracking-tight">BeautyNova</span>
     </div>
-
+    
     <div class="px-4 py-4 border-b border-gray-100 shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden">
@@ -93,6 +90,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
                     Create Services
+                </a>
+
+                 <a href="{{ route('owner.create_branch') }}" wire:navigate 
+                   class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Create Branch
                 </a>
 
                 <a href="{{ route('owner.employee') }}" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
@@ -222,6 +227,16 @@
                     </svg>
                     Your Shop
                 </a>
+
+                
+                   <a href="{{ route('owner.branch_table') }}" wire:navigate 
+                   class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Branches
+                </a>
+
             </div>
         </div>
     </nav>
@@ -249,3 +264,4 @@
         </form>
     </div>
 </aside>
+@endif

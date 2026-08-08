@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\HasGender;
+use App\Traits\HasGender;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Tenant;
-use App\OnlineStatusTrait;
+use App\Traits\OnlineStatusTrait;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;

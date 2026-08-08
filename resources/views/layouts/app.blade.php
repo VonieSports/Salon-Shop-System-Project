@@ -13,16 +13,19 @@
     @livewireStyles
 </head>
 <body class=" bg-white text-gray-800  antialiased dark-transition">
-    
+@if(!request()->routeIs('admin.login') && !request()->routeIs('admin.*'))
     @include('layouts.public.header')
+    @endif
 
     <main>
         {{ $slot }}
     </main>
 
-    @livewireScripts
-
+@if(!request()->routeIs('admin.login') && !request()->routeIs('admin.*'))
     @include('layouts.public.footer')
+    @endif
+    
+    @livewireScripts
  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script src="./node_modules/preline/dist/preline.js"></script>
 </body>

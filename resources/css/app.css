@@ -51,4 +51,6 @@
                                 scrollbar-width: none;
                             }
 
-                            
+                 .font-serif-display {
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }             

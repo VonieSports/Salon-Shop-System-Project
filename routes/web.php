@@ -3,9 +3,10 @@
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/seller_centre', function() {return redirect()->route('owner.login.page');})->name('seller_centre');
+Route::get('/seller_centre', function() {return redirect()->livewire('owner.login.page');})->name('seller_centre');
 Route::livewire('/', 'pages::public.home')->name('index.page');
 Route::livewire('/login', 'pages::public_auth.login')->name('login');
+Route::livewire('/admin/login', 'pages::admin_auth.login')->name('admin.login.page');
 Route::livewire('/seller_centre', 'pages::owner_auth.login')->name('owner.login.page');
 Route::livewire('/become_seller', 'pages::owner_auth.register')->name('owner.register.page');
 Route::livewire('/register', 'pages::public_auth.register')->name('register.page');
@@ -22,6 +23,7 @@ Route::livewire('/track_order', 'pages::customer.track-order')->name('customer.t
 Route::livewire('/appointment', 'pages::customer.appointment')->name('customer.appointment');
 Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
 Route::livewire('/favourite', 'pages::customer.favourite')->name('customer.favourite');
+Route::livewire('/notification', 'pages::customer.notification')->name('customer.notification');
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
@@ -30,7 +32,9 @@ Route::livewire('/dashboard', 'pages::salon_owner.dashboard')->name('owner.dashb
 Route::livewire('/profile', 'pages::salon_owner.profile')->name('owner.profile');
 Route::livewire('/business_info', 'pages::salon_owner.business-info')->name('owner.business_info');
 Route::livewire('/business_setup', 'pages::salon_owner.business-setup')->name('owner.business_setup');
-Route::livewire('/update/profile', 'pages::salon_owner.update-profile')->name('owner.update_profile');   
+Route::livewire('/update/profile', 'pages::salon_owner.update-profile')->name('owner.update_profile');
+Route::livewire('/business/approval', 'pages::salon_owner.business-approval')->name('owner.business_approval');
+Route::livewire('/business/rejected', 'pages::salon_owner.business-rejected')->name('owner.business_rejected');   
 Route::middleware('setup.complete')->group(function () {
 Route::livewire('/employee', 'pages::salon_owner.employee')->name('owner.employee');
 Route::livewire('/account', 'pages::salon_owner.account')->name('owner.account');
@@ -62,7 +66,6 @@ Route::livewire('/update/profile', 'pages::employee.update-profile')->name('empl
 Route::livewire('/business_info', 'pages::employee.business-info')->name('employee.business_info');
 Route::livewire('/business_setup', 'pages::employee.business-setup')->name('employee.business_setup');
 Route::livewire('/account', 'pages::employee.account')->name('employee.account');
-Route::livewire('/employee/table', 'pages::employee.employee')->name('employee.employee_table');
 Route::livewire('/branch/table', 'pages::employee.branch-table')->name('employee.branch_table');
 Route::livewire('/category/management', 'pages::employee.category-management')->name('employee.category_management');
 Route::livewire('/create/branch', 'pages::employee.create-branch')->name('employee.create_branch');
@@ -73,7 +76,7 @@ Route::livewire('/create/service', 'pages::employee.create-service')->name('empl
 Route::livewire('/customer/review', 'pages::employee.customer-review')->name('employee.customer_review');
 Route::livewire('/schedule', 'pages::employee.employee-schedule')->name('employee.employe_schedule');
 Route::livewire('/inventory', 'pages::employee.inventory')->name('employee.inventory');
-Route::livewire('/notiication', 'pages::employee.notification')->name('employee.notification');
+Route::livewire('/notification', 'pages::employee.notification')->name('employee.notification');
 Route::livewire('/product/management', 'pages::employee.product-management')->name('employee.product_management');
 Route::livewire('/service/management', 'pages::employee.servie-management')->name('employee.service_management');
 Route::livewire('/update/employee', 'pages::employee.update-employee')->name('employee.update_employee');   
@@ -82,9 +85,11 @@ Route::livewire('/update/service', 'pages::employee.update-service')->name('empl
 Route::livewire('/inventory', 'pages::employee.inventory')->name('employee.inventory');                               
 });
 });
-
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 Route::livewire('/dashboard', 'pages::admin.dashboard')->name('admin.dashboard');
+Route::livewire('/profile', 'pages::admin.profile')->name('admin.profile');
+Route::livewire('/update/profile', 'pages::admin.update-profile')->name('admin.update_profile');
+Route::livewire('/business/approvals', 'pages::admin.business-approval')->name('admin.business_approvals');
+Route::livewire('/shop/management', 'pages::admin.shop-management')->name('admin.shop_management');
+Route::livewire('/shop/customer', 'pages::admin.shop-customer')->name('admin.shop_customer');
 });
-
-

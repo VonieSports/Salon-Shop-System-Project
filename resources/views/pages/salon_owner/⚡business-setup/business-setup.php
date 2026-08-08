@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Livewire\Owner;
+
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -7,10 +9,11 @@ use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Layout;
+use App\Traits\RequiresTenant; // <--- USE THIS TRAIT HERE
 
 new #[Layout('layouts.salon_owner')] class extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, RequiresTenant;
 
     public $tenant;
     public $business_name;
@@ -29,20 +32,32 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function mount()
     {
-        $this->tenant = Auth::user()->tenant;
+        $user = Auth::user();
         
-        if ($this->tenant) {
-            if ($this->tenant->business_setup_completed) {
-                $this->loadBusinessData();
-                $this->is_setup_complete = true;
-                $this->is_editing = false;
-            } else {
-                $this->resetForm();
-                $this->is_setup_complete = false;
-                $this->is_editing = true;
-            }
-        } else {
+        // CRITICAL: Use $this->getTenant() from the trait
+        // This works for Main Owners AND Branch Managers (via pivot table)
+        $this->tenant = $this->getTenant();
+        
+        // If still no tenant found via trait, check pivot table directly just in case
+        if (!$this->tenant) {
+            $this->tenant = $user->tenantsWithAccess()
+                ->wherePivotIn('role', ['owner', 'admin'])
+                ->first();
+        }
+        
+        // If still no tenant found, block access
+        if (!$this->tenant) {
             return redirect()->route('owner.dashboard');
+        }
+
+        if ($this->tenant->business_setup_completed) {
+            $this->loadBusinessData();
+            $this->is_setup_complete = true;
+            $this->is_editing = false;
+        } else {
+            $this->resetForm();
+            $this->is_setup_complete = false;
+            $this->is_editing = true;
         }
     }
 
@@ -68,20 +83,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->description = null;
         $this->existing_logo = null;
         $this->business_hours = [];
-        $this->business_logo = null;
-    }
-
-    public function startEditing()
-    {
-        $this->loadBusinessData();
-        $this->is_editing = true;
-        $this->business_logo = null;
-    }
-
-    public function cancelEdit()
-    {
-        $this->loadBusinessData();
-        $this->is_editing = false;
         $this->business_logo = null;
     }
 
@@ -151,72 +152,55 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function saveBusinessInfo()
     {
-        $this->validate();
+       $this->validate();
 
-        DB::transaction(function () {
-            $user = Auth::user();
-            
-            $hoursToSave = [];
-            foreach ($this->business_hours as $day => $hours) {
-                if ($hours['open'] || $hours['close'] || $hours['closed']) {
-                    $hoursToSave[$day] = [
-                        'open' => $hours['open'] ?? null,
-                        'close' => $hours['close'] ?? null,
-                        'closed' => $hours['closed'] ?? false,
-                    ];
-                }
-            }
+    DB::transaction(function () {
+        $user = Auth::user();
 
-            if (!$this->tenant) {
-                $this->tenant = Tenant::create([
-                    'user_id' => $user->id,
-                    'name' => $this->business_name,
-                    'slug' => \Illuminate\Support\Str::slug($this->business_name),
-                    'email' => $this->business_email,
-                    'phone' => $this->business_phone,
-                    'address' => $this->business_address,
-                    'business_type' => $this->business_type,
-                    'description' => $this->description,
-                    'business_hours' => $hoursToSave,
-                    'is_active' => true,
-                    'business_setup_completed' => true,
-                    'verification_status' => 'pending',
-                    'submitted_at' => now(),
-                ]);
-            } else {
-                $updateData = [
-                    'business_hours' => $hoursToSave,
-                    'business_setup_completed' => true,
-                    'submitted_at' => now(),
+        $hoursToSave = [];
+        foreach ($this->business_hours as $day => $hours) {
+            if ($hours['open'] || $hours['close'] || $hours['closed']) {
+                $hoursToSave[$day] = [
+                    'open' => $hours['open'] ?? null,
+                    'close' => $hours['close'] ?? null,
+                    'closed' => $hours['closed'] ?? false,
                 ];
-
-                // Only update fields that have values
-                if ($this->business_name) $updateData['name'] = $this->business_name;
-                if ($this->business_email) $updateData['email'] = $this->business_email;
-                if ($this->business_phone) $updateData['phone'] = $this->business_phone;
-                if ($this->business_address) $updateData['address'] = $this->business_address;
-                if ($this->business_type) $updateData['business_type'] = $this->business_type;
-                if ($this->description) $updateData['description'] = $this->description;
-
-                $this->tenant->update($updateData);
             }
+        }
 
-            if ($this->business_logo) {
-                if ($this->tenant->logo) {
-                    Storage::disk('public')->delete($this->tenant->logo);
-                }
-                $logoPath = $this->business_logo->store('tenant-logos', 'public');
-                $this->tenant->update(['logo' => $logoPath]);
-                $this->existing_logo = $logoPath;
-                $this->business_logo = null;
+        $updateData = [
+            'business_hours' => $hoursToSave,
+            'business_setup_completed' => true,
+            'verification_status' => 'pending', // NEW: reset on every (re)submit
+            'rejection_reason' => null,          // NEW: clear any previous rejection
+            'submitted_at' => now(),
+        ];
+
+        if ($this->business_name) $updateData['name'] = $this->business_name;
+        if ($this->business_email) $updateData['email'] = $this->business_email;
+        if ($this->business_phone) $updateData['phone'] = $this->business_phone;
+        if ($this->business_address) $updateData['address'] = $this->business_address;
+        if ($this->business_type) $updateData['business_type'] = $this->business_type;
+        if ($this->description) $updateData['description'] = $this->description;
+
+        $this->tenant->update($updateData);
+
+        if ($this->business_logo) {
+            if ($this->tenant->logo) {
+                Storage::disk('public')->delete($this->tenant->logo);
             }
+            $logoPath = $this->business_logo->store('tenant-logos', 'public');
+            $this->tenant->update(['logo' => $logoPath]);
+            $this->existing_logo = $logoPath;
+            $this->business_logo = null;
+        }
 
-            $this->is_setup_complete = true;
-            $this->is_editing = false;
-            $this->loadBusinessData();
-        });
+        $this->is_setup_complete = true;
+        $this->is_editing = false;
+        $this->loadBusinessData();
+    });
 
-        session()->flash('success', 'Business information saved successfully!');
-        return redirect()->route('owner.business_info');
+    session()->flash('success', 'Business information submitted for review!');
+    return redirect()->route('owner.business_approval'); // CHANGED
     }
 };

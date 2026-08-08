@@ -1,9 +1,12 @@
 <?php
 
 namespace App\Models;
-use App\Models\InventoryLog;
+
 use App\Models\Expenses;
-use App\BusinessHoursTrait;
+use App\Models\InventoryLog;
+use App\Traits\BusinessHoursTrait;
+use App\Traits\HasTenantHierarchy;
+use App\Traits\HasVerificationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tenant extends Model
 {
-     use BusinessHoursTrait;
-     
-      protected $fillable = [
+    use BusinessHoursTrait, HasTenantHierarchy, HasVerificationStatus;
+
+    protected $fillable = [
         'user_id',
+        'parent_tenant_id',
         'name',
         'slug',
         'phone',
@@ -31,17 +35,26 @@ class Tenant extends Model
         'submitted_at',
     ];
 
-     protected $casts = [
+    protected $casts = [
         'is_active' => 'boolean',
         'business_setup_completed' => 'boolean',
         'business_hours' => 'array',
         'submitted_at' => 'datetime',
     ];
 
-
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function parentTenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'parent_tenant_id');
+    }
+
+    public function branches(): HasMany
+    {
+        return $this->hasMany(Tenant::class, 'parent_tenant_id');
     }
 
     public function employees(): HasMany
@@ -57,6 +70,11 @@ class Tenant extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function user(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'tenant_users')->withPivot('role')->withTimestamps();
     }
 
     public function products(): HasMany
@@ -90,10 +108,9 @@ class Tenant extends Model
     }
 
     public function staff(): BelongsToMany
-{
-    return $this->belongsToMany(User::class, 'tenant_users')
-    ->withPivot('role')->withTimestamps();
-}
+    {
+        return $this->belongsToMany(User::class, 'tenant_users')->withPivot('role')->withTimestamps();
+    }
 
     public function inventoryLogs(): HasMany
     {
@@ -104,4 +121,4 @@ class Tenant extends Model
     {
         return $this->hasMany(Expenses::class);
     }
-}
+};

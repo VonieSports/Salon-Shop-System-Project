@@ -56,51 +56,25 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->paginate(12);
     }
 
-    protected function applyStatusFilter($query)
+    protected function applyStatusFilter($query): void
     {
-        switch ($this->statusFilter) {
-            case 'online':
-                $query->whereHas('user', function ($q) {
-                    $q->whereNotNull('last_login_at')
-                        ->where(function ($sub) {
-                            $sub->whereNull('last_logout_at')
-                                ->orWhere('last_activity_at', '>=', now()->subMinutes(5));
-                        });
-                });
-                break;
-
-            case 'offline':
-                $query->whereHas('user', function ($q) {
-                    $q->whereNotNull('last_logout_at')
-                        ->orWhere(function ($sub) {
-                            $sub->whereNull('last_activity_at')
-                                ->orWhere('last_activity_at', '<', now()->subMinutes(5));
-                        });
-                });
-                break;
-
-            case 'never_logged_in':
-                $query->whereHas('user', function ($q) {
-                    $q->whereNull('last_login_at');
-                });
-                break;
-
-            case 'inactive':
-                $query->where('is_active', false);
-                break;
-        }
+        match ($this->statusFilter) {
+            'online' => $query->whereHas('user', fn ($q) => $q->online()),
+            'offline' => $query->whereHas('user', fn ($q) => $q->offline()),
+            'never_logged_in' => $query->whereHas('user', fn ($q) => $q->neverLoggedIn()),
+            'has_commission' => $query->where('is_commission_eligible', true),
+            'inactive' => $query->where('is_active', false),
+            default => null,
+        };
     }
 
-    public function getOnlineCount(): int
+    #[Computed]
+    public function onlineCount(): int
     {
         return Employee::where('tenant_id', $this->tenantId)
             ->where('is_active', true)
-            ->whereHas('user', function ($q) {
-                $q->whereNotNull('last_login_at')
-            ->where(function ($sub) {
-            $sub->whereNull('last_logout_at')
-            ->orWhere('last_activity_at', '>=', now()->subMinutes(5));
-        }); })->count();
+            ->whereHas('user', fn ($q) => $q->online())
+            ->count();
     }
 
     public function toggleActive(int $id): void
@@ -115,12 +89,12 @@ new #[Layout('layouts.salon_owner')] class extends Component
         }
 
         $employee->update([
-            'is_active' => !$employee->is_active
+            'is_active' => !$employee->is_active,
         ]);
 
         if ($employee->user) {
             $employee->user->update([
-                'is_active' => $employee->is_active
+                'is_active' => $employee->is_active,
             ]);
         }
 
@@ -159,7 +133,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
             Log::error('Error deleting employee', [
                 'error' => $e->getMessage(),
                 'employee_id' => $id,
-                'tenant_id' => $this->tenantId
+                'tenant_id' => $this->tenantId,
             ]);
             session()->flash('error', 'Failed to delete employee.');
         }
