@@ -19,11 +19,9 @@ Route::livewire('/update/profile', 'pages::customer.update-profile')->name('cust
 Route::livewire('/cart', 'pages::customer.cart')->name('customer.cart');
 Route::livewire('/item/{id}', 'pages::customer.item-detail')->name('customer.item_detail');
 Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.checkout');
-Route::livewire('/track_order', 'pages::customer.track-order')->name('customer.track_order');
-Route::livewire('/appointment', 'pages::customer.appointment')->name('customer.appointment');
+Route::livewire('/track_order/{order}', 'pages::customer.track-order')->name('customer.track_order');
 Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
-Route::livewire('/favourite', 'pages::customer.favourite')->name('customer.favourite');
-Route::livewire('/notification', 'pages::customer.notification')->name('customer.notification');
+Route::livewire('/notification_history', 'pages::customer.notification-history')->name('customer.notification_history');
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
@@ -56,6 +54,8 @@ Route::livewire('/archive', 'pages::salon_owner.archive')->name('owner.archive')
 Route::livewire('/settings', 'pages::salon_owner.setting')->name('owner.setting');
 Route::livewire('/notification', 'pages::salon_owner.notification')->name('owner.notification');
 Route::livewire('/customer/review', 'pages::salon_owner.customer-review')->name('owner.customer_review');
+Route::livewire('/customer/orders', 'pages::salon_owner.customer-order-management')->name('owner.customer_orders');
+Route::livewire('/customer/appointments', 'pages::salon_owner.customer-appointment-management')->name('owner.customer_appointments');
 Route::livewire('/walkin', 'pages::salon_owner.walkin-customer')->name('owner.walkin_customer');
 });
 });

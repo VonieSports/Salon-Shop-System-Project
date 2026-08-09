@@ -1,5 +1,5 @@
 <div class="pb-28 lg:pb-6" x-data="{ activeTab: 'overview' }">
-
+ <!-- Customer checkout/item detail -->
     @if (session()->has('message'))
         <div class="mb-4 bg-green-50 text-green-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('message') }}</div>
     @endif
@@ -141,7 +141,12 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     </button>
                 </div>
-
+@error('variant')
+    <p class="text-sm text-red-600 font-medium -mt-2">{{ $message }}</p>
+@enderror
+@error('stock')
+    <p class="text-sm text-red-600 font-medium -mt-2">{{ $message }}</p>
+@enderror
                 <!-- Buttons -->
                 <button wire:click="buyNow" @if($this->stockStatus === 'out') disabled @endif
                         class="flex-1 py-3 bg-[#1E7A4A] text-white text-sm font-bold rounded-lg hover:bg-[#175e39] transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
@@ -333,6 +338,12 @@
     <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] px-4 py-3 lg:hidden">
         <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-2 flex-1">
+                @error('variant')
+    <p class="text-sm text-red-600 font-medium -mt-2">{{ $message }}</p>
+@enderror
+@error('stock')
+    <p class="text-sm text-red-600 font-medium -mt-2">{{ $message }}</p>
+@enderror
                 <button wire:click="addToCart" @if($this->stockStatus === 'out') disabled @endif
                         class="flex-1 py-2 bg-white border-2 border-[#1E7A4A] text-[#1E7A4A] text-sm font-semibold rounded-full hover:bg-[#1E7A4A] hover:text-white transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
                     Add To Cart

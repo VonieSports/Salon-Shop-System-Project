@@ -1,5 +1,5 @@
 <?php
-
+    //Inventory 
 use App\Models\InventoryLog;
 use App\Models\ItemVariant;
 use App\Models\Post;

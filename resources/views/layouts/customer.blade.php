@@ -14,13 +14,10 @@
 </head>
 <body class="bg-gray-50 font-['Inter'] antialiased overflow-x-hidden"
       x-data="{ mobileMenuOpen: false, searchOpen: false }">
-
-    <!-- Fixed Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         @include('layouts.customer.header')
     </header>
 
-    <!-- Mobile Menu Overlay -->
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
          x-show="mobileMenuOpen"
          x-transition:enter="opacity-0"
@@ -32,13 +29,11 @@
          @click="mobileMenuOpen = false">
     </div>
 
-    <!-- Mobile Menu -->
     <div class="fixed top-0 left-0 w-[300px] max-w-[85vw] h-full bg-white z-50 overflow-y-auto transition-transform duration-300 ease-in-out lg:hidden"
          :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'">
         @include('layouts.customer.sidebar')
     </div>
 
-    <!-- Main Content -->
     <main class="pt-[110px] sm:pt-[120px] lg:pt-[130px] min-h-screen">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             {{ $slot }}

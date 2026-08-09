@@ -155,7 +155,7 @@
             </div>
 
             <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-2 pl-3 border-l-2 border-gray-200 flex flex-col gap-0.5">
-                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                <a href="{{ route('owner.customer_orders') }}" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>

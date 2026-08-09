@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\CartService;
 use App\Models\ItemVariant;
 use App\Models\Post;
 use Livewire\Attributes\Computed;
@@ -196,27 +197,88 @@ new #[Layout('layouts.customer')] class extends Component
         $this->currentImage = $images[($currentIndex - 1 + $images->count()) % $images->count()];
     }
 
-    public function selectAttributeValue(string $attributeName, string $value): void
-    {
-        $this->selectedAttributes[$attributeName] = $value;
+   public function selectAttributeValue(string $attributeName, string $value): void
+{
+    $this->selectedAttributes[$attributeName] = $value;
+    $this->resetErrorBag('variant');
 
-        $matchingVariant = $this->variants->first(function ($variant) {
-            foreach ($this->selectedAttributes as $key => $val) {
-                if (($variant->attributes[$key] ?? null) !== $val) {
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        if ($matchingVariant) {
-            $this->selectedVariantId = $matchingVariant->id;
-
-            if ($matchingVariant->image) {
-                $this->currentImage = $matchingVariant->image;
+    $matchingVariant = $this->variants->first(function ($variant) {
+        foreach ($this->selectedAttributes as $key => $val) {
+            if (($variant->attributes[$key] ?? null) !== $val) {
+                return false;
             }
         }
+        return true;
+    });
+
+    // No matching combination → force re-selection before checkout is allowed
+    $this->selectedVariantId = $matchingVariant?->id;
+
+    if ($matchingVariant?->image) {
+        $this->currentImage = $matchingVariant->image;
     }
+}
+
+protected function canAddToCart(): bool
+{
+    $this->resetErrorBag(['variant', 'stock']);
+
+    if ($this->post->type === 'product' && $this->variants->isNotEmpty() && !$this->selectedVariantId) {
+        $this->addError('variant', 'Please select all variant options before continuing.');
+        return false;
+    }
+
+    if ($this->stockStatus === 'out') {
+        $this->addError('stock', 'This item is currently out of stock.');
+        return false;
+    }
+
+    return true;
+}
+
+public function addToCart(): void
+{
+    if (!$this->canAddToCart()) {
+        return;
+    }
+
+    app(CartService::class)->add([
+        'tenant_id' => $this->post->tenant_id,
+        'post_id' => $this->post->id,
+        'product_id' => $this->inventory?->id,
+        'variant_id' => $this->selectedVariantId,
+        'name' => $this->post->name,
+        'image' => $this->currentImage ?? $this->post->image,
+        'unit_price' => $this->displayPrice,
+        'quantity' => $this->quantity,
+        'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
+        'max_stock' => $this->stock ?? 999,
+    ]);
+
+    session()->flash('message', 'Added to cart successfully!');
+}
+
+public function buyNow()
+{
+    if (!$this->canAddToCart()) {
+        return;
+    }
+
+    app(CartService::class)->add([
+        'tenant_id' => $this->post->tenant_id,
+        'post_id' => $this->post->id,
+        'product_id' => $this->inventory?->id,
+        'variant_id' => $this->selectedVariantId,
+        'name' => $this->post->name,
+        'image' => $this->currentImage ?? $this->post->image,
+        'unit_price' => $this->displayPrice,
+        'quantity' => $this->quantity,
+        'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
+        'max_stock' => $this->stock ?? 999,
+    ]);
+
+    return redirect()->route('customer.checkout');
+}
 
     public function toggleFavorite(): void
     {
@@ -241,15 +303,5 @@ new #[Layout('layouts.customer')] class extends Component
     public function decrementQuantity(): void
     {
         $this->quantity = max(1, $this->quantity - 1);
-    }
-
-    public function addToCart(): void
-    {
-        session()->flash('message', 'Added to cart successfully!');
-    }
-
-    public function buyNow()
-    {
-        return redirect()->route('customer.checkout');
     }
 };

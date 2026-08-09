@@ -78,7 +78,7 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-xs font-medium text-gray-700 truncate">{{ $tenant->owner?->name ?? '—' }}</p>
-                            <p class="text-[11px] text-gray-400 truncate">Owner</p>
+                            <p class="text-[11px] text-gray-400 truncate">Manager</p>
                         </div>
                     </div>
 

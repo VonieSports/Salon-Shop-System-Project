@@ -9,48 +9,59 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-playfair: 'Playfair Display', Georgia, serif;
-    --color-g-base: #1e7a4a;
-    --color-g-mid: #2f9d66;
-    --color-g-dark: #145537;
-    --color-g-text: #cfe8dc;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --color-g-base: #1e7a4a;
+  --color-g-mid: #2f9d66;
+  --color-g-dark: #145537;
+  --color-g-text: #cfe8dc;
 }
+
 @layer base {
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
 }
+
 /* Defaults hover styles on all devices */
 @custom-variant hover (&:hover);
 
 
- body { font-family: 'Inter', sans-serif; }
-  .font-serif-display { font-family: 'Playfair Display', serif; }
-  .bg-pattern {
-    background-image:
-      radial-gradient(circle at 8% 18%, rgba(20,90,60,0.07) 0, transparent 3%),
-      radial-gradient(circle at 92% 82%, rgba(20,90,60,0.07) 0, transparent 3%);
-  }
+body {
+  font-family: 'Inter', sans-serif;
+}
 
-    .scrollbar-hide {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-            }
+.font-serif-display {
+  font-family: 'Playfair Display', serif;
+}
 
-                 .variant-values-container::-webkit-scrollbar {
-                                display: none;
-                            }
-                            .variant-values-container {
-                                -ms-overflow-style: none;
-                                scrollbar-width: none;
-                            }
+.bg-pattern {
+  background-image:
+    radial-gradient(circle at 8% 18%, rgba(20, 90, 60, 0.07) 0, transparent 3%),
+    radial-gradient(circle at 92% 82%, rgba(20, 90, 60, 0.07) 0, transparent 3%);
+}
 
-                 .font-serif-display {
-      font-family: 'Georgia', 'Times New Roman', serif;
-    }             
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.variant-values-container::-webkit-scrollbar {
+  display: none;
+}
+
+.variant-values-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.font-serif-display {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}

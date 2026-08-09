@@ -1,5 +1,5 @@
 <?php
-
+// Product Management
 use App\Models\Post;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;

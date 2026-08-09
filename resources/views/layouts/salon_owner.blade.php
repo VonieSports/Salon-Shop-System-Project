@@ -13,12 +13,10 @@
     <body x-data="{ 
         sidebarOpen: false,
         init() {
-            // Check if desktop
             if (window.innerWidth >= 1024) {
                 this.sidebarOpen = true;
             }
             
-            // Handle resize
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 1024) {
                     this.sidebarOpen = true;
@@ -27,7 +25,6 @@
                 }
             });
             
-            // Close sidebar on navigation for mobile
             window.addEventListener('livewire:navigating', () => {
                 if (window.innerWidth < 1024) {
                     this.sidebarOpen = false;

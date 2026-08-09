@@ -1,5 +1,5 @@
 <div>
-
+    <!-- Inventory -->
     <div class="min-h-screen bg-gray-50">
         <div class="mx-auto space-y-6">
 

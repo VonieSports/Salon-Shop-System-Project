@@ -1,6 +1,6 @@
 
 <div>
-    <div class="max-w-2xl mx-auto space-y-6">
+    <div class="mx-auto space-y-6">
     <div class="flex items-center gap-3">
         <a href="{{ route('admin.profile') }}" wire:navigate class="p-2 rounded-lg hover:bg-gray-100 transition">
             <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -14,7 +14,6 @@
     </div>
 
     <form wire:submit.prevent="updateProfile" enctype="multipart/form-data" class="space-y-6">
-
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center gap-5">
                 <label class="group relative block w-20 h-20 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden cursor-pointer hover:border-emerald-400 transition shrink-0">

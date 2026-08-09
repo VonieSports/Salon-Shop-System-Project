@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gray-50 p-4">
     <div class="mx-auto space-y-6">
-
+<!-- Product Management -->
         @if (session()->has('message'))
         <div class="bg-green-50 text-green-700 px-5 py-3.5 rounded-xl text-sm font-medium">{{ session('message') }}
         </div>

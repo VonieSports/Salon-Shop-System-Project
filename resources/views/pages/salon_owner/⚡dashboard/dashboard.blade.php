@@ -1,4 +1,4 @@
-
+<!-- shop Owner Dashboard -->
 <div class="mx-5 py-5">
 @if (session()->has('warning'))
     <div class="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-xl text-sm font-medium">

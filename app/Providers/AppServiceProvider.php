@@ -23,22 +23,22 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {// AppServiceProvider::boot()
-View::composer(
-    ['layouts.salon_owner', 'layouts.salon_owner.header', 'layouts.salon_owner.sidebar'],
-    function ($view) {
-        static $tenant = null;
-        static $resolved = false;
+    {
+        View::composer(
+            ['layouts.salon_owner', 'layouts.salon_owner.header', 'layouts.salon_owner.sidebar'],
+            function ($view) {
+                static $tenant = null;
+                static $resolved = false;
 
-        if (!$resolved) {
-            $tenant = Auth::user()?->tenant()
-                ->select(['id', 'name', 'email', 'logo', 'business_setup_completed', 'verification_status', 'rejection_reason'])
-                ->first();
-            $resolved = true;
+                if (!$resolved) {
+                    $tenant = Auth::user()?->tenant()
+                    ->select(['id', 'name', 'email', 'logo', 'business_setup_completed', 'verification_status', 'rejection_reason'])
+                    ->first();
+                    $resolved = true;
+                }
+
+            $view->with('tenant', $tenant);
         }
-
-        $view->with('tenant', $tenant);
-    }
-);
+    );
     }
 }

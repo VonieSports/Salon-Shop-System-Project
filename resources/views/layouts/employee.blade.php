@@ -13,12 +13,10 @@
     <body x-data="{ 
         sidebarOpen: false,
         init() {
-            // Only open on desktop by default
             if (window.innerWidth >= 1024) {
                 this.sidebarOpen = true;
             }
             
-            // Handle resize - close on mobile, open on desktop
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 1024) {
                     this.sidebarOpen = true;
@@ -27,7 +25,6 @@
                 }
             });
             
-            // Close sidebar on navigation for mobile
             window.addEventListener('livewire:navigating', () => {
                 if (window.innerWidth < 1024) {
                     this.sidebarOpen = false;
@@ -44,7 +41,6 @@
     x-init="init()" 
     class="bg-gray-100 overflow-x-hidden">
         <div class="flex h-screen overflow-hidden">
-            <!-- Sidebar -->
             <div x-show="sidebarOpen" 
                  x-transition:enter="transition-all duration-300 ease-in-out"
                  x-transition:enter-start="-translate-x-full opacity-0"
@@ -56,7 +52,6 @@
                 @include('layouts.employee.sidebar')
             </div>
 
-            <!-- Mobile overlay -->
             <div x-show="sidebarOpen && window.innerWidth < 1024" 
                  x-transition:enter="transition-opacity duration-300 ease-in-out"
                  x-transition:enter-start="opacity-0"

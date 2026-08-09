@@ -13,9 +13,6 @@ new #[Layout('layouts.customer')] class extends Component
 
    $this->user = Auth::user();
    $this->customer = $this->user->customer;
-
-
+   
    }
-
-  
 };

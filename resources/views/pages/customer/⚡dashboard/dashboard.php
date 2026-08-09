@@ -1,5 +1,5 @@
 <?php
-
+//  Customer Dashboard 
 use App\Models\Post;
 use App\Models\ProductCategory;
 use App\Models\ServiceCategory;

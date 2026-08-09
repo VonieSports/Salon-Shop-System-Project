@@ -92,7 +92,7 @@
                 </button>
 
                 @guest
-                    <a href="{{ route('login.page') }}" class="bg-[#1E7A4A] hover:bg-[#16633c] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition whitespace-nowrap h-[36px] flex items-center">
+                    <a href="{{ route('login') }}" class="bg-[#1E7A4A] hover:bg-[#16633c] text-white text-sm font-medium px-4 py-1.5 rounded-lg transition whitespace-nowrap h-[36px] flex items-center">
                         Sign in
                     </a>
                 @else
@@ -115,8 +115,8 @@
                                 <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
                                 <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
                             </div>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Orders</a>
+                            <a href="{{ route('customer.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Profile</a>
+                            <a href="{{ route('customer.order_history') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Orders</a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -130,7 +130,7 @@
 
         <!-- Navigation -->
         <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-600 py-2 border-t border-gray-100">
-            <a href="{{ route('index.page') }}" class="relative py-1 hover:text-emerald-700 transition group font-semibold text-emerald-700">
+            <a href="{{ route('customer.dashboard') }}" class="relative py-1 hover:text-emerald-700 transition group font-semibold text-emerald-700">
                 Home
                 <span class="absolute -bottom-2 left-0 right-0 h-0.5 bg-emerald-600 rounded-full"></span>
             </a>

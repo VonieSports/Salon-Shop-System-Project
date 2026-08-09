@@ -14,7 +14,6 @@
        x-transition:leave-end="-translate-x-full"
        x-cloak>
     <div class="flex flex-col h-full">
-        <!-- Logo - Fixed Top -->
         <div class="flex items-center gap-3 px-4 py-4 border-b border-gray-100 shrink-0">
             <div class="w-9 h-9 rounded-lg bg-[#1E7A4A] flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -25,7 +24,6 @@
             <span class="font-bold text-lg text-gray-800 tracking-tight">BeautyNova</span>
         </div>
 
-        <!-- Business Info - Fixed -->
         <div class="px-4 py-4 border-b border-gray-100 shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 overflow-hidden">
@@ -49,9 +47,7 @@
             </div>
         </div>
 
-        <!-- Navigation - Scrollable -->
         <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-            <!-- Dashboard -->
             <a href="{{ route('employee.dashboard') }}" wire:navigate 
                class="sidebar-item flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                @click="if(window.innerWidth < 1024) sidebarOpen = false">
@@ -61,7 +57,6 @@
                 Dashboard
             </a>
 
-            <!-- MANAGEMENT -->
             <div x-data="{ open: localStorage.getItem('managementOpen') === 'true' }" 
                  x-init="$watch('open', val => localStorage.setItem('managementOpen', val))"
                  class="pt-2 border-t border-gray-100">
@@ -159,7 +154,6 @@
                 </div>
             </div>
 
-            <!-- OPERATIONS -->
             <div x-data="{ open: localStorage.getItem('operationsOpen') === 'true' }" 
                  x-init="$watch('open', val => localStorage.setItem('operationsOpen', val))"
                  class="pt-2 border-t border-gray-100">
