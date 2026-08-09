@@ -19,7 +19,7 @@ A multi-tenant web application for managing salon and shop operations built with
 - **Backend**: Laravel 13.12
 - **Frontend**: Livewire, Blade, Vite
 - **Database**: MySQL
-- **PHP**: 8.2+
+- **PHP**: 8.5+
 
 ## Installation
 
