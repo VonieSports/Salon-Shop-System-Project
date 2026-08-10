@@ -114,6 +114,13 @@
                     Accounts
                 </a>
 
+                <a href="{{ route('owner.employee_schedule') }}" class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Schedules
+                </a>
+
                 <a href="{{ route('owner.product_management') }}" wire:navigate 
                    class="sidebar-item flex items-center gap-3.5 px-4 py-2.5 pl-9 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -176,7 +183,7 @@
                     Reservations
                 </a>
                 
-                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                <a href="{{ route('owner.customer_review') }}" class="sidebar-item flex items-center gap-3 px-4 py-2 pl-8 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
                     </svg>

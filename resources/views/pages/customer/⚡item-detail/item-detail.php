@@ -1,8 +1,7 @@
 <?php
 
-use App\Services\CartService;
-use App\Models\ItemVariant;
 use App\Models\Post;
+use App\Services\CartService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -10,71 +9,63 @@ use Livewire\Component;
 new #[Layout('layouts.customer')] class extends Component
 {
     public Post $post;
-    public $inventory;
-    public $variants = [];
-
+    public int $quantity = 1;
     public array $selectedAttributes = [];
+    public ?string $currentImage = null;
     public ?int $selectedVariantId = null;
 
-    public int $quantity = 1;
-    public ?string $currentImage = null;
-
-    public int $reviewCount = 0;
-
-    public function mount($id): void
+    /**
+     * Bound automatically because the route segment is named {post},
+     * matching this parameter name exactly (implicit route model binding).
+     */
+    public function mount(Post $post): void
     {
-        $this->post = Post::with(['tenant:id,name', 'inventory', 'productCategory:id,name', 'serviceCategory:id,name'])
-            ->published()
-            ->whereNull('archived_at')
-            ->findOrFail($id);
+        abort_unless($post->status === 'published' && is_null($post->archived_at), 404);
 
-        $this->inventory = $this->post->inventory;
+        $post->load(['tenant:id,name', 'productCategory:id,name', 'serviceCategory:id,name']);
+        $post->load($post->type === 'product' ? 'inventory.variants' : 'inventory');
+
+        $this->post = $post;
         $this->currentImage = $this->post->image;
-        $this->reviewCount = rand(100, 500);
 
-        if ($this->post->type === 'product' && $this->inventory) {
-            $this->variants = ItemVariant::where('product_id', $this->inventory->id)->get();
-
-            if ($this->variants->isNotEmpty()) {
-                $firstVariant = $this->variants->first();
-                $this->selectedAttributes = $firstVariant->attributes ?? [];
+        if ($this->post->type === 'product' && $this->availableOptions) {
+            $firstVariant = $this->post->inventory?->variants?->first();
+            if ($firstVariant) {
+                $this->selectedAttributes = is_array($firstVariant->attributes)
+                    ? $firstVariant->attributes
+                    : (json_decode($firstVariant->attributes, true) ?? []);
                 $this->selectedVariantId = $firstVariant->id;
+                if ($firstVariant->image) {
+                    $this->currentImage = $firstVariant->image;
+                }
             }
         }
-    }
-
-    #[Computed]
-    public function selectedVariant()
-    {
-        if (!$this->selectedVariantId) {
-            return null;
-        }
-
-        return $this->variants->firstWhere('id', $this->selectedVariantId);
-    }
-
-    #[Computed]
-    public function allImages()
-    {
-        return collect([$this->post->image])
-            ->merge($this->variants->pluck('image'))
-            ->filter()
-            ->unique()
-            ->values();
     }
 
     #[Computed]
     public function availableOptions(): array
     {
+        if ($this->post->type !== 'product') return [];
+
+        $variants = $this->post->inventory?->variants ?? collect();
         $options = [];
 
-        foreach ($this->variants as $variant) {
-            foreach ($variant->attributes ?? [] as $key => $value) {
+        foreach ($variants as $variant) {
+            $attributes = is_array($variant->attributes) ? $variant->attributes : (json_decode($variant->attributes, true) ?? []);
+            foreach ($attributes as $key => $value) {
                 $options[$key][] = $value;
             }
         }
 
         return array_map(fn ($values) => array_values(array_unique($values)), $options);
+    }
+
+    #[Computed]
+    public function selectedVariant()
+    {
+        if (!$this->selectedVariantId) return null;
+
+        return $this->post->inventory?->variants?->firstWhere('id', $this->selectedVariantId);
     }
 
     #[Computed]
@@ -90,218 +81,155 @@ new #[Layout('layouts.customer')] class extends Component
     }
 
     #[Computed]
-    public function stock(): ?int
+    public function stock(): int
     {
-        if ($this->post->type !== 'product') {
-            return null;
-        }
+        if ($this->post->type !== 'product') return 0;
 
         if ($this->selectedVariant) {
             return $this->selectedVariant->stock ?? 0;
         }
 
-        return $this->inventory->stock ?? 0;
+        return $this->post->inventory?->stock ?? 0;
     }
 
     #[Computed]
-    public function stockStatus(): ?string
+    public function stockStatus(): string
     {
-        if ($this->post->type !== 'product') {
-            return null;
-        }
-
         $stock = $this->stock;
-        $threshold = $this->inventory->low_stock_alert ?? 0;
+        $threshold = $this->post->inventory?->low_stock_alert ?? 5;
 
-        if ($stock <= 0) {
-            return 'out';
-        }
-
-        if ($stock <= $threshold) {
-            return 'low';
-        }
-
+        if ($stock <= 0) return 'out';
+        if ($stock <= $threshold) return 'low';
         return 'in';
     }
 
     #[Computed]
-    public function isFavorited(): bool
+    public function allImages(): array
     {
-        return in_array($this->post->id, session()->get('favorites', []));
+        return collect([$this->post->image])
+            ->merge(($this->post->inventory?->variants ?? collect())->pluck('image'))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 
     #[Computed]
-    public function shopProducts()
+    public function reviewCount(): int
     {
-        if (!$this->post->tenant_id) {
-            return collect();
-        }
-
-        return Post::where('tenant_id', $this->post->tenant_id)
-            ->where('id', '!=', $this->post->id)
-            ->published()
-            ->whereNull('archived_at')
-            ->product()
-            ->inRandomOrder()
-            ->limit(6)
-            ->get();
-    }
-
-    #[Computed]
-    public function recommendedProducts()
-    {
-        if (!$this->post->product_category_id) {
-            return collect();
-        }
-
-        return Post::where('product_category_id', $this->post->product_category_id)
-            ->where('id', '!=', $this->post->id)
-            ->published()
-            ->whereNull('archived_at')
-            ->product()
-            ->inRandomOrder()
-            ->limit(4)
-            ->get();
+        return class_exists(\App\Models\Review::class)
+            ? \App\Models\Review::where('product_id', $this->post->inventory?->id)->count()
+            : 0;
     }
 
     public function selectImage(int $index): void
     {
         $images = $this->allImages;
-
         if (isset($images[$index])) {
             $this->currentImage = $images[$index];
         }
     }
 
-    public function nextImage(): void
-    {
-        $images = $this->allImages;
-        $currentIndex = $images->search($this->currentImage);
-
-        if ($currentIndex === false) {
-            return;
-        }
-
-        $this->currentImage = $images[($currentIndex + 1) % $images->count()];
-    }
-
     public function previousImage(): void
     {
         $images = $this->allImages;
-        $currentIndex = $images->search($this->currentImage);
+        if (count($images) <= 1) return;
 
-        if ($currentIndex === false) {
-            return;
-        }
-
-        $this->currentImage = $images[($currentIndex - 1 + $images->count()) % $images->count()];
+        $i = array_search($this->currentImage, $images, true);
+        $this->currentImage = $images[$i !== false && $i > 0 ? $i - 1 : count($images) - 1];
     }
 
-   public function selectAttributeValue(string $attributeName, string $value): void
-{
-    $this->selectedAttributes[$attributeName] = $value;
-    $this->resetErrorBag('variant');
-
-    $matchingVariant = $this->variants->first(function ($variant) {
-        foreach ($this->selectedAttributes as $key => $val) {
-            if (($variant->attributes[$key] ?? null) !== $val) {
-                return false;
-            }
-        }
-        return true;
-    });
-
-    // No matching combination → force re-selection before checkout is allowed
-    $this->selectedVariantId = $matchingVariant?->id;
-
-    if ($matchingVariant?->image) {
-        $this->currentImage = $matchingVariant->image;
-    }
-}
-
-protected function canAddToCart(): bool
-{
-    $this->resetErrorBag(['variant', 'stock']);
-
-    if ($this->post->type === 'product' && $this->variants->isNotEmpty() && !$this->selectedVariantId) {
-        $this->addError('variant', 'Please select all variant options before continuing.');
-        return false;
-    }
-
-    if ($this->stockStatus === 'out') {
-        $this->addError('stock', 'This item is currently out of stock.');
-        return false;
-    }
-
-    return true;
-}
-
-public function addToCart(): void
-{
-    if (!$this->canAddToCart()) {
-        return;
-    }
-
-    app(CartService::class)->add([
-        'tenant_id' => $this->post->tenant_id,
-        'post_id' => $this->post->id,
-        'product_id' => $this->inventory?->id,
-        'variant_id' => $this->selectedVariantId,
-        'name' => $this->post->name,
-        'image' => $this->currentImage ?? $this->post->image,
-        'unit_price' => $this->displayPrice,
-        'quantity' => $this->quantity,
-        'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
-        'max_stock' => $this->stock ?? 999,
-    ]);
-
-    session()->flash('message', 'Added to cart successfully!');
-}
-
-public function buyNow()
-{
-    if (!$this->canAddToCart()) {
-        return;
-    }
-
-    app(CartService::class)->add([
-        'tenant_id' => $this->post->tenant_id,
-        'post_id' => $this->post->id,
-        'product_id' => $this->inventory?->id,
-        'variant_id' => $this->selectedVariantId,
-        'name' => $this->post->name,
-        'image' => $this->currentImage ?? $this->post->image,
-        'unit_price' => $this->displayPrice,
-        'quantity' => $this->quantity,
-        'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
-        'max_stock' => $this->stock ?? 999,
-    ]);
-
-    return redirect()->route('customer.checkout');
-}
-
-    public function toggleFavorite(): void
+    public function nextImage(): void
     {
-        $favorites = session()->get('favorites', []);
+        $images = $this->allImages;
+        if (count($images) <= 1) return;
 
-        if (in_array($this->post->id, $favorites)) {
-            $favorites = array_diff($favorites, [$this->post->id]);
-        } else {
-            $favorites[] = $this->post->id;
+        $i = array_search($this->currentImage, $images, true);
+        $this->currentImage = $images[$i !== false && $i < count($images) - 1 ? $i + 1 : 0];
+    }
+
+    public function selectAttributeValue(string $attribute, string $value): void
+    {
+        $this->selectedAttributes[$attribute] = $value;
+        $this->resetErrorBag('variant');
+
+        $matched = ($this->post->inventory?->variants ?? collect())->first(function ($variant) {
+            $attributes = is_array($variant->attributes) ? $variant->attributes : (json_decode($variant->attributes, true) ?? []);
+            foreach ($this->selectedAttributes as $key => $val) {
+                if (($attributes[$key] ?? null) !== $val) return false;
+            }
+            return true;
+        });
+
+        $this->selectedVariantId = $matched?->id;
+
+        if ($matched?->image) {
+            $this->currentImage = $matched->image;
         }
-
-        session()->put('favorites', $favorites);
-        unset($this->isFavorited);
     }
 
     public function incrementQuantity(): void
     {
-        $maxQuantity = $this->stock ?? 99;
-        $this->quantity = min($this->quantity + 1, max(1, $maxQuantity));
+        $this->quantity = min($this->quantity + 1, max(1, $this->stock ?: 99));
     }
 
     public function decrementQuantity(): void
     {
         $this->quantity = max(1, $this->quantity - 1);
+    }
+
+    protected function canAddToCart(): bool
+    {
+        $this->resetErrorBag(['variant', 'stock']);
+
+        if ($this->post->type === 'product' && !empty($this->availableOptions) && !$this->selectedVariantId) {
+            $this->addError('variant', 'Please select all variant options before continuing.');
+            return false;
+        }
+
+        if ($this->stockStatus === 'out') {
+            $this->addError('stock', 'This item is currently out of stock.');
+            return false;
+        }
+
+        return true;
+    }
+
+    public function addToCart(): void
+    {
+        if (!$this->canAddToCart()) return;
+
+        app(CartService::class)->add([
+            'tenant_id' => $this->post->tenant_id,
+            'product_id' => $this->post->inventory?->id,
+            'variant_id' => $this->selectedVariantId,
+            'name' => $this->post->name,
+            'image' => $this->currentImage ?? $this->post->image,
+            'unit_price' => $this->displayPrice,
+            'quantity' => $this->quantity,
+            'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
+            'max_stock' => $this->stock ?: 999,
+        ]);
+
+        session()->flash('message', 'Added to cart successfully!');
+    }
+
+    public function buyNow()
+    {
+        if (!$this->canAddToCart()) return;
+
+        app(CartService::class)->add([
+            'tenant_id' => $this->post->tenant_id,
+            'product_id' => $this->post->inventory?->id,
+            'variant_id' => $this->selectedVariantId,
+            'name' => $this->post->name,
+            'image' => $this->currentImage ?? $this->post->image,
+            'unit_price' => $this->displayPrice,
+            'quantity' => $this->quantity,
+            'variant_attributes' => $this->selectedVariantId ? $this->selectedAttributes : [],
+            'max_stock' => $this->stock ?: 999,
+        ]);
+
+        return redirect()->route('customer.checkout');
     }
 };

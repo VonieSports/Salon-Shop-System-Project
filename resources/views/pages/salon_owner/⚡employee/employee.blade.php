@@ -66,24 +66,14 @@
                 </div>
                 @else
                 <div class="overflow-x-auto -mx-3 sm:mx-0">
-                    <table class="w-full min-w-160 sm:min-w-full">
+                    <table class="w-full min-w-180 sm:min-w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th
-                                    class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                    Employee</th>
-                                <th
-                                    class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                                    Contact</th>
-                                <th
-                                    class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                    Position</th>
-                                <th
-                                    class="px-3 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                    Hired</th>
-                                <th
-                                    class="px-3 sm:px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                    Actions</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[25%]">Employee</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Contact</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Position</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell w-[25%]">Schedule</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -96,39 +86,73 @@
                             'label' => 'No User',
                             'is_online' => false,
                             ];
+
+                            // ==========================================================
+                            // SMART SCHEDULE FORMATTING (Collapses Mon-Fri with same time)
+                            // ==========================================================
+                            $daysMap = ['monday'=>'Mon', 'tuesday'=>'Tue', 'wednesday'=>'Wed', 'thursday'=>'Thu', 'friday'=>'Fri', 'saturday'=>'Sat', 'sunday'=>'Sun'];
+                            $orderedDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                            
+                            // Group schedules by Start/End time first
+                            $schedules = $employee->schedules->groupBy(function($item) {
+                                return \Carbon\Carbon::parse($item->start_time)->format('H:i') . '-' . \Carbon\Carbon::parse($item->end_time)->format('H:i');
+                            });
+
+                            $scheduleDisplay = '<span class="text-gray-400 text-sm italic">N/A</span>';
+
+                            if($schedules->isNotEmpty()) {
+                                $displayParts = [];
+                                foreach($schedules as $timeKey => $group) {
+                                    $days = $group->pluck('day_of_week')->map(fn($d) => $daysMap[$d] ?? ucfirst($d))->values();
+                                    $sortedDays = $days->sortBy(fn($d) => array_search($d, $orderedDays))->values();
+                                    
+                                    // Format Times
+                                    $times = explode('-', $timeKey);
+                                    $start = \Carbon\Carbon::createFromFormat('H:i', $times[0])->format('g:i A');
+                                    $end = \Carbon\Carbon::createFromFormat('H:i', $times[1])->format('g:i A');
+
+                                    // Check for consecutive days
+                                    $dayString = '';
+                                    if($sortedDays->count() >= 3 && $sortedDays->first() === 'Mon' && $sortedDays->last() === 'Fri' && $sortedDays->count() === 5) {
+                                        $dayString = 'Mon - Fri';
+                                    } elseif($sortedDays->first() === 'Mon' && $sortedDays->last() === 'Sat' && $sortedDays->count() === 6) {
+                                        $dayString = 'Mon - Sat';
+                                    } else {
+                                        $dayString = $sortedDays->implode(', ');
+                                    }
+                                    
+                                    $displayParts[] = "<span class='whitespace-nowrap text-sm font-medium text-gray-800 bg-gray-100 px-3 py-1 rounded inline-block mb-1'>{$dayString} <span class='text-gray-500 font-normal'>({$start} - {$end})</span></span>";
+                                }
+                                $scheduleDisplay = implode(' ', $displayParts);
+                            }
                             @endphp
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-3 sm:px-4 py-3">
-                                    <div class="flex items-center gap-2 sm:gap-3">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
                                         <div class="relative shrink-0">
                                             @if($user?->avatar)
                                             <img src="{{ Storage::url($user->avatar) }}"
-                                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200">
+                                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">
                                             @else
-                                            <div
-                                                class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-gray-200">
-                                                <span class="text-xs sm:text-sm font-bold text-emerald-700">
+                                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-gray-200">
+                                                <span class="text-sm font-bold text-emerald-700">
                                                     {{ strtoupper(substr($user?->name ?? 'U', 0, 1)) }}
                                                 </span>
                                             </div>
                                             @endif
                                             @if(isset($status['is_online']) && $status['is_online'])
-                                            <span
-                                                class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
+                                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse"></span>
                                             @elseif($user?->last_login_at)
-                                            <span
-                                                class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-gray-400 border-2 border-white rounded-full"></span>
+                                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gray-400 border-2 border-white rounded-full"></span>
                                             @endif
                                         </div>
                                         <div class="min-w-0">
-                                            <p
-                                                class="text-sm font-semibold text-gray-900 truncate max-w-25 sm:max-w-37.5">
-                                                {{ $user?->name ?? 'Unknown' }}</p>
-                                            <p class="text-xs text-gray-400 truncate max-w-25 sm:max-w-none">
+                                            <p class="text-sm font-semibold text-gray-900 truncate max-w-28 sm:max-w-40">{{ $user?->name ?? 'Unknown' }}</p>
+                                            <p class="text-xs text-gray-500 truncate max-w-28 sm:max-w-none">
                                                 @if(isset($status['is_online']) && $status['is_online'])
                                                 <span class="text-green-600 font-medium">● Online</span>
                                                 @elseif($user?->last_login_at)
-                                                <span class="text-gray-400">● Offline</span>
+                                                <span class="text-gray-500">● Offline</span>
                                                 @else
                                                 <span class="text-yellow-600">● Not logged in</span>
                                                 @endif
@@ -137,81 +161,62 @@
                                     </div>
                                 </td>
 
-                                <td class="px-3 sm:px-4 py-3 hidden sm:table-cell">
-                                    <p class="text-sm text-gray-600 truncate max-w-25">{{ $user?->email ?? 'No
-                                        email' }}</p>
-                                    <p class="text-xs text-gray-400">{{ $user?->phone ?? 'No phone' }}</p>
+                                <td class="px-4 py-3 hidden sm:table-cell">
+                                    <p class="text-sm text-gray-600 truncate max-w-32">{{ $user?->email ?? 'No email' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $user?->phone ?? 'No phone' }}</p>
                                 </td>
 
-                                <td class="px-3 sm:px-4 py-3 hidden md:table-cell">
-                                    <span class="text-sm text-gray-700">{{ $employee->position }}</span>
+                                <td class="px-4 py-3 hidden md:table-cell">
+                                    <span class="text-sm text-gray-700 whitespace-nowrap">{{ $employee->position }}</span>
                                 </td>
 
-                                <td class="px-3 sm:px-4 py-3 hidden lg:table-cell">
-                                    <span class="text-sm text-gray-700">
-                                        {{ $employee->hired_at ? $employee->hired_at->format('M d, Y') : '-' }}
-                                    </span>
+                                <td class="px-4 py-3 hidden lg:table-cell">
+                                    {!! $scheduleDisplay !!}
                                 </td>
 
-                             <td class="px-3 sm:px-4 py-3 text-right">
-    <div class="flex items-center justify-end gap-2">
-        <a href="{{ route('owner.update_employee', $employee->id) }}"
-            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
-            title="Update Employee">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            Update
-        </a>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="flex items-center justify-end gap-2 flex-wrap">
+                                        <a href="{{ route('owner.update_employee', $employee->id) }}"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg  text-indigo-700 hover:bg-indigo-100 transition whitespace-nowrap ">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                           
+                                        </a>
 
-        <button wire:click="toggleActive({{ $employee->id }})"
-            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg transition
-                               {{ $employee->is_active 
-                                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
-                                  : 'bg-green-100 text-green-700 hover:bg-green-200' }}"
-            title="{{ $employee->is_active ? 'Deactivate' : 'Activate' }}">
-            @if($employee->is_active)
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-            Deactivate
-            @else
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Activate
-            @endif
-        </button>
+                                        <button wire:click="toggleActive({{ $employee->id }})"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition whitespace-nowrap  {{ $employee->is_active ? ' text-yellow-700  hover:bg-yellow-100' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' }}">
+                                            @if($employee->is_active)
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                          
+                                            @else
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            
+                                            @endif
+                                        </button>
 
-        <button wire:click="openPermissionModal({{ $employee->id }})"
-            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
-            title="Manage Permissions">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Permissions
-        </button>
+                                        <button wire:click="openPermissionModal({{ $employee->id }})"
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg  text-blue-700  hover:bg-blue-100 transition whitespace-nowrap">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                           
+                                        </button>
 
-        <button wire:click="deleteEmployee({{ $employee->id }})"
-            wire:confirm="Delete this employee? This action cannot be undone."
-            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
-            title="Delete Employee">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            Delete
-        </button>
-    </div>
-</td>
+                                        <button wire:click="deleteEmployee({{ $employee->id }})"
+                                            wire:confirm="Delete this employee? This action cannot be undone."
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg  text-red-700  hover:bg-red-100 transition whitespace-nowrap">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

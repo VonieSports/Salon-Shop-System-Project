@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 new #[Layout('layouts.customer')] class extends Component
 {
   
-    use WithPagination;
+   use WithPagination;
 
     public string $statusFilter = 'all';
 
@@ -20,7 +20,7 @@ new #[Layout('layouts.customer')] class extends Component
     public function orders()
     {
         return Order::query()
-            ->with(['tenant:id,name,logo', 'items'])
+            ->with(['tenant:id,name', 'items.product:id,image'])
             ->where('user_id', Auth::id())
             ->when($this->statusFilter !== 'all', fn ($q) => $q->where('status', $this->statusFilter))
             ->latest()

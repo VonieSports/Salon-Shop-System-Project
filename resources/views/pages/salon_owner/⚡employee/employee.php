@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Employee;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -40,7 +41,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function employees()
     {
         return Employee::query()
-            ->with(['user'])
+            ->with(['user', 'schedules']) // Eager load schedules to prevent N+1
             ->where('tenant_id', $this->tenantId)
             ->when($this->search, function ($query) {
                 $query->whereHas('user', function ($q) {

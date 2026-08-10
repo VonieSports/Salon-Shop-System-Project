@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('gender')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-
             $table->unique(['tenant_id', 'phone']);
             $table->unique(['tenant_id', 'email']);
         });

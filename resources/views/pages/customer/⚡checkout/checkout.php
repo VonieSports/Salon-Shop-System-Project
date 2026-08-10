@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Customer;
 use App\Models\InventoryLog;
 use App\Models\ItemVariant;
@@ -8,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Tenant;
 use App\Services\CartService;
+use App\Services\PaymongoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,6 +21,7 @@ use Livewire\Component;
 new #[Layout('layouts.customer')] class extends Component
 {
     public string $paymentType = 'cash';
+    public array $notes = [];
 
     #[Computed]
     public function groupedCart()
@@ -25,10 +29,7 @@ new #[Layout('layouts.customer')] class extends Component
         $grouped = app(CartService::class)->groupedByTenant();
         if ($grouped->isEmpty()) return collect();
 
-        $tenants = Tenant::whereIn('id', $grouped->keys())
-            ->select('id', 'name', 'logo')
-            ->get()
-            ->keyBy('id');
+        $tenants = Tenant::whereIn('id', $grouped->keys())->select('id', 'name', 'logo')->get()->keyBy('id');
 
         return $grouped->map(fn ($items, $tenantId) => [
             'tenant' => $tenants->get((int) $tenantId),
@@ -38,17 +39,8 @@ new #[Layout('layouts.customer')] class extends Component
         ]);
     }
 
-    #[Computed]
-    public function totalItems(): int
-    {
-        return (int) $this->groupedCart->sum('item_count');
-    }
-
-    #[Computed]
-    public function grandTotal(): float
-    {
-        return (float) $this->groupedCart->sum('subtotal');
-    }
+    #[Computed] public function totalItems(): int { return (int) $this->groupedCart->sum('item_count'); }
+    #[Computed] public function grandTotal(): float { return (float) $this->groupedCart->sum('subtotal'); }
 
     public function updateQuantity(string $cartItemId, int $quantity): void
     {
@@ -89,17 +81,13 @@ new #[Layout('layouts.customer')] class extends Component
                     $lines = [];
 
                     foreach ($items as $item) {
-                        $product = Product::where('tenant_id', $tenantId)
-                            ->lockForUpdate()
-                            ->findOrFail($item['product_id']);
+                        $product = Product::where('tenant_id', $tenantId)->lockForUpdate()->findOrFail($item['product_id']);
 
                         $variant = null;
                         $availableStock = $product->stock;
 
                         if (!empty($item['variant_id'])) {
-                            $variant = ItemVariant::where('tenant_id', $tenantId)
-                                ->lockForUpdate()
-                                ->findOrFail($item['variant_id']);
+                            $variant = ItemVariant::where('tenant_id', $tenantId)->lockForUpdate()->findOrFail($item['variant_id']);
                             $availableStock = $variant->stock ?? 0;
                         }
 
@@ -118,13 +106,14 @@ new #[Layout('layouts.customer')] class extends Component
                         'customer_id' => $customer->id,
                         'order_number' => 'ORD-' . strtoupper(Str::random(10)),
                         'type' => 'product',
-                        'status' => 'pending',
-                        'payment_status' => 'unpaid',
+                        'status' => OrderStatus::PENDING,
+                        'payment_status' => PaymentStatus::UNPAID,
                         'payment_type' => $this->paymentType,
                         'subtotal' => $subtotal,
                         'discount' => 0,
                         'tax' => 0,
                         'total' => $subtotal,
+                        'notes' => $this->notes[$tenantId] ?? null,
                     ]);
                     $createdOrderIds[] = $order->id;
 
@@ -140,9 +129,7 @@ new #[Layout('layouts.customer')] class extends Component
                             'price' => $item['unit_price'],
                             'quantity' => $item['quantity'],
                             'subtotal' => $lineSubtotal,
-                            'variant_details' => !empty($item['variant_attributes'])
-                                ? json_encode($item['variant_attributes'])
-                                : null,
+                            'variant_details' => !empty($item['variant_attributes']) ? json_encode($item['variant_attributes']) : null,
                         ]);
 
                         if ($variant) {
@@ -170,6 +157,11 @@ new #[Layout('layouts.customer')] class extends Component
                     $cartService->clearTenant($tenantId);
                 }
             });
+
+            // Single-shop online payment -> send to PayMongo (or local demo checkout).
+            if ($this->paymentType === 'online' && count($createdOrderIds) === 1) {
+                return redirect()->route('', $createdOrderIds[0]);
+            }
 
             if (count($createdOrderIds) > 1) {
                 session()->flash('success', 'Your orders across ' . count($createdOrderIds) . ' shops have been placed!');

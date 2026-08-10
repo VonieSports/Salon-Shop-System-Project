@@ -151,12 +151,10 @@ new #[Layout('layouts.salon_owner')] class extends Component
     }
 
     public function saveBusinessInfo()
-    {
-       $this->validate();
+{
+    $this->validate();
 
     DB::transaction(function () {
-        $user = Auth::user();
-
         $hoursToSave = [];
         foreach ($this->business_hours as $day => $hours) {
             if ($hours['open'] || $hours['close'] || $hours['closed']) {
@@ -168,13 +166,23 @@ new #[Layout('layouts.salon_owner')] class extends Component
             }
         }
 
+        // Only send the business back to "pending" if this is the first
+        // submission or it was previously rejected. An already-approved
+        // shop stays approved when the owner just tweaks a detail —
+        // routine edits shouldn't force a full re-review.
+        $isFirstSubmission = !$this->tenant->business_setup_completed;
+        $wasRejected = $this->tenant->verification_status === 'rejected';
+
         $updateData = [
             'business_hours' => $hoursToSave,
             'business_setup_completed' => true,
-            'verification_status' => 'pending', // NEW: reset on every (re)submit
-            'rejection_reason' => null,          // NEW: clear any previous rejection
-            'submitted_at' => now(),
         ];
+
+        if ($isFirstSubmission || $wasRejected) {
+            $updateData['verification_status'] = 'pending';
+            $updateData['rejection_reason'] = null;
+            $updateData['submitted_at'] = now();
+        }
 
         if ($this->business_name) $updateData['name'] = $this->business_name;
         if ($this->business_email) $updateData['email'] = $this->business_email;
@@ -200,7 +208,14 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->loadBusinessData();
     });
 
-    session()->flash('success', 'Business information submitted for review!');
-    return redirect()->route('owner.business_approval'); // CHANGED
-    }
+    $message = ($this->tenant->verification_status === 'pending')
+        ? 'Business information submitted for review!'
+        : 'Business information updated successfully!';
+
+    session()->flash('success', $message);
+
+    return $this->tenant->verification_status === 'pending'
+        ? redirect()->route('owner.business_approval')
+        : redirect()->route('owner.business_info');
+}
 };

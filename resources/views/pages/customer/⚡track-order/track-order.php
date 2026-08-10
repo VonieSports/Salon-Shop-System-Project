@@ -17,12 +17,6 @@ new #[Layout('layouts.customer')] class extends Component
         'completed' => 'Picked Up',
     ];
 
-    /**
-     * $order arrives here already resolved by Laravel's implicit route
-     * model binding (the {order} segment matches this parameter name).
-     * We still must verify ownership manually, since binding alone
-     * doesn't scope to the logged-in user.
-     */
     public function mount(Order $order): void
     {
         abort_unless($order->user_id === Auth::id(), 404);

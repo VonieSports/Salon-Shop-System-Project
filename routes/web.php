@@ -17,11 +17,16 @@ Route::livewire('/dashboard', 'pages::customer.dashboard')->name('customer.dashb
 Route::livewire('/profile', 'pages::customer.profile')->name('customer.profile');
 Route::livewire('/update/profile', 'pages::customer.update-profile')->name('customer.update_profile');
 Route::livewire('/cart', 'pages::customer.cart')->name('customer.cart');
-Route::livewire('/item/{id}', 'pages::customer.item-detail')->name('customer.item_detail');
+Route::livewire('/item/{post}', 'pages::customer.item-detail')->name('customer.item_detail');
 Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.checkout');
 Route::livewire('/track_order/{order}', 'pages::customer.track-order')->name('customer.track_order');
 Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
 Route::livewire('/notification_history', 'pages::customer.notification-history')->name('customer.notification_history');
+Route::livewire('/payment_demo/{linkId}', 'pages::customer.payment-demo')->name('customer.payment_demo');
+Route::get('/customer/payment/{order}/paymongo', [\App\Http\Controllers\PaymongoPaymentController::class, 'checkout'])->name('customer.payment.paymongo');
+Route::get('/customer/payment/demo/{linkId}', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoCheckout'])->name('customer.payment.demo');
+Route::post('/customer/payment/demo/{linkId}/confirm', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoConfirm'])->name('customer.payment.demo.confirm');
+Route::post('/webhooks/paymongo', [\App\Http\Controllers\PaymongoWebhookController::class, 'handle']);
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
