@@ -1,24 +1,8 @@
-<div class="min-h-screen bg-white">
-    <div class="max-w-5xl mx-auto px-4 py-6">
-
+<div class="bg-white lg:mt-10 mt-0">
+    <div class="mx-auto px-4 py-6">
         @if (session()->has('error'))
             <div class="mb-4 bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">{{ session('error') }}</div>
         @endif
-
-        <div class="flex items-center justify-between mb-8">
-            <a href="{{ route('customer.dashboard') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Back to shop
-            </a>
-            <div class="flex items-center gap-1.5 text-xs text-gray-400">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                Secure Checkout
-            </div>
-        </div>
 
         @if ($this->groupedCart->isEmpty())
             <div class="text-center py-20">
@@ -43,26 +27,29 @@
                             <div class="space-y-4">
                                 @foreach ($group['items'] as $item)
                                     <div wire:key="cart-{{ $item['cart_item_id'] }}" class="flex items-center gap-4 border border-gray-200 rounded-xl p-3">
+                                        <!-- Image -->
                                         <div class="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
                                             @if ($item['image'])
                                                 <img src="{{ Storage::url($item['image']) }}" class="w-full h-full object-cover">
                                             @endif
                                         </div>
+                                        
+                                        <!-- Info -->
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 truncate">{{ $item['name'] }}</p>
                                             @if (!empty($item['variant_attributes']))
                                                 <p class="text-xs text-gray-500 mt-0.5">{{ collect($item['variant_attributes'])->map(fn ($v, $k) => "{$k}: {$v}")->implode(' / ') }}</p>
                                             @endif
-                                            <p class="text-sm font-semibold text-gray-900 mt-1">₱{{ number_format($item['unit_price'], 2) }}</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</span>
+                                                <span class="text-sm font-medium text-gray-900">× ₱{{ number_format($item['unit_price'], 2) }}</span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden shrink-0">
-                                            <button wire:click="updateQuantity('{{ $item['cart_item_id'] }}', {{ $item['quantity'] - 1 }})" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-50 text-sm">−</button>
-                                            <span class="w-8 text-center text-sm">{{ $item['quantity'] }}</span>
-                                            <button wire:click="updateQuantity('{{ $item['cart_item_id'] }}', {{ $item['quantity'] + 1 }})" class="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-50 text-sm">+</button>
+
+                                        <!-- Subtotal (No action) -->
+                                        <div class="text-sm font-bold text-gray-900">
+                                            ₱{{ number_format($item['unit_price'] * $item['quantity'], 2) }}
                                         </div>
-                                        <button wire:click="removeItem('{{ $item['cart_item_id'] }}')" class="text-gray-300 hover:text-red-500 transition shrink-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        </button>
                                     </div>
                                 @endforeach
                             </div>
@@ -79,7 +66,7 @@
                         </svg>
                         <div>
                             <p class="text-sm font-semibold text-gray-800">In-store pickup</p>
-                            <p class="text-xs text-gray-500 mt-0.5">No shipping needed — pick up your order directly from the shop.</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Pick up your order directly from the shop.</p>
                         </div>
                     </div>
 
@@ -87,12 +74,12 @@
                         <p class="text-sm font-semibold text-gray-800 mb-3">Payment Method</p>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center gap-2.5 border rounded-lg p-3 cursor-pointer transition {{ $paymentType === 'cash' ? 'border-emerald-600 bg-emerald-50' : 'border-gray-200' }}">
-                                <input type="radio" wire:model.live="paymentType" value="cash" class="text-emerald-600 focus:ring-emerald-500">
+                                <input type="radio" name="paymentType" wire:model.live="paymentType" value="cash" class="text-emerald-600 focus:ring-emerald-500">
                                 <span class="text-sm text-gray-700">Cash on Pickup</span>
                             </label>
                             <label class="flex items-center gap-2.5 border rounded-lg p-3 cursor-pointer transition {{ $paymentType === 'online' ? 'border-emerald-600 bg-emerald-50' : 'border-gray-200' }}">
-                                <input type="radio" wire:model.live="paymentType" value="online" class="text-emerald-600 focus:ring-emerald-500">
-                                <span class="text-sm text-gray-700">Online (PayMongo)</span>
+                                <input type="radio" name="paymentType" wire:model.live="paymentType" value="online" class="text-emerald-600 focus:ring-emerald-500">
+                                <span class="text-sm text-gray-700">Online Payment</span>
                             </label>
                         </div>
                     </div>
@@ -132,7 +119,7 @@
 
                         <div class="flex items-center justify-between border-t border-gray-200 pt-4 mt-4">
                             <span class="text-base font-bold text-gray-900">Total</span>
-                            <span class="text-2xl font-bold text-emerald-700">₱{{ number_format($this->grandTotal, 2) }}</span>
+                            <span class="text-2xl font-bold text-gray-900">₱{{ number_format($this->grandTotal, 2) }}</span>
                         </div>
 
                         <button wire:click="placeOrder" wire:loading.attr="disabled" wire:target="placeOrder"

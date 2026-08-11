@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 class CartService
 {
     protected const SESSION_KEY = 'shopping_cart';
+    protected const BUY_NOW_KEY = 'buy_now_item';
 
     public function items(): Collection
     {
@@ -19,12 +20,8 @@ class CartService
         $cart = session()->get(self::SESSION_KEY, []);
 
         foreach ($cart as $key => $existing) {
-            if ($existing['product_id'] === $item['product_id']
-                && $existing['variant_id'] === $item['variant_id']) {
-                $cart[$key]['quantity'] = min(
-                    $cart[$key]['quantity'] + $item['quantity'],
-                    $item['max_stock'] ?? 999
-                );
+            if ($existing['product_id'] === $item['product_id'] && $existing['variant_id'] === $item['variant_id']) {
+                $cart[$key]['quantity'] = min($cart[$key]['quantity'] + $item['quantity'], $item['max_stock'] ?? 999);
                 session()->put(self::SESSION_KEY, $cart);
                 return $key;
             }
@@ -41,7 +38,6 @@ class CartService
     public function updateQuantity(string $cartItemId, int $quantity): void
     {
         $cart = session()->get(self::SESSION_KEY, []);
-
         if (isset($cart[$cartItemId])) {
             $max = $cart[$cartItemId]['max_stock'] ?? 999;
             $cart[$cartItemId]['quantity'] = max(1, min($quantity, $max));
@@ -76,5 +72,37 @@ class CartService
     public function groupedByTenant(): Collection
     {
         return $this->items()->groupBy('tenant_id');
+    }
+
+    public function setBuyNowItem(array $item): void
+    {
+        $item['cart_item_id'] = 'buy_now';
+        session()->put(self::BUY_NOW_KEY, $item);
+    }
+
+    public function getBuyNowItem(): ?array
+    {
+        return session()->get(self::BUY_NOW_KEY);
+    }
+
+    public function clearBuyNowItem(): void
+    {
+        session()->forget(self::BUY_NOW_KEY);
+    }
+    
+    // =================================================================
+    // FIX: Removed the duplicate getCart() method entirely. 
+    // All read operations must use items() or groupedByTenant().
+    // =================================================================
+    
+    // If you want a helper for the Livewire Cart component, use this:
+    public function getCart(): Collection
+    {
+        return $this->items();
+    }
+
+    public function clearCart(): void
+    {
+        $this->clearAll();
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Services\OrderRulesService;
 use App\Support\PrivacyMasker;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -10,33 +12,35 @@ new #[Layout('layouts.customer')] class extends Component
 {
     public Order $order;
 
-    public const STEPS = [
-        'pending' => 'Order Placed',
-        'confirmed' => 'Preparing Order',
-        'ready_for_pickup' => 'Ready for Pickup',
-        'completed' => 'Picked Up',
-    ];
-
     public function mount(Order $order): void
     {
         abort_unless($order->user_id === Auth::id(), 404);
 
-        $this->order = $order->load(['tenant:id,name,logo,address,phone', 'items', 'customer']);
+        $this->order = $order->load([
+            'tenant:id,name,address,phone',
+            'items.product:id,name,image',
+            'items.service:id,name,image',
+            'customer',
+        ]);
     }
 
     public function currentStepIndex(): int
     {
-        $index = array_search($this->order->status, array_keys(self::STEPS), true);
-        return $index === false ? 0 : $index;
+        $flow = OrderStatus::getFlow();
+        $i = array_search($this->order->status, $flow, true);
+        return $i === false ? 0 : $i;
+    }
+
+    public function canCancel(): bool
+    {
+        return app(OrderRulesService::class)->canCancel($this->order);
     }
 
     public function cancelOrder(): void
     {
-        if (!in_array($this->order->status, ['pending', 'confirmed'], true)) {
-            return;
-        }
+        if (!$this->canCancel()) return;
 
-        $this->order->update(['status' => 'canceled']);
+        $this->order->update(['status' => OrderStatus::CANCELED]);
         $this->order->refresh();
         session()->flash('success', 'Your order has been canceled.');
     }

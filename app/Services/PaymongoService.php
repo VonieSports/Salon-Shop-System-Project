@@ -57,19 +57,19 @@ class PaymongoService
         return $response->json('data.attributes.checkout_url');
     }
 
-    protected function createDemoCheckout(Order $order): string
-    {
-        $linkId = 'demo_' . Str::uuid();
+   protected function createDemoCheckout(Order $order): string
+{
+    $linkId = 'demo_' . Str::uuid();
 
-        PendingPayment::create([
-            'user_id' => $order->user_id,
-            'paymongo_link_id' => $linkId,
-            'checkout_url' => route('customer.payment_demo', $linkId),
-            'status' => 'pending',
-            'order_data' => ['order_id' => $order->id],
-            'expires_at' => now()->addHours(1),
-        ]);
+    PendingPayment::create([
+        'user_id' => $order->user_id,
+        'paymongo_link_id' => $linkId,
+        'checkout_url' => route('customer.payment.demo', $linkId), 
+        'status' => 'pending',
+        'order_data' => ['order_id' => $order->id],
+        'expires_at' => now()->addHours(1),
+    ]);
 
-        return route('customer.payment_demo', $linkId);
-    }
+    return route('customer.payment.demo', $linkId);
+}
 }

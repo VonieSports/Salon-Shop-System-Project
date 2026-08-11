@@ -14,15 +14,22 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
-            $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
+            $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('appointment_number')->unique();
-            $table->dateTime('start_time');
-            $table->dateTime('end_time');
-            $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
+            $table->foreignId('service_id')->constrained('services')->cascadeOnDelete();
+            $table->foreignId('post_id')->nullable()->constrained('posts')->nullOnDelete();
+            $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
+            $table->date('appointment_date');
+            $table->unsignedInteger('queue_number');
+            $table->string('status')->default('queued');
+            $table->timestamp('queued_at')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->unique(['employee_id', 'appointment_date', 'queue_number']);
+            $table->index(['tenant_id', 'appointment_date']);
         });
     }
 

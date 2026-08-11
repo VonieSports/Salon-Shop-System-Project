@@ -113,83 +113,170 @@
         </div>
     </div>
 
-    <!-- Order Detail Modal -->
-    @if ($selectedOrder)
-        <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
-            <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" wire:click="closeOrder"></div>
-            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[85vh] overflow-y-auto">
-                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900">Order #{{ $selectedOrder->order_number }}</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">{{ $selectedOrder->created_at->format('M d, Y g:i A') }}</p>
+   <!-- Order Detail Modal -->
+@if ($selectedOrder)
+    <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/40" wire:click="closeOrder"></div>
+        <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Order #{{ $selectedOrder->order_number }}</h3>
+                    <p class="text-sm text-gray-500">{{ $selectedOrder->created_at->format('F d, Y g:i A') }}</p>
+                </div>
+                <button wire:click="closeOrder" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-5 space-y-4">
+                
+                <!-- Customer Info -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Customer Information</p>
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-1">
+                        <p class="text-sm font-medium text-gray-900">{{ $this->maskName($selectedOrder->customer?->name) }}</p>
+                        <p class="text-sm text-gray-600">{{ $this->maskEmail($selectedOrder->customer?->email) }}</p>
+                        <p class="text-sm text-gray-600">{{ $this->maskPhone($selectedOrder->customer?->phone) }}</p>
                     </div>
-                    <button wire:click="closeOrder" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
                 </div>
 
-                <div class="p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-gray-400 uppercase mb-1">Customer</p>
-                            <p class="text-sm text-gray-800">{{ $this->maskName($selectedOrder->customer?->name) }}</p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                {{ $this->maskEmail($selectedOrder->customer?->email) }} · {{ $this->maskPhone($selectedOrder->customer?->phone) }}
-                            </p>
+                <!-- Status & Payment -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status</p>
+                        <div class="bg-gray-50 rounded-lg px-4 py-2.5">
+                            <span class="text-sm font-medium text-gray-900">{{ $selectedOrder->status?->label() ?? ucfirst($selectedOrder->status) }}</span>
                         </div>
-                        <span class="px-2 py-1 text-xs font-medium rounded {{ $selectedOrder->payment_status?->badgeClass() ?? 'bg-gray-50 text-gray-700' }}">
-                            {{ $selectedOrder->payment_status?->label() ?? ucfirst($selectedOrder->payment_status) }}
-                        </span>
                     </div>
+                    <div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Payment</p>
+                        <div class="bg-gray-50 rounded-lg px-4 py-2.5">
+                            <span class="text-sm font-medium text-gray-900">{{ $selectedOrder->payment_status?->label() ?? ucfirst($selectedOrder->payment_status) }}</span>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="border-t border-gray-100 pt-3 space-y-2">
+                <!-- Order Items -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Order Items</p>
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
                         @foreach ($selectedOrder->items as $item)
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-gray-700">{{ $item->name }} × {{ $item->quantity }}</span>
-                                <span class="font-medium text-gray-900">${{ number_format($item->subtotal, 2) }}</span>
+                            <div class="flex items-center justify-between text-sm border-b border-gray-200 last:border-0 pb-3 last:pb-0">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ $item->name }}</p>
+                                    <p class="text-xs text-gray-500">Qty: {{ $item->quantity }}</p>
+                                </div>
+                                <span class="font-medium text-gray-900">₱{{ number_format($item->subtotal, 2) }}</span>
                             </div>
                         @endforeach
                     </div>
+                </div>
 
-                    <div class="border-t border-gray-100 pt-3 flex items-center justify-between">
-                        <p class="text-sm font-medium text-gray-700">Total</p>
-                        <p class="text-lg font-bold text-[#1E7A4A]">${{ number_format($selectedOrder->total, 2) }}</p>
+                <!-- Total -->
+                <div class="border-t border-gray-200 pt-4 flex items-center justify-between">
+                    <p class="text-sm font-medium text-gray-700">Total Amount</p>
+                    <p class="text-xl font-bold text-gray-900">₱{{ number_format($selectedOrder->total, 2) }}</p>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600">Payment Method</span>
+                        <span class="font-medium text-gray-900">
+                            {{ $selectedOrder->payment_type === 'cash' ? 'Cash on Pickup' : 'Online Payment' }}
+                        </span>
                     </div>
+                    @if ($selectedOrder->paymentMethod)
+                        <div class="flex items-center justify-between text-sm mt-2 pt-2 border-t border-gray-100">
+                            <span class="text-gray-600">Paid via</span>
+                            <span class="font-medium text-gray-900">{{ $selectedOrder->paymentMethod->name }}</span>
+                        </div>
+                    @endif
+                </div>
 
-                   <div class="border-t border-gray-100 pt-3 space-y-2">
-    @if ($selectedOrder->payment_status !== \App\Enums\PaymentStatus::PAID)
-        @if ($selectedOrder->status->canMarkPaid())
-            <button wire:click="markAsPaid({{ $selectedOrder->id }})"
-                    class="w-full px-3 py-2 bg-emerald-600 text-white rounded-md text-xs font-semibold hover:bg-emerald-700 transition">
-                Mark as Paid
+     @if ($selectedOrder->status !== \App\Enums\OrderStatus::CANCELED)
+    <div class="border-t border-gray-100 pt-4">
+        <p class="text-xs font-semibold text-gray-400 uppercase mb-3">Fulfillment Status</p>
+
+        @php $currentIndex = $this->selectedOrderStepIndex(); @endphp
+        <div class="flex items-center mb-4">
+            @foreach (\App\Enums\OrderStatus::getFlow() as $stepIndex => $step)
+                @php $done = $stepIndex <= $currentIndex; @endphp
+                <div class="flex-1 flex flex-col items-center relative">
+                    @if ($stepIndex > 0)
+                        <div class="absolute top-2.5 right-1/2 w-full h-0.5 {{ $stepIndex <= $currentIndex ? 'bg-[#1E7A4A]' : 'bg-gray-200' }}"></div>
+                    @endif
+                    <div class="relative z-10 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold {{ $done ? 'bg-[#1E7A4A] text-white' : 'bg-gray-200 text-gray-400' }}">
+                        @if ($done && $stepIndex < $currentIndex)
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        @else
+                            {{ $stepIndex + 1 }}
+                        @endif
+                    </div>
+                    <p class="text-[10px] mt-1.5 text-center {{ $done ? 'text-gray-700 font-medium' : 'text-gray-400' }}">{{ $step->label() }}</p>
+                </div>
+            @endforeach
+        </div>
+
+        @if ($selectedOrder->status->actionLabel())
+            <button wire:click="advanceStatus({{ $selectedOrder->id }})"
+                    class="w-full px-3 py-2 bg-[#1E7A4A] text-white rounded-md text-xs font-semibold hover:bg-[#16633c] transition">
+                {{ $selectedOrder->status->actionLabel() }}
             </button>
         @else
-            <p class="text-xs text-amber-600 text-center">Confirm this order before marking it as paid.</p>
+            <p class="text-xs text-gray-400 text-center">This order has completed its fulfillment cycle.</p>
         @endif
-    @endif
-    
-    @if ($selectedOrder->status->getNextStatus())
-        <button wire:click="advanceStatus({{ $selectedOrder->id }})"
-                class="w-full px-3 py-2 bg-[#1E7A4A] text-white rounded-md text-xs font-semibold hover:bg-[#16633c] transition">
-            Proceed "{{ $selectedOrder->status->getNextStatus()->label() }}"
-        </button>
-    @endif
 
-    @if ($selectedOrder->status->canCancel())
-        <button wire:click="cancelOrder({{ $selectedOrder->id }})" wire:confirm="Cancel this order?"
-                class="w-full px-3 py-2 border border-red-200 text-red-600 rounded-md text-xs font-semibold hover:bg-red-50 transition">
-            Cancel Order
-        </button>
-    @endif
+        @if ($this->canCancelOrder($selectedOrder))
+            <button wire:click="cancelOrder({{ $selectedOrder->id }})" wire:confirm="Cancel this order?"
+                    class="w-full mt-2 px-3 py-2 border border-red-200 text-red-600 rounded-md text-xs font-semibold hover:bg-red-50 transition">
+                Cancel Order
+            </button>
+        @elseif ($selectedOrder->payment_type === 'online' && $selectedOrder->payment_status === \App\Enums\PaymentStatus::PAID && $selectedOrder->status->canCancel())
+            <p class="text-[11px] text-gray-400 text-center mt-2">Paid online — this order can no longer be canceled.</p>
+        @endif
+    </div>
+@else
+    <div class="border-t border-gray-100 pt-4">
+        <p class="text-sm text-red-600 font-medium text-center">This order was canceled.</p>
+    </div>
+@endif
 
-    @if ($selectedOrder->paymentMethod)
-        <p class="text-[11px] text-gray-400 text-center pt-1">Paid via {{ $selectedOrder->paymentMethod->name }}</p>
+<div class="border-t border-gray-100 pt-4">
+    <p class="text-xs font-semibold text-gray-400 uppercase mb-2">Payment</p>
+    <div class="flex items-center justify-between text-xs mb-3">
+        <span class="text-gray-500">Method</span>
+        <span class="font-medium text-gray-700">{{ $selectedOrder->payment_type === 'cash' ? 'Cash on Pickup' : 'PayMongo (Online)' }}</span>
+    </div>
+
+    @if ($selectedOrder->payment_status === \App\Enums\PaymentStatus::PAID)
+        <div class="flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-md">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-xs font-semibold text-emerald-700">Payment Received</span>
+        </div>
+    @elseif ($selectedOrder->status === \App\Enums\OrderStatus::CANCELED)
+        <p class="text-xs text-gray-400 text-center">Order was canceled — no payment due.</p>
+    @elseif ($selectedOrder->status->canMarkPaid())
+        <button wire:click="markAsPaid({{ $selectedOrder->id }})"
+                class="w-full px-3 py-2 bg-emerald-600 text-white rounded-md text-xs font-semibold hover:bg-emerald-700 transition">
+            Mark as Paid
+        </button>
+    @else
+        <p class="text-xs text-amber-600 text-center">Confirm this order before marking it as paid.</p>
     @endif
 </div>
-                </div>
+
+    @if ($selectedOrder->paymentMethod)
+        <p class="text-[11px] text-gray-400 text-center pt-2">Recorded via {{ $selectedOrder->paymentMethod->name }}</p>
+    @endif
+</div>
             </div>
         </div>
-    @endif
+    </div>
+@endif
 </div>

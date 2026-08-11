@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -9,8 +10,7 @@ use Livewire\WithPagination;
 
 new #[Layout('layouts.customer')] class extends Component
 {
-  
-   use WithPagination;
+    use WithPagination;
 
     public string $statusFilter = 'all';
 
@@ -23,7 +23,6 @@ new #[Layout('layouts.customer')] class extends Component
             ->with(['tenant:id,name', 'items.product:id,image'])
             ->where('user_id', Auth::id())
             ->when($this->statusFilter !== 'all', fn ($q) => $q->where('status', $this->statusFilter))
-            ->latest()
-            ->paginate(8);
+            ->latest()->paginate(8);
     }
 };

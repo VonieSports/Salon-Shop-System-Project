@@ -7,11 +7,10 @@ use App\Models\PendingPayment;
 use App\Services\PaymentService;
 use App\Services\PaymongoService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class PaymongoPaymentController extends Controller
 {
-     public function checkout(Order $order, PaymongoService $paymongo)
+    public function checkout(Order $order, PaymongoService $paymongo)
     {
         abort_unless($order->user_id === Auth::id(), 404);
 
@@ -25,9 +24,16 @@ class PaymongoPaymentController extends Controller
     public function demoCheckout(string $linkId)
     {
         $pending = PendingPayment::where('paymongo_link_id', $linkId)->firstOrFail();
-        $order = Order::findOrFail($pending->order_data['order_id']);
+        
+        $orderId = $pending->order_data['order_id'] ?? null;
+        if (!$orderId) {
+            abort(404, 'Order data missing for this payment link.');
+        }
 
-        return redirect()->route('customer.payment_demo', compact('pending', 'order'));
+        $order = Order::findOrFail($orderId);
+        abort_unless($order->user_id === Auth::id(), 403);
+
+        return view('pages.customer.⚡payment-demo.payment-demo', compact('pending', 'order'));
     }
 
     public function demoConfirm(string $linkId, PaymentService $paymentService)

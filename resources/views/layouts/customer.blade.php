@@ -8,11 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-gray-50 font-['Inter'] antialiased overflow-x-hidden"
+<body class="bg-[#f5f5f5] font-['Inter'] antialiased overflow-x-hidden"
       x-data="{ mobileMenuOpen: false, searchOpen: false }">
     <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         @include('layouts.customer.header')

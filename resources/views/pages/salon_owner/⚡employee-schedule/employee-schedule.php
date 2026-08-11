@@ -1,8 +1,8 @@
 <?php
-
+//employee schedule management + service assignment
 use App\Models\Employee;
 use App\Models\Schedule;
-use App\Models\Tenant;
+use App\Models\Service;
 use App\Services\ScheduleService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,12 +20,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public bool $hasShopHours = false;
     public ?int $expandedEmployeeId = null;
 
-    // Modal Controls
     public bool $showAddShiftModal = false;
     public ?int $modalEmployeeId = null;
     public string $shiftDay = '';
     public string $shiftStart = '';
     public string $shiftEnd = '';
+
+    public bool $showServiceModal = false;
+    public ?int $serviceModalEmployeeId = null;
+    public array $selectedServiceIds = [];
 
     protected $listeners = ['refreshSchedule' => '$refresh'];
 
@@ -42,16 +45,12 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function toggleExpand(int $employeeId): void
     {
-        if ($this->expandedEmployeeId === $employeeId) {
-            $this->expandedEmployeeId = null;
-        } else {
-            $this->expandedEmployeeId = $employeeId;
-        }
+        $this->expandedEmployeeId = $this->expandedEmployeeId === $employeeId ? null : $employeeId;
     }
 
     public function getEmployeesProperty()
     {
-        return Employee::with(['user', 'schedules'])
+        return Employee::with(['user', 'schedules', 'services:id,name'])
             ->where('tenant_id', Auth::user()->tenant->id)
             ->where('is_active', true)
             ->when($this->search, function ($query) {
@@ -64,7 +63,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
             })
             ->orderBy('position')
             ->get()
-            ->filter(fn($emp) => $emp->user && !$emp->user->hasRole('owner'));
+            ->filter(fn ($emp) => $emp->user && !$emp->user->hasRole('owner'));
+    }
+
+    public function getAllServicesProperty()
+    {
+        return Service::where('tenant_id', Auth::user()->tenant->id)
+            ->active()
+            ->orderBy('name')
+            ->get(['id', 'name','image','price','duration_minutes']);
     }
 
     public function getEmployeeWeekSchedule(int $employeeId)
@@ -163,5 +170,42 @@ new #[Layout('layouts.salon_owner')] class extends Component
             Log::error('Error saving shift: ' . $e->getMessage());
             session()->flash('error', 'Failed to save shift.');
         }
+    }
+
+    public function openServiceModal(int $employeeId): void
+    {
+        $tenantId = Auth::user()->tenant->id;
+
+        $employee = Employee::where('tenant_id', $tenantId)
+            ->with('services:id')
+            ->findOrFail($employeeId);
+
+        $this->serviceModalEmployeeId = $employeeId;
+        $this->selectedServiceIds = $employee->services->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->showServiceModal = true;
+    }
+
+    public function closeServiceModal(): void
+    {
+        $this->showServiceModal = false;
+        $this->serviceModalEmployeeId = null;
+        $this->selectedServiceIds = [];
+    }
+
+    public function saveServiceAssignment(): void
+    {
+        if (!$this->serviceModalEmployeeId) {
+            return;
+        }
+
+        $tenantId = Auth::user()->tenant->id;
+        $employee = Employee::where('tenant_id', $tenantId)->findOrFail($this->serviceModalEmployeeId);
+
+        $pivotData = array_fill_keys($this->selectedServiceIds, ['tenant_id' => $tenantId]);
+        $employee->services()->sync($pivotData);
+
+        $this->closeServiceModal();
+        $this->dispatch('refreshSchedule');
+        session()->flash('message', 'Service assignments updated.');
     }
 };

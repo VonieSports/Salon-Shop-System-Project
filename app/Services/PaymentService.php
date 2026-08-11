@@ -8,7 +8,6 @@ use App\Models\PaymentMethod;
 
 class PaymentService
 {
-   
     public function markPaid(Order $order): Order
     {
         if ($order->payment_status === PaymentStatus::PAID) {

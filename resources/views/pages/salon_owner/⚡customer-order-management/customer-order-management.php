@@ -4,6 +4,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\Tenant;
+use App\Services\OrderRulesService;
 use App\Services\PaymentService;
 use App\Support\PrivacyMasker;
 use Illuminate\Support\Facades\Auth;
@@ -76,10 +77,20 @@ new #[Layout('layouts.salon_owner')] class extends Component
         $this->selectedOrder = null;
     }
 
-    /**
-     * Moves the order forward one stage:
-     * Pending -> Confirmed -> Preparing -> Ready for Pickup -> Completed.
-     */
+    public function selectedOrderStepIndex(): int
+    {
+        if (!$this->selectedOrder) return 0;
+        $flow = OrderStatus::getFlow();
+        $i = array_search($this->selectedOrder->status, $flow, true);
+        return $i === false ? 0 : $i;
+    }
+
+    /** Blade-friendly wrapper — direct method-injection isn't resolved when a method is called from a template rather than as a wire:click action. */
+    public function canCancelOrder($order): bool
+    {
+        return app(OrderRulesService::class)->canCancel($order);
+    }
+
     public function advanceStatus(int $orderId): void
     {
         $order = Order::forTenant($this->tenantId)->findOrFail($orderId);
@@ -103,8 +114,11 @@ new #[Layout('layouts.salon_owner')] class extends Component
     {
         $order = Order::forTenant($this->tenantId)->findOrFail($orderId);
 
-        if (!$order->status->canCancel()) {
-            session()->flash('error', 'This order can no longer be canceled.');
+        if (!$this->canCancelOrder($order)) {
+            $message = ($order->payment_type === 'online' && $order->payment_status === PaymentStatus::PAID)
+                ? 'This order was paid online and can no longer be canceled. Please continue processing it to completion.'
+                : 'This order can no longer be canceled.';
+            session()->flash('error', $message);
             return;
         }
 

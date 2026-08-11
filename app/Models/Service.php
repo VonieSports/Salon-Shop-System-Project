@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
-      protected $fillable = [
+    protected $fillable = [
         'tenant_id',
         'service_category_id',
         'name',
@@ -53,6 +54,16 @@ class Service extends Model
     {
         return $this->hasMany(Post::class, 'inventory_id')
             ->where('inventory_type', 'App\Models\Service');
+    }
+
+    public function employees(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, 'employee_services')->withPivot('tenant_id')->withTimestamps();
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 
     public function scopeActive($query)

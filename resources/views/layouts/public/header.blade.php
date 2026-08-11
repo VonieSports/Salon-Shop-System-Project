@@ -1,4 +1,3 @@
-<div>
 <!-- Top bar - hidden on mobile, shown on tablet+ -->
 <div class="hidden sm:block bg-[#1E7A4A] text-white text-xs">
   <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-10 py-2.5 flex flex-wrap items-center justify-between gap-2">
@@ -52,7 +51,7 @@
           </svg>
         </button>
 
-        <a href="#" class="flex items-center gap-1.5 shrink-0">
+        <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-1.5 shrink-0">
           <svg class="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-1.5 2-4 3-4 6a4 4 0 008 0c0-3-2.5-4-4-6z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 13v8M9 18h6"/>
@@ -61,43 +60,64 @@
         </a>
       </div>
 
-      <!-- Right: Icons + Sign in (Mobile) -->
+      <!-- Right: Icons + Auth (Mobile) -->
       <div class="flex items-center gap-0.5">
-        <!-- Search Icon -->
         <button id="searchToggleMobile" class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-1.5 rounded-lg transition" aria-label="Open search">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </button>
 
-        <!-- Wishlist -->
         <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-1.5 rounded-lg transition relative" aria-label="Wishlist">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
           </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">2</span>
+          <span class="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm border border-white">2</span>
         </button>
 
-        <!-- Cart -->
-        <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-1.5 rounded-lg transition relative" aria-label="Cart">
+        <a href="{{ route('customer.cart') }}" class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-1.5 rounded-lg transition relative" aria-label="Cart">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
           </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">3</span>
-        </button>
+          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm border border-white">3</span>
+        </a>
 
-        <!-- Notification (hidden on very small screens) -->
         <button class="hidden xs:flex text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-1.5 rounded-lg transition relative" aria-label="Notifications">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
           </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">5</span>
+          <span class="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm border border-white">5</span>
         </button>
 
-        <!-- Sign In Button -->
-        <a href="{{ route('login') }}" class="bg-[#1E7A4A] hover:bg-emerald-800 active:bg-emerald-900 transition text-white text-xs font-medium px-2.5 py-1.5 rounded-lg whitespace-nowrap ml-0.5">
-          Sign in
-        </a>
+        @auth
+            <div class="relative ml-0.5" x-data="{ open: false }" @click.away="open = false">
+                <button @click="open = !open" class="flex items-center gap-1 pl-0.5 pr-1 py-0.5 rounded-full hover:bg-gray-50 transition-colors">
+                    <div class="w-7 h-7 rounded-full bg-[#1E7A4A] flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                </button>
+                <div x-show="open" x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     class="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 z-50 py-1">
+                    <div class="px-4 py-2 border-b border-gray-100">
+                        <p class="text-xs font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                    </div>
+                    <a href="{{ route('customer.update_profile') }}" class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">Profile</a>
+                    <a href="{{ route('customer.order_history') }}" class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition">My Orders</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 transition">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        @else
+            <a href="{{ route('login') }}" class="bg-[#1E7A4A] hover:bg-emerald-800 active:bg-emerald-900 transition text-white text-xs font-medium px-2.5 py-1.5 rounded-lg whitespace-nowrap ml-0.5">
+                Sign in
+            </a>
+        @endauth
       </div>
     </div>
 
@@ -105,7 +125,7 @@
     <div class="hidden lg:flex items-center justify-between h-[88px]">
       <!-- Left: Logo -->
       <div class="flex items-center gap-3">
-        <a href="#" class="flex items-center gap-2 shrink-0">
+        <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-2 shrink-0">
           <svg class="w-8 h-8 text-emerald-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-1.5 2-4 3-4 6a4 4 0 008 0c0-3-2.5-4-4-6z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 13v8M9 18h6"/>
@@ -116,7 +136,7 @@
 
       <!-- Center: Navigation -->
       <nav class="flex items-center justify-center flex-1 gap-6 xl:gap-8 text-sm font-medium text-gray-700 px-4">
-        <a href="#" class="relative py-2 hover:text-emerald-800 transition group">
+        <a href="{{ route('customer.dashboard') }}" class="relative py-2 hover:text-emerald-800 transition group">
           Home
           <span class="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-emerald-800 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
         </a>
@@ -159,8 +179,9 @@
         </a>
       </nav>
 
-      <!-- Right: Search + Icons + Sign in -->
+      <!-- Right: Search + Icons + Desktop Auth Block -->
       <div class="flex items-center gap-3">
+        <!-- Search Bar -->
         <div class="relative w-48 xl:w-56">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -169,30 +190,68 @@
                  class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 focus:bg-white transition placeholder:text-gray-400">
         </div>
 
-        <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative" aria-label="Wishlist">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-          </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm">2</span>
-        </button>
+        <!-- ICONS ROW - PERFECTLY SPACED -->
+        <div class="flex items-center gap-2 xl:gap-3 ml-1">
+          <!-- Wishlist -->
+          <a href="#" class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative flex items-center justify-center" aria-label="Wishlist">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm border-2 border-white">2</span>
+          </a>
 
-        <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative" aria-label="Cart">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-          </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm">3</span>
-        </button>
+          <!-- Cart -->
+          <a href="{{ route('customer.cart') }}" class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative flex items-center justify-center" aria-label="Cart">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm border-2 border-white">3</span>
+          </a>
 
-        <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative" aria-label="Notifications">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-          </svg>
-          <span class="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm">5</span>
-        </button>
+          <!-- Notifications -->
+          <button class="text-gray-700 hover:text-emerald-800 hover:bg-emerald-50 p-2 rounded-lg transition relative flex items-center justify-center" aria-label="Notifications">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="absolute -top-1 -right-1 bg-emerald-600 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm border-2 border-white">5</span>
+          </button>
+        </div>
 
-        <a href="{{ route('login') }}" class="bg-[#1E7A4A] hover:bg-emerald-800 active:bg-emerald-900 transition text-white text-sm font-medium px-6 py-2.5 rounded-lg whitespace-nowrap shadow-sm hover:shadow-md">
-          Sign in
-        </a>
+        <!-- UNIFIED DESKTOP AUTH BLOCK -->
+        @auth
+            <div class="relative ml-2" x-data="{ open: false }" @click.away="open = false">
+                <button @click="open = !open" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-gray-50 transition-colors">
+                    <div class="w-9 h-9 rounded-full bg-[#1E7A4A] flex items-center justify-center text-white text-sm font-bold border-2 border-white shadow-sm">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                    <span class="hidden xl:block text-sm font-medium text-gray-700 max-w-[80px] truncate">{{ Auth::user()->name }}</span>
+                    <svg class="w-3 h-3 text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 py-1">
+                    <div class="px-4 py-2 border-b border-gray-100">
+                        <p class="text-sm font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                    </div>
+                    <a href="{{ route('customer.update_profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Profile</a>
+                    <a href="{{ route('customer.order_history') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">My Orders</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        @else
+            <a href="{{ route('login') }}" class="bg-[#1E7A4A] hover:bg-emerald-800 active:bg-emerald-900 transition text-white text-sm font-medium px-6 py-2.5 rounded-lg whitespace-nowrap shadow-sm hover:shadow-md">
+                Sign in
+            </a>
+        @endauth
       </div>
     </div>
   </div>
@@ -201,7 +260,7 @@
   <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-100 bg-white shadow-lg">
     <div class="px-4 py-4 space-y-1 max-h-[70vh] overflow-y-auto">
       <nav class="flex flex-col text-sm font-medium text-gray-700">
-        <a href="#" class="py-3 hover:text-emerald-800 transition border-b border-gray-50 flex items-center justify-between">
+        <a href="{{ route('customer.dashboard') }}" class="py-3 hover:text-emerald-800 transition border-b border-gray-50 flex items-center justify-between">
           Home
           <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -229,7 +288,7 @@
           <button onclick="toggleMobileCategories()" class="w-full py-3 hover:text-emerald-800 transition flex items-center justify-between">
             Categories
             <svg id="mobileCategoryArrow" class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7 7"/>
             </svg>
           </button>
           <div id="mobileCategories" class="hidden pl-4 pb-2 space-y-1">
@@ -254,8 +313,26 @@
       </nav>
 
       <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2">
-        <a href="{{ route('owner.login.page') }}" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">Seller Centre</a>
-        <a href="{{ route('owner.register.page') }}" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">Become a Seller</a>
+        @auth
+            <div class="flex items-center gap-3 px-2 py-2 border-b border-gray-50">
+                <div class="w-10 h-10 rounded-full bg-[#1E7A4A] flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                </div>
+            </div>
+            <a href="{{ route('customer.order_history') }}" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">My Orders</a>
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                @csrf
+                <button type="submit" class="block w-full text-center bg-red-50 hover:bg-red-100 text-red-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">Sign Out</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="block w-full text-center bg-[#1E7A4A] hover:bg-emerald-800 text-white text-sm font-medium px-6 py-2.5 rounded-lg transition">Sign In</a>
+            <a href="{{ route('owner.login.page') }}" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">Seller Centre</a>
+            <a href="{{ route('owner.register.page') }}" class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-6 py-2.5 rounded-lg transition">Become a Seller</a>
+        @endauth
       </div>
 
       <div class="mt-4 pt-4 border-t border-gray-100">
@@ -414,4 +491,3 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
-</div>

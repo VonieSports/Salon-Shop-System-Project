@@ -10,7 +10,6 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Tenant;
 use App\Services\CartService;
-use App\Services\PaymongoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,10 +22,29 @@ new #[Layout('layouts.customer')] class extends Component
     public string $paymentType = 'cash';
     public array $notes = [];
 
+    protected function isBuyNowMode(): bool
+    {
+        return app(CartService::class)->getBuyNowItem() !== null;
+    }
+
     #[Computed]
     public function groupedCart()
     {
-        $grouped = app(CartService::class)->groupedByTenant();
+        $checkoutItems = session('checkout_selected_items');
+        
+        $grouped = collect();
+        
+        if ($checkoutItems) {
+            $grouped = collect($checkoutItems)->groupBy('tenant_id');
+            session()->forget('checkout_selected_items');
+        } else {
+            $buyNowItem = app(CartService::class)->getBuyNowItem();
+
+            $grouped = $buyNowItem
+                ? collect([$buyNowItem['tenant_id'] => collect([$buyNowItem])])
+                : app(CartService::class)->groupedByTenant();
+        }
+
         if ($grouped->isEmpty()) return collect();
 
         $tenants = Tenant::whereIn('id', $grouped->keys())->select('id', 'name', 'logo')->get()->keyBy('id');
@@ -42,22 +60,10 @@ new #[Layout('layouts.customer')] class extends Component
     #[Computed] public function totalItems(): int { return (int) $this->groupedCart->sum('item_count'); }
     #[Computed] public function grandTotal(): float { return (float) $this->groupedCart->sum('subtotal'); }
 
-    public function updateQuantity(string $cartItemId, int $quantity): void
-    {
-        app(CartService::class)->updateQuantity($cartItemId, $quantity);
-        unset($this->groupedCart);
-    }
-
-    public function removeItem(string $cartItemId): void
-    {
-        app(CartService::class)->remove($cartItemId);
-        unset($this->groupedCart);
-    }
-
     public function placeOrder()
     {
         $cartService = app(CartService::class);
-        $grouped = $cartService->groupedByTenant();
+        $grouped = $this->groupedCart; 
 
         if ($grouped->isEmpty()) {
             session()->flash('error', 'Your cart is empty.');
@@ -66,11 +72,13 @@ new #[Layout('layouts.customer')] class extends Component
 
         $user = Auth::user();
         $createdOrderIds = [];
+        $buyNowMode = $this->isBuyNowMode();
 
         try {
-            DB::transaction(function () use ($grouped, $user, $cartService, &$createdOrderIds) {
-                foreach ($grouped as $tenantId => $items) {
+            DB::transaction(function () use ($grouped, $user, &$createdOrderIds) {
+                foreach ($grouped as $tenantId => $group) {
                     $tenantId = (int) $tenantId;
+                    $items = $group['items'];
 
                     $customer = Customer::firstOrCreate(
                         ['tenant_id' => $tenantId, 'user_id' => $user->id],
@@ -153,14 +161,19 @@ new #[Layout('layouts.customer')] class extends Component
                             'reference' => "Order #{$order->order_number}",
                         ]);
                     }
-
-                    $cartService->clearTenant($tenantId);
                 }
             });
 
-            // Single-shop online payment -> send to PayMongo (or local demo checkout).
+            if ($buyNowMode) {
+                $cartService->clearBuyNowItem();
+            } else {
+                foreach ($grouped as $tenantId => $group) {
+                    $cartService->clearTenant((int) $tenantId);
+                }
+            }
+
             if ($this->paymentType === 'online' && count($createdOrderIds) === 1) {
-                return redirect()->route('', $createdOrderIds[0]);
+                return redirect()->route('customer.payment.paymongo', $createdOrderIds[0]);
             }
 
             if (count($createdOrderIds) > 1) {

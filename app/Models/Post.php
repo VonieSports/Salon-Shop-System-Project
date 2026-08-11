@@ -8,11 +8,13 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Post extends Model
 {
-  protected $fillable = [
+    protected $fillable = [
         'tenant_id',
         'created_by',
         'service_category_id',
@@ -38,7 +40,7 @@ class Post extends Model
         'additional_info' => 'array',
     ];
 
-     public function tenant(): BelongsTo
+    public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
@@ -56,6 +58,16 @@ class Post extends Model
     public function productCategory(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class);
+    }
+
+    public function employees(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, 'post_employees');
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 
     public function scopeProduct($query)
@@ -87,7 +99,7 @@ class Post extends Model
     {
         return $query->where('status', 'rejected');
     }
-     public function inventory(): MorphTo
+    public function inventory(): MorphTo
     {
         return $this->morphTo('inventory', 'inventory_type', 'inventory_id');
     }

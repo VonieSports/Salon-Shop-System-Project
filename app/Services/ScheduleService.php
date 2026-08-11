@@ -9,7 +9,6 @@ use Carbon\Carbon;
 
 class ScheduleService
 {
-
     public function isShopOpen(Tenant $tenant, string $day, ?string $time = null): bool
     {
         $hours = $tenant->getBusinessHours();

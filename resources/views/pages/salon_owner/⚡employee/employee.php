@@ -1,5 +1,5 @@
 <?php
-
+//employee table
 use App\Models\Employee;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +27,8 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public $selectedEmployeeId = null;
     public $selectedPermissions = [];
     public $allPermissions = [];
+
+    public ?int $expandedEmployeeId = null;
 
     public function mount(): void
     {
@@ -76,6 +78,15 @@ new #[Layout('layouts.salon_owner')] class extends Component
             ->where('is_active', true)
             ->whereHas('user', fn ($q) => $q->online())
             ->count();
+    }
+
+    public function toggleSchedule(int $employeeId): void
+    {
+        if ($this->expandedEmployeeId === $employeeId) {
+            $this->expandedEmployeeId = null;
+        } else {
+            $this->expandedEmployeeId = $employeeId;
+        }
     }
 
     public function toggleActive(int $id): void
