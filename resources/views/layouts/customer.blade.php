@@ -12,7 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-[#f5f5f5] font-['Inter'] antialiased overflow-x-hidden"
+<body class="bg-[#f5f5f5] antialiased overflow-x-hidden"
       x-data="{ mobileMenuOpen: false, searchOpen: false }">
     <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         @include('layouts.customer.header')
@@ -35,7 +35,7 @@
     </div>
 
     <main class="pt-[110px] sm:pt-[120px] lg:pt-[130px] min-h-screen">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
             {{ $slot }}
         </div>
     </main>

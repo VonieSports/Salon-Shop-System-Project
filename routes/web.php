@@ -13,7 +13,7 @@ Route::livewire('/seller_centre', 'pages::owner_auth.login')->name('owner.login.
 Route::livewire('/become_seller', 'pages::owner_auth.register')->name('owner.register.page');
 Route::livewire('/register', 'pages::public_auth.register')->name('register.page');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-Route::post('/webhooks/paymongo', [\App\Http\Controllers\PaymongoWebhookController::class, 'handle']);
+Route::post('/webhooks/paymongo', [PaymongoWebhookController::class, 'handle']);
 
 Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::livewire('/dashboard', 'pages::customer.dashboard')->name('customer.dashboard');
@@ -26,9 +26,9 @@ Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::livewire('/track_order/{order}', 'pages::customer.track-order')->name('customer.track_order');
     Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
     Route::livewire('/notification_history', 'pages::customer.notification-history')->name('customer.notification_history');
-    Route::get('/customer/payment/{order}/paymongo', [\App\Http\Controllers\PaymongoPaymentController::class, 'checkout'])->name('customer.payment.paymongo');
-    Route::get('/customer/payment/demo/{linkId}', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoCheckout'])->name('customer.payment.demo');
-    Route::post('/customer/payment/demo/{linkId}/confirm', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoConfirm'])->name('customer.payment.demo.confirm');
+    Route::get('/customer/payment/{order}/paymongo', [PaymongoPaymentController::class, 'checkout'])->name('customer.payment.paymongo');
+    Route::get('/customer/payment/demo/{linkId}', [PaymongoPaymentController::class, 'demoCheckout'])->name('customer.payment.demo');
+    Route::post('/customer/payment/demo/{linkId}/confirm', [PaymongoPaymentController::class, 'demoConfirm'])->name('customer.payment.demo.confirm');
 });
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
