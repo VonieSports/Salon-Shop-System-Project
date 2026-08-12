@@ -103,4 +103,6 @@ class Post extends Model
     {
         return $this->morphTo('inventory', 'inventory_type', 'inventory_id');
     }
+
+    
 }

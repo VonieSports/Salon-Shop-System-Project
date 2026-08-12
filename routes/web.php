@@ -13,6 +13,7 @@ Route::livewire('/seller_centre', 'pages::owner_auth.login')->name('owner.login.
 Route::livewire('/become_seller', 'pages::owner_auth.register')->name('owner.register.page');
 Route::livewire('/register', 'pages::public_auth.register')->name('register.page');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::post('/webhooks/paymongo', [\App\Http\Controllers\PaymongoWebhookController::class, 'handle']);
 
 Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::livewire('/dashboard', 'pages::customer.dashboard')->name('customer.dashboard');
@@ -29,8 +30,6 @@ Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::get('/customer/payment/demo/{linkId}', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoCheckout'])->name('customer.payment.demo');
     Route::post('/customer/payment/demo/{linkId}/confirm', [\App\Http\Controllers\PaymongoPaymentController::class, 'demoConfirm'])->name('customer.payment.demo.confirm');
 });
-
-Route::post('/webhooks/paymongo', [\App\Http\Controllers\PaymongoWebhookController::class, 'handle']);
 
 Route::middleware(['auth', 'track.activity'])->group(function () {
 Route::prefix('owner')->middleware(['owner'])->group(function () {

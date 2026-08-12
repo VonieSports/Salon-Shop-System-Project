@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('service_category_id')->nullable()->constrained('service_categories')->nullOnDelete();
             $table->string('name');
             $table->string('image')->nullable();
+            
             $table->decimal('price', 10, 2)->nullable();
             $table->integer('duration_minutes')->nullable();
             $table->text('description')->nullable();

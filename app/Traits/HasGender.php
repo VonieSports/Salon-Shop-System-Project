@@ -30,7 +30,6 @@ trait HasGender
         ];
     }
 
-
     public function isMale(): bool
     {
         return $this->gender === 'male';

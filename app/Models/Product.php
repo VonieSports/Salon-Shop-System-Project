@@ -112,4 +112,5 @@ class Product extends Model
             get: fn () => $this->stock <= 0,
         );
     }
+
 }

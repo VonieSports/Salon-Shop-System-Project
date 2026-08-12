@@ -30,13 +30,13 @@
 @custom-variant hover (&:hover);
 
 
-body {
+/* body {
   font-family: 'Inter', sans-serif;
-}
-
+} */
+/* 
 .font-serif-display {
   font-family: 'Playfair Display', serif;
-}
+} */
 
 .bg-pattern {
   background-image:
@@ -62,7 +62,7 @@ body {
   scrollbar-width: none;
 }
 
-.font-serif-display {
+/* .font-serif-display {
   font-family: 'Georgia', 'Times New Roman', serif;
-}
+} */
 

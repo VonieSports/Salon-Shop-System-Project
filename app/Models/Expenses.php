@@ -25,4 +25,5 @@ class Expenses extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
+    
 }
