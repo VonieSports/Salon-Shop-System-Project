@@ -16,57 +16,10 @@ A multi-tenant web application for managing salon and shop operations built with
 
 ## Tech Stack
 
-- **Backend**: Laravel 11
+- **Backend**: Laravel 13.12
 - **Frontend**: Livewire, Blade, Vite
 - **Database**: MySQL
-- **PHP**: 8.2+
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd web-access-multi-tenant-salon-shop
-   ```
-
-2. Install dependencies:
-   ```bash
-   composer install
-   npm install
-   ```
-
-3. Setup environment:
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-4. Database setup:
-   ```bash
-   php artisan migrate
-   php artisan db:seed
-   ```
-
-5. Build assets:
-   ```bash
-   npm run build
-   ```
-
-## Development
-
-Run the development server:
-
-```bash
-php artisan serve
-npm run dev
-```
-
-## Testing
-
-Run tests:
-```bash
-php artisan test
-```
+- **PHP**: 8.5+
 
 ## License
 
