@@ -31,15 +31,12 @@ class PaymongoWebhookController extends Controller
         $orderId = $pending->order_data['order_id'] ?? null;
 
         if ($orderId && $order = Order::find($orderId)) {
-            
             Log::info('PayMongo webhook: Order found. Updating status to PAID.', ['order_id' => $order->id]);
-          
-            $paymentService->markPaid($order);
             
+            $paymentService->markPaid($order);
             $pending->update(['status' => 'paid']);
-
+            
             Log::info('PayMongo webhook: Success! Order marked as paid.');
-
         } else {
             Log::error('PayMongo webhook: Order NOT FOUND', ['order_id' => $orderId]);
         }

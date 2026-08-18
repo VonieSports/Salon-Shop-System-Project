@@ -26,7 +26,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'track.activity' => \App\Http\Middleware\TrackUserActivity::class,
         ]);
         
-        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectGuestsTo(function ($request) {
+            if ($request->is('webhooks/paymongo')) {
+                return null; 
+            }
+            return route('login');
+              });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

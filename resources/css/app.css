@@ -29,15 +29,6 @@
 /* Defaults hover styles on all devices */
 @custom-variant hover (&:hover);
 
-
-/* body {
-  font-family: 'Inter', sans-serif;
-} */
-/* 
-.font-serif-display {
-  font-family: 'Playfair Display', serif;
-} */
-
 .bg-pattern {
   background-image:
     radial-gradient(circle at 8% 18%, rgba(20, 90, 60, 0.07) 0, transparent 3%),
@@ -61,8 +52,4 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-/* .font-serif-display {
-  font-family: 'Georgia', 'Times New Roman', serif;
-} */
 

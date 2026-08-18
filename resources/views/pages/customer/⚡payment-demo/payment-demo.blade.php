@@ -1,4 +1,4 @@
-<div style="min-height: 93vh; background: linear-gradient(to bottom, #f1f5f9, #e2e8f0); display: flex; align-items: center; justify-content: center; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif;">
+{{-- <div style="min-height: 93vh; background: linear-gradient(to bottom, #f1f5f9, #e2e8f0); display: flex; align-items: center; justify-content: center; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif;">
     <div style="background: #ffffff; border-radius: 1.25rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05); max-width: 32rem; width: 100%; overflow: hidden;">
         <div style="background: #0f172a; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -74,4 +74,4 @@
             </form>
         </div>
     </div>
-</div>
+</div> --}}

@@ -6,7 +6,6 @@ use App\Models\Order;
 use App\Models\Tenant;
 use App\Services\OrderRulesService;
 use App\Services\PaymentService;
-use App\Support\PrivacyMasker;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -85,7 +84,6 @@ new #[Layout('layouts.salon_owner')] class extends Component
         return $i === false ? 0 : $i;
     }
 
-    /** Blade-friendly wrapper — direct method-injection isn't resolved when a method is called from a template rather than as a wire:click action. */
     public function canCancelOrder($order): bool
     {
         return app(OrderRulesService::class)->canCancel($order);
@@ -148,8 +146,4 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
         session()->flash('message', 'Order marked as paid.');
     }
-
-    public function maskName(?string $name): string { return PrivacyMasker::name($name); }
-    public function maskPhone(?string $phone): string { return PrivacyMasker::phone($phone); }
-    public function maskEmail(?string $email): string { return PrivacyMasker::email($email); }
 };
