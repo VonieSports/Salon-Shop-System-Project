@@ -39,36 +39,38 @@ new #[Layout('layouts.salon_owner')] class extends Component
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingStatusFilter(): void { $this->resetPage(); }
 
-    #[Computed]
-    public function orders()
-    {
-        return Order::query()
-            ->forTenant($this->tenantId)
-            ->withCustomer()
-            ->withItems()
-            ->when($this->search, fn ($q) => $q->search($this->search))
-            ->when($this->statusFilter !== 'all', fn ($q) => $q->byStatus($this->statusFilter))
-            ->latestOrder()
-            ->paginate(12);
-    }
+ #[Computed]
+public function orders()
+{
+    return Order::query()
+        ->forTenant($this->tenantId)
+        ->where('type', 'product')
+        ->withCustomer()
+        ->withItems()
+        ->when($this->search, fn ($q) => $q->search($this->search))
+        ->when($this->statusFilter !== 'all', fn ($q) => $q->byStatus($this->statusFilter))
+        ->latestOrder()
+        ->paginate(12);
+}
+#[Computed]
+public function statusCounts(): array
+{
+    return Order::forTenant($this->tenantId)
+        ->where('type', 'product')
+        ->selectRaw('status, count(*) as count')
+        ->groupBy('status')
+        ->pluck('count', 'status')
+        ->toArray();
+}
 
-    #[Computed]
-    public function statusCounts(): array
-    {
-        return Order::forTenant($this->tenantId)
-            ->selectRaw('status, count(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
-    }
-
-    public function viewOrder(int $orderId): void
-    {
-        $this->selectedOrderId = $orderId;
-        $this->selectedOrder = Order::forTenant($this->tenantId)
-            ->with(['customer', 'items.product', 'paymentMethod'])
-            ->find($orderId);
-    }
+  public function viewOrder(int $orderId): void
+{
+    $this->selectedOrderId = $orderId;
+    $this->selectedOrder = Order::forTenant($this->tenantId)
+        ->where('type', 'product')
+        ->with(['customer', 'items.product', 'paymentMethod'])
+        ->find($orderId);
+}
 
     public function closeOrder(): void
     {
@@ -91,7 +93,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function advanceStatus(int $orderId): void
     {
-        $order = Order::forTenant($this->tenantId)->findOrFail($orderId);
+        $order = Order::forTenant($this->tenantId)->where('type', 'product')->findOrFail($orderId);
         $next = $order->status->getNextStatus();
 
         if (!$next) return;
@@ -110,7 +112,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function cancelOrder(int $orderId): void
     {
-        $order = Order::forTenant($this->tenantId)->findOrFail($orderId);
+        $order = Order::forTenant($this->tenantId)->where('type', 'product')->findOrFail($orderId);
 
         if (!$this->canCancelOrder($order)) {
             $message = ($order->payment_type === 'online' && $order->payment_status === PaymentStatus::PAID)
@@ -130,7 +132,7 @@ new #[Layout('layouts.salon_owner')] class extends Component
 
     public function markAsPaid(int $orderId, PaymentService $paymentService): void
     {
-        $order = Order::forTenant($this->tenantId)->findOrFail($orderId);
+       $order = Order::forTenant($this->tenantId)->where('type', 'product')->findOrFail($orderId);
 
         if ($order->payment_status === PaymentStatus::PAID) return;
 

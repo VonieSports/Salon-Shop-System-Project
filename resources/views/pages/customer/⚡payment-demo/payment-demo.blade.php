@@ -1,77 +1,147 @@
-{{-- <div style="min-height: 93vh; background: linear-gradient(to bottom, #f1f5f9, #e2e8f0); display: flex; align-items: center; justify-content: center; padding: 1.5rem; font-family: system-ui, -apple-system, sans-serif;">
-    <div style="background: #ffffff; border-radius: 1.25rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05); max-width: 32rem; width: 100%; overflow: hidden;">
-        <div style="background: #0f172a; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <svg style="width: 1.5rem; height: 1.5rem; color: #ffffff;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                </svg>
-                <span style="color: #ffffff; font-weight: 600; font-size: 1rem; letter-spacing: 0.02em;">Via Online Payment</span>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete your payment</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-50">
 
-        <div style="padding: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                <div>
-                    <p style="font-size: 0.875rem; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Pay to</p>
-                    <p style="font-size: 1rem; font-weight: 600; color: #0f172a;">{{ $order->tenant?->name ?? 'Style Station' }}</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 0.75rem; color: #94a3b8;">Order #{{ $order->order_number }}</p>
-                </div>
-            </div>
+    <div class="min-h-screen flex items-center justify-center p-4">
 
-            <div style="background: #f8fafc; border-radius: 0.75rem; padding: 1.5rem; text-align: center; border: 1px solid #f1f5f9; margin: 1rem 0;">
-                <p style="font-size: 0.875rem; color: #64748b; font-weight: 500; margin-bottom: 0.25rem;">Total Amount Due</p>
-                <h1 style="font-size: 3rem; font-weight: 700; color: #0f172a; line-height: 1; margin: 0;">
-                    ₱{{ number_format($order->total, 2) }}
-                </h1>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm overflow-hidden">
+
+            <div class="px-5 pt-5 pb-4 text-center border-b border-gray-100">
+                <p class="text-[11px] font-semibold text-amber-600 bg-amber-50 inline-block px-2.5 py-1 rounded-full uppercase tracking-wide mb-3">
+                    Demo &mdash; No real charge
+                </p>
+                <p class="text-2xl font-bold text-gray-900">₱{{ number_format($order->total, 2) }}</p>
+                <p class="text-xs text-gray-400 mt-1">Order #{{ $order->order_number }}</p>
             </div>
 
-            <div style="border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; padding: 1rem 0; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
-                    <span style="color: #64748b;">Payment Method</span>
-                    <span style="color: #0f172a; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="display: flex; gap: 2px;">
-                            <svg width="24" height="16" viewBox="0 0 24 16" fill="none"><rect width="24" height="16" rx="2" fill="#1a1f71"/><path d="M9 11H11L13 6H11L9 11Z" fill="#fff"/><path d="M16 11H19L20 6H17L16 11Z" fill="#fff"/></svg>
-                            <svg width="24" height="16" viewBox="0 0 24 16" fill="none"><rect width="24" height="16" rx="2" fill="#ff5f00"/><path d="M9 3H15V13H9V3Z" fill="#eb001b"/><path d="M9 3H15V13H9V3Z" fill="#f79e1b"/></svg>
-                        </span>
-                        <span>Online Payment</span>
-                    </span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.875rem;">
-                    <span style="color: #64748b;">Transaction Status</span>
-                    <span style="font-weight: 500; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: #f59e0b;"></span>
-                        Awaiting Payment
-                    </span>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: center; gap: 1.5rem; font-size: 0.75rem; color: #94a3b8; margin-bottom: 1.5rem;">
-                <span style="display: flex; align-items: center; gap: 0.375rem;">
-                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Secured
-                </span>
-                <span style="display: flex; align-items: center; gap: 0.375rem;">
-                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    Encrypted
-                </span>
-                <span style="display: flex; align-items: center; gap: 0.375rem;">
-                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Protected
-                </span>
-            </div>
-
-            <form method="POST" action="{{ route('customer.payment.demo.confirm', $pending->paymongo_link_id) }}" style="margin-top: 0.5rem;">
+            <form id="payment-form" method="POST" action="{{ route('customer.payment.demo.confirm', $pending->paymongo_link_id) }}">
                 @csrf
-                <button type="submit" 
-                        style="width: 100%; background: #0e774b; color: #ffffff; font-weight: 600; padding: 0.75rem 1rem; border: none; border-radius: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s ease; font-size: 0.875rem;"
-                        onmouseenter="this.style.background='#007849'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 8px 25px rgba(0, 155, 90, 0.3)';"
-                        onmouseleave="this.style.background='#009b5a'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                    
-                    <span style="font-size: 1rem;"> Pay Now</span>
-                </button>
+
+                <div class="p-5 space-y-4">
+                    <!-- Channel selector -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="channel" value="gcash" checked class="peer sr-only">
+                            <div class="flex flex-col items-center gap-1.5 border-2 border-gray-200 rounded-xl py-2.5 transition
+                                        peer-checked:border-[#0075FF] peer-checked:bg-[#0075FF]/5">
+                                <img src="{{ asset('images/gcash.jpg') }}" alt="GCash" class="w-7 h-7 object-contain rounded-full">
+                                <span class="text-[11px] font-medium text-gray-700">GCash</span>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer">
+                            <input type="radio" name="channel" value="maya" class="peer sr-only">
+                            <div class="flex flex-col items-center gap-1.5 border-2 border-gray-200 rounded-xl py-2.5 transition
+                                        peer-checked:border-[#00D66E] peer-checked:bg-[#00D66E]/5">
+                                <img src="{{ asset('images/maya.jpg') }}" alt="Maya" class="w-7 h-7 object-contain rounded-full">
+                                <span class="text-[11px] font-medium text-gray-700">Maya</span>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer">
+                            <input type="radio" name="channel" value="qrph" class="peer sr-only">
+                            <div class="flex flex-col items-center gap-1.5 border-2 border-gray-200 rounded-xl py-2.5 transition
+                                        peer-checked:border-gray-800 peer-checked:bg-gray-100">
+                                <img src="{{ asset('images/paypal.jpg') }}" alt="QR Ph" class="w-7 h-7 object-contain rounded-full">
+                                <span class="text-[11px] font-medium text-gray-700">Paypal</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- QR -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-40 h-40 rounded-xl border-2 border-gray-200 p-1.5 bg-white">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($pending->checkout_url) }}"
+                                alt="Payment QR code" class="w-full h-full object-contain">
+                        </div>
+                        <p class="text-[11px] text-gray-400 text-center">
+                            Scan with your selected app, or tap below to simulate payment.
+                        </p>
+                    </div>
+
+                    <!-- Confirm -->
+                    <button type="submit" id="confirm-btn"
+                        class="w-full py-3 rounded-full bg-[#1E7A4A] text-white text-sm font-semibold hover:bg-[#16633c] transition active:scale-[0.99] disabled:opacity-60">
+                        <span id="confirm-btn-text">Simulate Successful Payment</span>
+                    </button>
+                </div>
             </form>
+
+            <p class="text-center text-[10px] text-gray-400 px-5 pb-4">
+                Sandbox screen &mdash; live keys switch to PayMongo's hosted checkout.
+            </p>
         </div>
     </div>
-</div> --}}
+
+    <!-- Thank you popup (hidden by default) -->
+    <div id="thankyou-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs p-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 mb-1">Thank you!</h2>
+            <p class="text-sm text-gray-500 mb-6">Your payment was received successfully.</p>
+            <button id="thankyou-ok-btn"
+                class="w-full py-3 rounded-full bg-[#1E7A4A] text-white text-sm font-semibold hover:bg-[#16633c] transition">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('payment-form');
+            const confirmBtn = document.getElementById('confirm-btn');
+            const confirmBtnText = document.getElementById('confirm-btn-text');
+            const modal = document.getElementById('thankyou-modal');
+            const okBtn = document.getElementById('thankyou-ok-btn');
+            let redirectUrl = null;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                confirmBtn.disabled = true;
+                confirmBtnText.textContent = 'Processing...';
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new FormData(form),
+                })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('Payment confirmation failed.');
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        redirectUrl = data.redirect_url;
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    })
+                    .catch(function () {
+                        confirmBtn.disabled = false;
+                        confirmBtnText.textContent = 'Simulate Successful Payment';
+                        alert('Something went wrong confirming your payment. Please try again.');
+                    });
+            });
+
+            okBtn.addEventListener('click', function () {
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

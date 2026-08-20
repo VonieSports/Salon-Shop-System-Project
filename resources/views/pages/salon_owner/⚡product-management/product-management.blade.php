@@ -94,39 +94,66 @@
                     <input type="checkbox" wire:model.live="selectedIds" value="{{ $item->id }}"
                         class="w-4 h-4 rounded border-gray-300 text-[#1E7A4A] focus:ring-[#1E7A4A] shrink-0">
 
-                    <button type="button" wire:click="viewItem({{ $item->id }})"
-                        class="group flex items-center gap-4 flex-1 min-w-0 text-left">
-                        <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0">
-                            @if($item->image)
-                            <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
-                                class="w-full h-full object-cover">
-                            @else
-                            <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h16M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                                </svg>
-                            </div>
-                            @endif
+                    <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+                        @if($item->image)
+                        <img src="{{ Storage::url($item->image) }}" alt="{{ $item->name }}"
+                            class="w-full h-full object-cover">
+                        @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h16M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                            </svg>
                         </div>
+                        @endif
+                    </div>
 
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $item->name }}</p>
-                            <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $item->productCategory?->name ??
-                                'Uncategorized' }} &bull; {{ $item->created_at->format('M j, Y') }}</p>
-                        </div>
-                        <span class="text-sm font-bold text-gray-900 shrink-0">${{ number_format($item->price ?? 0, 2)
-                            }}</span>
-                        <span
-                            class="px-2 py-0.5 text-[10px] font-semibold rounded-full shrink-0 {{ $item->status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
-                            {{ ucfirst($item->status) }}
-                        </span>
-                        <svg class="w-5 h-5 text-gray-300 group-hover:text-[#1E7A4A] transition shrink-0" fill="none"
-                            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $item->name }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $item->productCategory?->name ??
+                            'Uncategorized' }} &bull; {{ $item->created_at->format('M j, Y') }}</p>
+                    </div>
+                    <span class="text-sm font-bold text-gray-900 shrink-0">${{ number_format($item->price ?? 0, 2)
+                        }}</span>
+                    <span
+                        class="px-2 py-0.5 text-[10px] font-semibold rounded-full shrink-0 {{ $item->status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                        {{ ucfirst($item->status) }}
+                    </span>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        {{-- View --}}
+                        <button type="button" wire:click="viewItem({{ $item->id }})"
+                            class="p-2 rounded-full text-gray-400 hover:text-[#1E7A4A] hover:bg-[#1E7A4A]/10 transition"
+                            title="View">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+
+                        {{-- Update --}}
+                        <a href="{{ route('owner.update_product', $item->id) }}"
+                            class="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                            title="Update">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </a>
+
+                        {{-- Remove --}}
+                        <button type="button" wire:click="deleteItem({{ $item->id }})"
+                            wire:confirm="Archive this product? You can restore it later from the Archive page."
+                            class="p-2 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                            title="Remove">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 @endforeach
             </div>

@@ -22,7 +22,7 @@ Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::livewire('/cart', 'pages::customer.cart')->name('customer.cart');
     Route::livewire('/item/{post}', 'pages::customer.item-detail')->name('customer.item_detail');
     Route::livewire('/checkout', 'pages::customer.checkout')->name('customer.checkout');
-    Route::livewire('/service/checkout', 'pages::customer.service-checkout')->name('customer.service_checkout');
+    Route::livewire('/service/checkout/{post}', 'pages::customer.service-checkout')->name('customer.service_checkout');
     Route::livewire('/track_order/{order}', 'pages::customer.track-order')->name('customer.track_order');
     Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
     Route::livewire('/notification_history', 'pages::customer.notification_history')->name('customer.notification_history');

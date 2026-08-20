@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('paymongo_link_id')->unique();
             $table->string('checkout_url');
             $table->string('status')->default('pending');
+            $table->string('return_to')->nullable();
+            $table->string('channel')->nullable();
             $table->json('order_data');
             $table->timestamp('expires_at');
             $table->timestamps();

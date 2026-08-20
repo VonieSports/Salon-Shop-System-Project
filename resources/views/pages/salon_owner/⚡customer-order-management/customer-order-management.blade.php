@@ -173,12 +173,38 @@
                         <p class="text-xs font-medium text-gray-500">Total Amount</p>
                         <p class="text-2xl font-bold text-gray-900">₱{{ number_format($selectedOrder->total, 2) }}</p>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-                        <p class="text-xs font-medium text-gray-500">Payment Method</p>
-                        <p class="text-sm font-medium text-gray-900">
-                            {{ $selectedOrder->payment_type === 'cash' ? 'Cash on Pickup' : 'Online Payment' }}
-                        </p>
-                    </div>
+             <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+    <p class="text-xs font-medium text-gray-500">Payment Method</p>
+    @php
+        $methodName = $selectedOrder->payment_type === 'cash'
+            ? 'Cash on Pickup'
+            : ($selectedOrder->paymentMethod->name ?? 'Online Payment');
+
+        $methodKey = strtolower($methodName);
+
+        $methodIcon = match(true) {
+            str_contains($methodKey, 'gcash') => asset('images/gcash.jpg'),
+            str_contains($methodKey, 'maya') => asset('images/maya.jpg'),
+            str_contains($methodKey, 'qrph') => asset('images/paypal.jpg'),
+            default => null,    
+        };
+    @endphp
+    <div class="flex items-center gap-2.5">
+        @if ($methodIcon)
+            <img src="{{ $methodIcon }}" alt="{{ $methodName }}"
+                class="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0">
+        @elseif ($selectedOrder->payment_type === 'cash')
+            <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">₱</span>
+        @else
+            <span class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </span>
+        @endif
+        <p class="text-sm font-medium text-gray-900">{{ $methodName }}</p>
+    </div>
+</div>
                 </div>
 
                 <!-- Fulfillment Stepper -->

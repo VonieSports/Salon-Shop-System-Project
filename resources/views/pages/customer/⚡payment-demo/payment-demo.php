@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Order;
-use App\Models\PendingPayment;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 

@@ -38,6 +38,9 @@ return [
      'paymongo' => [
         'secret_key' => env('PAYMONGO_SECRET_KEY'),
         'public_key' => env('PAYMONGO_PUBLIC_KEY'),
+        'webhook_secret' => env('PAYMONGO_WEBHOOK_SECRET'),
+        'demo_mode' => env('PAYMONGO_DEMO_MODE', true),
+        'default_redirect' => env('PAYMONGO_DEFAULT_REDIRECT', 'customer.track_order'),
     ],
 
 ];
