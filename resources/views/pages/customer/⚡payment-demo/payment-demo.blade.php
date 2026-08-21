@@ -13,9 +13,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm overflow-hidden">
 
             <div class="px-5 pt-5 pb-4 text-center border-b border-gray-100">
-                <p class="text-[11px] font-semibold text-amber-600 bg-amber-50 inline-block px-2.5 py-1 rounded-full uppercase tracking-wide mb-3">
-                    Demo &mdash; No real charge
-                </p>
+            
                 <p class="text-2xl font-bold text-gray-900">₱{{ number_format($order->total, 2) }}</p>
                 <p class="text-xs text-gray-400 mt-1">Order #{{ $order->order_number }}</p>
             </div>
@@ -73,9 +71,6 @@
                 </div>
             </form>
 
-            <p class="text-center text-[10px] text-gray-400 px-5 pb-4">
-                Sandbox screen &mdash; live keys switch to PayMongo's hosted checkout.
-            </p>
         </div>
     </div>
 

@@ -25,7 +25,9 @@ Route::prefix('customer')->middleware(['auth', 'customer'])->group(function () {
     Route::livewire('/service/checkout/{post}', 'pages::customer.service-checkout')->name('customer.service_checkout');
     Route::livewire('/track_order/{order}', 'pages::customer.track-order')->name('customer.track_order');
     Route::livewire('/order_history', 'pages::customer.order-history')->name('customer.order_history');
-    Route::livewire('/notification_history', 'pages::customer.notification_history')->name('customer.notification_history');
+    Route::livewire('/bookings', 'pages::customer.booking')->name('customer.booking');
+    Route::livewire('/service/{service}', 'pages::customer.service-detail')->name('customer.service_detail');
+    Route::livewire('/notification_history', 'pages::customer.notification-history')->name('customer.notification_history');
     Route::get('/customer/payment/{order}/paymongo', [PaymongoPaymentController::class, 'checkout'])->name('customer.payment.paymongo');
     Route::get('/customer/payment/demo/{linkId}', [PaymongoPaymentController::class, 'demoCheckout'])->name('customer.payment.demo');
     Route::post('/customer/payment/demo/{linkId}/confirm', [PaymongoPaymentController::class, 'demoConfirm'])->name('customer.payment.demo.confirm');

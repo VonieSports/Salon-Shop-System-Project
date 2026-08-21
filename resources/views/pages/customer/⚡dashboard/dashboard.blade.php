@@ -138,11 +138,11 @@
                         <h2 class="text-xl font-serif text-[#1A1A1A]">Services</h2>
                         <span class="px-2 py-0.5 bg-[#C9A98E]/10 text-[#C9A98E] text-xs rounded-full">{{ $services->count() }}</span>
                         <div class="flex-1 h-px bg-[#E8E0D8]"></div>
-                    </div>
+                    </div>  
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         @foreach($services as $post)
-                            <a href="{{ route('customer.item_detail', $post->id) }}"
-                               class="group bg-white rounded-lg border border-[#E8E0D8] hover:border-[#C9A98E] hover:shadow-md transition-all duration-200">
+                <a href="{{ route('customer.service_detail', $post->id) }}"
+                   class="group bg-white rounded-lg border border-[#E8E0D8] hover:border-[#C9A98E] hover:shadow-md transition-all duration-200">
                                 <div class="relative aspect-square bg-[#F5F0EB] overflow-hidden rounded-t-lg">
                                     @if($post->image)
                                         <img src="{{ Storage::url($post->image) }}" alt="{{ $post->name }}"
@@ -161,8 +161,8 @@
 
                                     <button wire:click.stop.prevent="toggleFavorite({{ $post->id }})"
                                             class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
-                                        <svg class="w-4 h-4 {{ $this->isFavorite($post->id) ? 'text-[#C9A98E]' : 'text-[#A89A8C]' }} transition"
-                                             fill="{{ $this->isFavorite($post->id) ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 transition"
+                                             fill="" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
                                     </button>
@@ -229,8 +229,8 @@
 
                                     <button wire:click.stop.prevent="toggleFavorite({{ $post->id }})"
                                             class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-sm">
-                                        <svg class="w-4 h-4 {{ $this->isFavorite($post->id) ? 'text-[#C9A98E]' : 'text-[#A89A8C]' }} transition"
-                                             fill="{{ $this->isFavorite($post->id) ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4  transition"
+                                             fill="" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                         </svg>
                                     </button>

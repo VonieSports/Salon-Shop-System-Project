@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\HasGender;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Tenant;
+use App\Observers\UserObserver;
+use App\Traits\HasGender;
 use App\Traits\OnlineStatusTrait;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -34,7 +36,7 @@ use Spatie\Permission\Traits\HasRoles;
     'last_activity_at',
     'email_verified_at',
 ])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token'])] #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

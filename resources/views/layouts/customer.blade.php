@@ -30,12 +30,12 @@
          @click="mobileMenuOpen = false">
     </div>
 
-    <div class="fixed top-0 left-0 w-[300px] max-w-[85vw] h-full bg-white z-50 overflow-y-auto transition-transform duration-300 ease-in-out lg:hidden"
+    <div class="fixed top-0 left-0 w-[300px] max-w-[85vw] h-full bg-white z-50 transition-transform duration-300 ease-in-out lg:hidden"
          :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'">
         @include('layouts.customer.sidebar')
     </div>
 
-    <main class="pt-[110px] sm:pt-[120px] lg:pt-[130px] min-h-screen">
+    <main class="pt-[60px]  lg:pt-[130px] min-h-screen">
         <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
             {{ $slot }}
         </div>

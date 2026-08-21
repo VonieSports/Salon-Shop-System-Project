@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Service extends Model
 {
@@ -26,9 +27,9 @@ class Service extends Model
         'duration_minutes' => 'integer',
         'is_active' => 'boolean',
         'archived_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
+
+    // ===== Relationships =====
 
     public function tenant(): BelongsTo
     {
@@ -40,25 +41,11 @@ class Service extends Model
         return $this->belongsTo(ServiceCategory::class, 'service_category_id');
     }
 
-    public function variants(): HasMany
-    {
-        return $this->hasMany(ItemVariant::class);
-    }
-
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    public function posts(): HasMany
-    {
-        return $this->hasMany(Post::class, 'inventory_id')
-            ->where('inventory_type', 'App\Models\Service');
-    }
-
     public function employees(): BelongsToMany
     {
-        return $this->belongsToMany(Employee::class, 'employee_services')->withPivot('tenant_id')->withTimestamps();
+        return $this->belongsToMany(Employee::class, 'employee_services')
+                    ->withPivot('tenant_id')
+                    ->withTimestamps();
     }
 
     public function appointments(): HasMany
@@ -66,12 +53,40 @@ class Service extends Model
         return $this->hasMany(Appointment::class);
     }
 
-    public function scopeActive($query)
+    public function appointmentServices(): HasMany
+    {
+        return $this->hasMany(AppointmentService::class);
+    }
+
+    // ===== Helper Methods =====
+
+    /**
+     * Check if service is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active && is_null($this->archived_at);
+    }
+
+    /**
+     * Get active employees for this service
+     */
+    public function getActiveEmployees()
+    {
+        return $this->employees()
+            ->where('employees.is_active', true)
+            ->with(['user:id,name,avatar'])
+            ->get();
+    }
+
+    // ===== Scopes =====
+
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)->whereNull('archived_at');
     }
 
-    public function scopeArchived($query)
+    public function scopeArchived(Builder $query): Builder
     {
         return $query->whereNotNull('archived_at');
     }

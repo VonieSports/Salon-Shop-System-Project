@@ -47,16 +47,10 @@ class PaymongoWebhookController extends Controller
         return response()->json(['received' => true]);
     }
 
-    /**
-     * Verifies PayMongo's HMAC-SHA256 webhook signature so only PayMongo
-     * (not a random POST from anywhere) can mark an order as paid.
-     * https://developers.paymongo.com/docs/webhooks#verifying-webhook-signatures
-     */
     protected function hasValidSignature(Request $request): bool
     {
         $secret = config('services.paymongo.webhook_secret');
 
-        // No secret configured yet (pure local demo) — only allow outside production.
         if (blank($secret)) {
             return app()->environment(['local', 'testing']);
         }

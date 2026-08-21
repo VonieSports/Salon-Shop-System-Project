@@ -14,32 +14,43 @@ class AvailabilityService
 {
     public function eligibleEmployees(Post $post): Collection
     {
-        $assigned = $post->employees()->where('employees.is_active', true)->with('user:id,name,avatar')->get();
-
-        if ($assigned->isNotEmpty()) {
-            return $assigned;
+        // Check if employees are already loaded (avoids N+1)
+        if ($post->relationLoaded('employees')) {
+            return $post->employees
+                ->where('is_active', true)
+                ->filter(fn($emp) => $emp->user !== null)
+                ->values();
         }
 
-        return $post->inventory
-            ?->employees()
+        // Single query with eager loading
+        return $post->employees()
             ->where('employees.is_active', true)
-            ->with('user:id,name,avatar')
-            ->get() ?? collect();
+            ->whereHas('user')
+            ->with(['user:id,name,avatar'])
+            ->get();
     }
 
     public function employeeAvailability(Post $post, Carbon $date, ?Collection $employees = null): Collection
     {
         $employees = $employees ?? $this->eligibleEmployees($post);
-        if ($employees->isEmpty()) return collect();
+        if ($employees->isEmpty()) {
+            return collect();
+        }
 
-        $employeeIds = $employees->pluck('id');
+        $employeeIds = $employees->pluck('id')->toArray();
 
+        // Single query for all appointments
         $appointmentsByEmployee = Appointment::whereIn('employee_id', $employeeIds)
             ->whereDate('appointment_date', $date)
-            ->whereIn('status', [AppointmentStatus::QUEUED->value, AppointmentStatus::IN_PROGRESS->value])
+            ->whereIn('status', [
+                AppointmentStatus::QUEUED->value,
+                AppointmentStatus::IN_PROGRESS->value,
+            ])
+            ->select('employee_id', 'status', 'queue_number', 'id')
             ->get()
             ->groupBy('employee_id');
 
+        // Single query for all schedules
         $day = strtolower($date->format('l'));
         $schedulesByEmployee = Schedule::whereIn('employee_id', $employeeIds)
             ->where('day_of_week', $day)
@@ -48,9 +59,13 @@ class AvailabilityService
 
         $isOpen = $this->isTenantOpen($post->tenant, $date);
 
-        return $employees->map(function (Employee $employee) use ($appointmentsByEmployee, $schedulesByEmployee, $isOpen) {
+        return $employees->map(function (Employee $employee) use (
+            $appointmentsByEmployee,
+            $schedulesByEmployee,
+            $isOpen
+        ) {
             $queue = $appointmentsByEmployee->get($employee->id, collect());
-            $inProgress = $queue->firstWhere('status', AppointmentStatus::IN_PROGRESS);
+            $inProgress = $queue->firstWhere('status', AppointmentStatus::IN_PROGRESS->value);
 
             return [
                 'employee' => $employee,
@@ -64,9 +79,13 @@ class AvailabilityService
 
     protected function isTenantOpen($tenant, Carbon $date): bool
     {
+        if (!$tenant) {
+            return false;
+        }
+
         $hours = $tenant->getBusinessHours();
         $day = strtolower($date->format('l'));
 
         return !empty($hours[$day]) && !($hours[$day]['closed'] ?? false);
     }
-}
+};

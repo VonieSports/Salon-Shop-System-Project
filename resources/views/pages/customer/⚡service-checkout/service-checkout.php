@@ -1,5 +1,5 @@
 <?php
-//service checkout
+
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Customer;

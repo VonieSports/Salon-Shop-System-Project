@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->foreignId('service_id')->constrained('services')->cascadeOnDelete();
             $table->foreignId('post_id')->nullable()->constrained('posts')->nullOnDelete();
             $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
             $table->date('appointment_date');
@@ -27,7 +26,6 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-
             $table->unique(['employee_id', 'appointment_date', 'queue_number']);
             $table->index(['tenant_id', 'appointment_date']);
         });

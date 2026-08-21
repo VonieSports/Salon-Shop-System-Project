@@ -5,7 +5,7 @@
         <div class="flex items-center gap-3 flex-wrap">
             <span class="text-[#FFF7F9]/20 hidden md:inline">|</span>
             <span class="text-[#FFF7F9] text-[11px] tracking-[0.2em] uppercase font-medium hidden md:inline">Welcome to
-                Velvet & Co.</span>
+                Velvet </span>
             <a href="{{ route('owner.login.page') }}"
                 class="hover:text-[#FFF7F9] transition text-[#FFF7F9]/70 text-[11px] tracking-wide font-medium whitespace-nowrap flex items-center gap-1.5">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -22,13 +22,9 @@
                 </svg>
                 Become a Seller
             </a>
-            <span class="text-[#FFF7F9]/20 hidden md:inline">|</span>
-            <a href="#"
-                class="hover:text-[#FFF7F9] transition text-[#FFF7F9]/70 text-[11px] tracking-wide font-medium hidden md:inline whitespace-nowrap">Book
-                Appointment</a>
+         
         </div>
-
-        <!-- Right Side -->
+        
         <div class="flex items-center gap-4">
             <span class="text-[#FFF7F9]/40 text-[10px] tracking-[0.15em] uppercase font-medium hidden md:inline">Follow
                 us</span>
